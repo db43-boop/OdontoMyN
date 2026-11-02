@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel General - M&N Dental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800">
+    <div class="max-w-6xl mx-auto p-6">
+        <header class="flex justify-between items-center mb-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div>
+                <h1 class="text-2xl font-bold text-teal-800">Panel General - M&N</h1>
+                <p class="text-sm text-slate-500">Gestión de Historias Clínicas Odontológicas</p>
+            </div>
+            <a href="/nueva" class="bg-teal-700 hover:bg-teal-800 text-white font-medium px-5 py-2.5 rounded-xl shadow transition-colors flex items-center gap-2 text-sm">
+                <span>+ Nueva Historia Clínica</span>
+            </a>
+        </header>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <form method="GET" action="/dashboard" class="flex gap-4 mb-6">
+                <input type="text" name="q" value="{{ busqueda }}" placeholder="Buscar por Nombre o DNI del paciente..." class="flex-1 p-3 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-600 bg-slate-50">
+                <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white px-6 rounded-xl text-sm font-medium">Buscar</button>
+            </form>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50 text-slate-600 uppercase text-xs border-b">
+                        <tr>
+                            <th class="p-3">N° Historia</th>
+                            <th class="p-3">DNI</th>
+                            <th class="p-3">Nombre y Apellido</th>
+                            <th class="p-3">Teléfono</th>
+                            <th class="p-3">Fecha de Atención</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for h in historias %}
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-3 font-bold text-teal-700">#{{ h[1] }}</td>
+                            <td class="p-3 font-mono text-xs">{{ h[2] }}</td>
+                            <td class="p-3 font-medium">{{ h[3] }}</td>
+                            <td class="p-3">{{ h[4] }}</td>
+                            <td class="p-3 text-slate-500">{{ h[5] }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-8 text-slate-400">No hay historias clínicas registradas todavía.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
