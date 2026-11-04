@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="es">
 
@@ -44,6 +44,16 @@
         .modal li button:hover { background: #eff6ff; border-color: #2563eb; color: #2563eb; }
 
         .pieza-dentaria { cursor: pointer; }
+        #odontogram .tooth { cursor: pointer; }
+        #odontogram .tooth path { stroke: #000; stroke-width: 1.2; stroke-linejoin: round; stroke-linecap: round; }
+        #odontogram .tooth .tooth-shape { fill: #fff; }
+        #odontogram .tooth .detail { fill: none; }
+        #odontogram .tooth .dotted { fill: none; stroke-dasharray: 1.5 2; }
+        #odontogram .tooth text { font: bold 10px Arial, Helvetica, sans-serif; fill: #000; user-select: none; }
+        #odontogram .tooth:hover .tooth-shape { fill: #f1f5f9; }
+        #odontogram .tooth.selected .tooth-shape { fill: #bfdbfe; }
+        #odontogram .tooth.selected path { stroke: #1d4ed8; }
+        #odontogram .tooth.selected text { fill: #1d4ed8; }
 
         .tabs-container { display: flex; gap: 0; border-bottom: 2px solid #000000; margin-bottom: 1.5rem; }
 
@@ -127,7 +137,7 @@
 
                         <div class="flex items-center gap-2">
 
-                            <span class="text-xs font-bold uppercase">?  HISTORIA:</span>
+                            <span class="text-xs font-bold uppercase">N&deg;  HISTORIA:</span>
 
                             <input type="text" name="n_historia" value="{{ siguiente_n }}" readonly class="w-16 p-1 border border-slate-800 text-center font-bold text-sm bg-slate-50">
 
@@ -747,390 +757,522 @@
 
                         <div class="min-w-[850px] flex flex-col items-center gap-2">
 
-                            <div class="flex justify-center gap-1 w-full border-b border-slate-300 pb-1">
-
-                                {% for n in [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28] %}
-
-                                <input type="text" name="rec_sup2_{{n}}" maxlength="4" class="w-10 h-6 border border-slate-400 text-[10px] text-center font-bold uppercase bg-white outline-none">
-
-                                {% endfor %}
-
+                            {# Anotaciones superiores (alineadas con los dientes del grafico) #}
+                            <div class="w-full max-w-[800px] border-b border-slate-300 pb-1">
+                                <div class="relative w-full" style="height: 24px;">
+                                    {% for n in [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28] %}
+                                    {% set x = (255.5 - ((n % 10) - 1) * 31) if (n // 10) in [1,4,5,8] else (296.5 + ((n % 10) - 1) * 31) %}
+                                    <input type="text" name="rec_sup2_{{n}}" maxlength="4" style="left: {{ '%.3f'|format(x / 5.8) }}%; width: 4.828%;" class="absolute top-0 h-6 border border-slate-400 text-[10px] text-center font-bold uppercase bg-white outline-none">
+                                    {% endfor %}
+                                </div>
                             </div>
-
-                            <div class="flex justify-center gap-1 w-full pb-2">
-
-                                <div class="flex gap-1">
-
-                                    {% for n in [55,54,53,52,51] %}
-
-                                    <input type="text" name="rec_temp_sup_{{n}}" maxlength="4" class="w-9 h-6 border border-slate-400 text-[9px] text-center font-bold uppercase bg-white outline-none">
-
+                            <div class="w-full max-w-[800px] pb-2">
+                                <div class="relative w-full" style="height: 24px;">
+                                    {% for n in [55,54,53,52,51, 61,62,63,64,65] %}
+                                    {% set x = (255.5 - ((n % 10) - 1) * 31) if (n // 10) in [1,4,5,8] else (296.5 + ((n % 10) - 1) * 31) %}
+                                    <input type="text" name="rec_temp_sup_{{n}}" maxlength="4" style="left: {{ '%.3f'|format(x / 5.8) }}%; width: 4.828%;" class="absolute top-0 h-6 border border-slate-400 text-[9px] text-center font-bold uppercase bg-white outline-none">
                                     {% endfor %}
-
+                                <div class="absolute top-0 h-6 border-r-2 border-slate-800" style="left: 50%;"></div>
                                 </div>
-
-                                <div class="border-r-2 border-slate-800 h-6 mx-1"></div>
-
-                                <div class="flex gap-1">
-
-                                    {% for n in [61,62,63,64,65] %}
-
-                                    <input type="text" name="rec_temp_sup_{{n}}" maxlength="4" class="w-9 h-6 border border-slate-400 text-[9px] text-center font-bold uppercase bg-white outline-none">
-
-                                    {% endfor %}
-
-                                </div>
-
                             </div>
-
-                            {# FILA 1: adultos superiores #}
-
-                            <div class="flex items-center gap-1 border-b-2 border-slate-400 pb-3 w-full justify-center mb-1">
-
-                                <div class="flex gap-1">
-
-                                    {% for n in [18,17,16,15,14,13,12,11] %}
-
-                                    <div class="border border-slate-300 bg-white p-0.5 rounded text-center w-9">
-
-                                        <span class="text-[8px] font-bold text-amber-700 block">{{n}}</span>
-
-                                        <svg viewBox="0 0 30 40" class="w-7 h-9 mx-auto border border-dashed border-slate-300">
-
-                                            {% if n in [18,17,16,15] %}
-
-                                                <path d="M2,27 h26 v12 h-26 z M4,27 l6,-23 l6,23 l6,-23 l6,23" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                                <line x1="4" y1="33" x2="26" y2="33" stroke="#000000" stroke-width="1"/>
-
-                                                <line x1="15" y1="27" x2="15" y2="4" stroke="#000000" stroke-width="1"/>
-
-                                            {% elif n in [14,13] %}
-
-                                                <path d="M4,28 h22 v10 h-22 z M7,28 l8,-24 l8,24" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                            {% else %}
-
-                                                <path d="M4,28 h22 v10 h-22 z M7,28 l8,-24 l8,24" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                                <line x1="15" y1="28" x2="15" y2="4" stroke="#000000" stroke-width="1"/>
-
-                                            {% endif %}
-
-                                        </svg>
-
-                                    </div>
-
-                                    {% endfor %}
-
-                                </div>
-
-                                <div class="border-r-2 border-slate-800 h-12 mx-1"></div>
-
-                                <div class="flex gap-1">
-
-                                    {% for n in [21,22,23,24,25,26,27,28] %}
-
-                                    <div class="border border-slate-300 bg-white p-0.5 rounded text-center w-9">
-
-                                        <span class="text-[8px] font-bold text-amber-700 block">{{n}}</span>
-
-                                        <svg viewBox="0 0 30 40" class="w-7 h-9 mx-auto border border-dashed border-slate-300">
-
-                                            {% if n in [25,26,27,28] %}
-
-                                                <path d="M2,27 h26 v12 h-26 z M4,27 l6,-23 l6,23 l6,-23 l6,23" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                                <line x1="4" y1="33" x2="26" y2="33" stroke="#000000" stroke-width="1"/>
-
-                                                <line x1="15" y1="27" x2="15" y2="4" stroke="#000000" stroke-width="1"/>
-
-                                            {% elif n in [23,24] %}
-
-                                                <path d="M4,28 h22 v10 h-22 z M7,28 l8,-24 l8,24" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                            {% else %}
-
-                                                <path d="M4,28 h22 v10 h-22 z M7,28 l8,-24 l8,24" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                                <line x1="15" y1="28" x2="15" y2="4" stroke="#000000" stroke-width="1"/>
-
-                                            {% endif %}
-
-                                        </svg>
-
-                                    </div>
-
-                                    {% endfor %}
-
-                                </div>
-
+                            {# Grafico del odontograma (SVG) #}
+                            <div class="w-full max-w-[800px]">
+                            <svg id="odontogram" viewBox="0 0 580 410" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto" role="img" aria-label="Odontograma">
+                                <line x1="290" y1="0" x2="290" y2="410" stroke="#000" stroke-width="3"/>
+                                <line x1="126" y1="208" x2="470" y2="208" stroke="#000" stroke-width="1.5"/>
+                                <g id="tooth-11" data-tooth="11" class="tooth">
+                                <g transform="translate(255.5 30)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M5 59 L9 53 L19 53 L23 59 L19 66 L9 66 Z"/>
+                                </g>
+                                <text x="269.5" y="22" text-anchor="middle">11</text>
+                                </g>
+                                <g id="tooth-12" data-tooth="12" class="tooth">
+                                <g transform="translate(224.5 30)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M5 59 L9 53 L19 53 L23 59 L19 66 L9 66 Z"/>
+                                </g>
+                                <text x="238.5" y="22" text-anchor="middle">12</text>
+                                </g>
+                                <g id="tooth-13" data-tooth="13" class="tooth">
+                                <g transform="translate(193.5 30)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M4 60 L9 53 L19 53 L24 60 L14 69 Z"/>
+                                </g>
+                                <text x="207.5" y="22" text-anchor="middle">13</text>
+                                </g>
+                                <g id="tooth-14" data-tooth="14" class="tooth">
+                                <g transform="translate(162.5 30)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M6 56 Q14 53 22 56 L22 66 Q14 69 6 66 Z"/>
+                                <path class="detail" d="M6 59.5 H22"/>
+                                <path class="detail" d="M6 62.5 H22"/>
+                                <path class="dotted" d="M19 50 L25 10 L28 50"/>
+                                </g>
+                                <text x="176.5" y="22" text-anchor="middle">14</text>
+                                </g>
+                                <g id="tooth-15" data-tooth="15" class="tooth">
+                                <g transform="translate(131.5 30)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M6 56 Q14 53 22 56 L22 66 Q14 69 6 66 Z"/>
+                                <path class="detail" d="M6 59.5 H22"/>
+                                <path class="detail" d="M6 62.5 H22"/>
+                                </g>
+                                <text x="145.5" y="22" text-anchor="middle">15</text>
+                                </g>
+                                <g id="tooth-16" data-tooth="16" class="tooth">
+                                <g transform="translate(100.5 30)">
+                                <path class="tooth-shape" d="M2 52 L3 2 L10 27 L14 2 L18 27 L25 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="114.5" y="22" text-anchor="middle">16</text>
+                                </g>
+                                <g id="tooth-17" data-tooth="17" class="tooth">
+                                <g transform="translate(69.5 30)">
+                                <path class="tooth-shape" d="M2 52 L3 2 L10 27 L14 2 L18 27 L25 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="83.5" y="22" text-anchor="middle">17</text>
+                                </g>
+                                <g id="tooth-18" data-tooth="18" class="tooth">
+                                <g transform="translate(38.5 30)">
+                                <path class="tooth-shape" d="M2 52 L3 2 L10 27 L14 2 L18 27 L25 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="52.5" y="22" text-anchor="middle">18</text>
+                                </g>
+                                <g id="tooth-21" data-tooth="21" class="tooth">
+                                <g transform="translate(296.5 30)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M5 59 L9 53 L19 53 L23 59 L19 66 L9 66 Z"/>
+                                </g>
+                                <text x="310.5" y="22" text-anchor="middle">21</text>
+                                </g>
+                                <g id="tooth-22" data-tooth="22" class="tooth">
+                                <g transform="translate(327.5 30)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M5 59 L9 53 L19 53 L23 59 L19 66 L9 66 Z"/>
+                                </g>
+                                <text x="341.5" y="22" text-anchor="middle">22</text>
+                                </g>
+                                <g id="tooth-23" data-tooth="23" class="tooth">
+                                <g transform="translate(358.5 30)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M4 60 L9 53 L19 53 L24 60 L14 69 Z"/>
+                                </g>
+                                <text x="372.5" y="22" text-anchor="middle">23</text>
+                                </g>
+                                <g id="tooth-24" data-tooth="24" class="tooth">
+                                <g transform="translate(389.5 30)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M6 56 Q14 53 22 56 L22 66 Q14 69 6 66 Z"/>
+                                <path class="detail" d="M6 59.5 H22"/>
+                                <path class="detail" d="M6 62.5 H22"/>
+                                <path class="dotted" d="M19 50 L25 10 L28 50"/>
+                                </g>
+                                <text x="403.5" y="22" text-anchor="middle">24</text>
+                                </g>
+                                <g id="tooth-25" data-tooth="25" class="tooth">
+                                <g transform="translate(420.5 30)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M6 56 Q14 53 22 56 L22 66 Q14 69 6 66 Z"/>
+                                <path class="detail" d="M6 59.5 H22"/>
+                                <path class="detail" d="M6 62.5 H22"/>
+                                </g>
+                                <text x="434.5" y="22" text-anchor="middle">25</text>
+                                </g>
+                                <g id="tooth-26" data-tooth="26" class="tooth">
+                                <g transform="translate(451.5 30)">
+                                <path class="tooth-shape" d="M2 52 L3 2 L10 27 L14 2 L18 27 L25 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="465.5" y="22" text-anchor="middle">26</text>
+                                </g>
+                                <g id="tooth-27" data-tooth="27" class="tooth">
+                                <g transform="translate(482.5 30)">
+                                <path class="tooth-shape" d="M2 52 L3 2 L10 27 L14 2 L18 27 L25 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="496.5" y="22" text-anchor="middle">27</text>
+                                </g>
+                                <g id="tooth-28" data-tooth="28" class="tooth">
+                                <g transform="translate(513.5 30)">
+                                <path class="tooth-shape" d="M2 52 L3 2 L10 27 L14 2 L18 27 L25 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="527.5" y="22" text-anchor="middle">28</text>
+                                </g>
+                                <g id="tooth-51" data-tooth="51" class="tooth">
+                                <g transform="translate(255.5 100)">
+                                <path class="tooth-shape" d="M2 52 Q7 38 14 18 Q21 38 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M5 59 L9 53 L19 53 L23 59 L19 66 L9 66 Z"/>
+                                </g>
+                                <text x="269.5" y="190" text-anchor="middle">51</text>
+                                </g>
+                                <g id="tooth-52" data-tooth="52" class="tooth">
+                                <g transform="translate(224.5 100)">
+                                <path class="tooth-shape" d="M2 52 Q7 38 14 18 Q21 38 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M5 59 L9 53 L19 53 L23 59 L19 66 L9 66 Z"/>
+                                </g>
+                                <text x="238.5" y="190" text-anchor="middle">52</text>
+                                </g>
+                                <g id="tooth-53" data-tooth="53" class="tooth">
+                                <g transform="translate(193.5 100)">
+                                <path class="tooth-shape" d="M2 52 Q7 38 14 18 Q21 38 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M4 60 L9 53 L19 53 L24 60 L14 69 Z"/>
+                                </g>
+                                <text x="207.5" y="190" text-anchor="middle">53</text>
+                                </g>
+                                <g id="tooth-54" data-tooth="54" class="tooth">
+                                <g transform="translate(162.5 100)">
+                                <path class="tooth-shape" d="M2 52 L3 18 L10 35 L14 18 L18 35 L25 18 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="176.5" y="190" text-anchor="middle">54</text>
+                                </g>
+                                <g id="tooth-55" data-tooth="55" class="tooth">
+                                <g transform="translate(131.5 100)">
+                                <path class="tooth-shape" d="M2 52 L3 18 L10 35 L14 18 L18 35 L25 18 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="145.5" y="190" text-anchor="middle">55</text>
+                                </g>
+                                <g id="tooth-61" data-tooth="61" class="tooth">
+                                <g transform="translate(296.5 100)">
+                                <path class="tooth-shape" d="M2 52 Q7 38 14 18 Q21 38 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M5 59 L9 53 L19 53 L23 59 L19 66 L9 66 Z"/>
+                                </g>
+                                <text x="310.5" y="190" text-anchor="middle">61</text>
+                                </g>
+                                <g id="tooth-62" data-tooth="62" class="tooth">
+                                <g transform="translate(327.5 100)">
+                                <path class="tooth-shape" d="M2 52 Q7 38 14 18 Q21 38 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M5 59 L9 53 L19 53 L23 59 L19 66 L9 66 Z"/>
+                                </g>
+                                <text x="341.5" y="190" text-anchor="middle">62</text>
+                                </g>
+                                <g id="tooth-63" data-tooth="63" class="tooth">
+                                <g transform="translate(358.5 100)">
+                                <path class="tooth-shape" d="M2 52 Q7 38 14 18 Q21 38 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M4 60 L9 53 L19 53 L24 60 L14 69 Z"/>
+                                </g>
+                                <text x="372.5" y="190" text-anchor="middle">63</text>
+                                </g>
+                                <g id="tooth-64" data-tooth="64" class="tooth">
+                                <g transform="translate(389.5 100)">
+                                <path class="tooth-shape" d="M2 52 L3 18 L10 35 L14 18 L18 35 L25 18 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="403.5" y="190" text-anchor="middle">64</text>
+                                </g>
+                                <g id="tooth-65" data-tooth="65" class="tooth">
+                                <g transform="translate(420.5 100)">
+                                <path class="tooth-shape" d="M2 52 L3 18 L10 35 L14 18 L18 35 L25 18 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="434.5" y="190" text-anchor="middle">65</text>
+                                </g>
+                                <g id="tooth-81" data-tooth="81" class="tooth">
+                                <g transform="translate(255.5 306) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 Q7 38 14 18 Q21 38 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M5 59 L9 53 L19 53 L23 59 L19 66 L9 66 Z"/>
+                                </g>
+                                <text x="269.5" y="226" text-anchor="middle">81</text>
+                                </g>
+                                <g id="tooth-82" data-tooth="82" class="tooth">
+                                <g transform="translate(224.5 306) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 Q7 38 14 18 Q21 38 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M5 59 L9 53 L19 53 L23 59 L19 66 L9 66 Z"/>
+                                </g>
+                                <text x="238.5" y="226" text-anchor="middle">82</text>
+                                </g>
+                                <g id="tooth-83" data-tooth="83" class="tooth">
+                                <g transform="translate(193.5 306) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 Q7 38 14 18 Q21 38 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M4 60 L9 53 L19 53 L24 60 L14 69 Z"/>
+                                </g>
+                                <text x="207.5" y="226" text-anchor="middle">83</text>
+                                </g>
+                                <g id="tooth-84" data-tooth="84" class="tooth">
+                                <g transform="translate(162.5 306) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 L5 18 L14 35 L23 18 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="176.5" y="226" text-anchor="middle">84</text>
+                                </g>
+                                <g id="tooth-85" data-tooth="85" class="tooth">
+                                <g transform="translate(131.5 306) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 L5 18 L14 35 L23 18 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="145.5" y="226" text-anchor="middle">85</text>
+                                </g>
+                                <g id="tooth-71" data-tooth="71" class="tooth">
+                                <g transform="translate(296.5 306) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 Q7 38 14 18 Q21 38 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M5 59 L9 53 L19 53 L23 59 L19 66 L9 66 Z"/>
+                                </g>
+                                <text x="310.5" y="226" text-anchor="middle">71</text>
+                                </g>
+                                <g id="tooth-72" data-tooth="72" class="tooth">
+                                <g transform="translate(327.5 306) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 Q7 38 14 18 Q21 38 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M5 59 L9 53 L19 53 L23 59 L19 66 L9 66 Z"/>
+                                </g>
+                                <text x="341.5" y="226" text-anchor="middle">72</text>
+                                </g>
+                                <g id="tooth-73" data-tooth="73" class="tooth">
+                                <g transform="translate(358.5 306) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 Q7 38 14 18 Q21 38 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M4 60 L9 53 L19 53 L24 60 L14 69 Z"/>
+                                </g>
+                                <text x="372.5" y="226" text-anchor="middle">73</text>
+                                </g>
+                                <g id="tooth-74" data-tooth="74" class="tooth">
+                                <g transform="translate(389.5 306) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 L5 18 L14 35 L23 18 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="403.5" y="226" text-anchor="middle">74</text>
+                                </g>
+                                <g id="tooth-75" data-tooth="75" class="tooth">
+                                <g transform="translate(420.5 306) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 L5 18 L14 35 L23 18 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="434.5" y="226" text-anchor="middle">75</text>
+                                </g>
+                                <g id="tooth-41" data-tooth="41" class="tooth">
+                                <g transform="translate(255.5 379) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M5 59 L9 53 L19 53 L23 59 L19 66 L9 66 Z"/>
+                                </g>
+                                <text x="269.5" y="398" text-anchor="middle">41</text>
+                                </g>
+                                <g id="tooth-42" data-tooth="42" class="tooth">
+                                <g transform="translate(224.5 379) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M5 59 L9 53 L19 53 L23 59 L19 66 L9 66 Z"/>
+                                </g>
+                                <text x="238.5" y="398" text-anchor="middle">42</text>
+                                </g>
+                                <g id="tooth-43" data-tooth="43" class="tooth">
+                                <g transform="translate(193.5 379) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M4 60 L9 53 L19 53 L24 60 L14 69 Z"/>
+                                </g>
+                                <text x="207.5" y="398" text-anchor="middle">43</text>
+                                </g>
+                                <g id="tooth-44" data-tooth="44" class="tooth">
+                                <g transform="translate(162.5 379) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M6 56 Q14 53 22 56 L22 66 Q14 69 6 66 Z"/>
+                                <path class="detail" d="M6 59.5 H22"/>
+                                <path class="detail" d="M6 62.5 H22"/>
+                                </g>
+                                <text x="176.5" y="398" text-anchor="middle">44</text>
+                                </g>
+                                <g id="tooth-45" data-tooth="45" class="tooth">
+                                <g transform="translate(131.5 379) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M6 56 Q14 53 22 56 L22 66 Q14 69 6 66 Z"/>
+                                <path class="detail" d="M6 59.5 H22"/>
+                                <path class="detail" d="M6 62.5 H22"/>
+                                </g>
+                                <text x="145.5" y="398" text-anchor="middle">45</text>
+                                </g>
+                                <g id="tooth-46" data-tooth="46" class="tooth">
+                                <g transform="translate(100.5 379) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 L5 2 L14 27 L23 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="114.5" y="398" text-anchor="middle">46</text>
+                                </g>
+                                <g id="tooth-47" data-tooth="47" class="tooth">
+                                <g transform="translate(69.5 379) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 L5 2 L14 27 L23 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="83.5" y="398" text-anchor="middle">47</text>
+                                </g>
+                                <g id="tooth-48" data-tooth="48" class="tooth">
+                                <g transform="translate(38.5 379) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 L5 2 L14 27 L23 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="52.5" y="398" text-anchor="middle">48</text>
+                                </g>
+                                <g id="tooth-31" data-tooth="31" class="tooth">
+                                <g transform="translate(296.5 379) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M5 59 L9 53 L19 53 L23 59 L19 66 L9 66 Z"/>
+                                </g>
+                                <text x="310.5" y="398" text-anchor="middle">31</text>
+                                </g>
+                                <g id="tooth-32" data-tooth="32" class="tooth">
+                                <g transform="translate(327.5 379) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M5 59 L9 53 L19 53 L23 59 L19 66 L9 66 Z"/>
+                                </g>
+                                <text x="341.5" y="398" text-anchor="middle">32</text>
+                                </g>
+                                <g id="tooth-33" data-tooth="33" class="tooth">
+                                <g transform="translate(358.5 379) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M4 60 L9 53 L19 53 L24 60 L14 69 Z"/>
+                                </g>
+                                <text x="372.5" y="398" text-anchor="middle">33</text>
+                                </g>
+                                <g id="tooth-34" data-tooth="34" class="tooth">
+                                <g transform="translate(389.5 379) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M6 56 Q14 53 22 56 L22 66 Q14 69 6 66 Z"/>
+                                <path class="detail" d="M6 59.5 H22"/>
+                                <path class="detail" d="M6 62.5 H22"/>
+                                </g>
+                                <text x="403.5" y="398" text-anchor="middle">34</text>
+                                </g>
+                                <g id="tooth-35" data-tooth="35" class="tooth">
+                                <g transform="translate(420.5 379) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 Q7 22 14 2 Q21 22 26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M6 56 Q14 53 22 56 L22 66 Q14 69 6 66 Z"/>
+                                <path class="detail" d="M6 59.5 H22"/>
+                                <path class="detail" d="M6 62.5 H22"/>
+                                </g>
+                                <text x="434.5" y="398" text-anchor="middle">35</text>
+                                </g>
+                                <g id="tooth-36" data-tooth="36" class="tooth">
+                                <g transform="translate(451.5 379) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 L5 2 L14 27 L23 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="465.5" y="398" text-anchor="middle">36</text>
+                                </g>
+                                <g id="tooth-37" data-tooth="37" class="tooth">
+                                <g transform="translate(482.5 379) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 L5 2 L14 27 L23 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="496.5" y="398" text-anchor="middle">37</text>
+                                </g>
+                                <g id="tooth-38" data-tooth="38" class="tooth">
+                                <g transform="translate(513.5 379) scale(1 -1)">
+                                <path class="tooth-shape" d="M2 52 L5 2 L14 27 L23 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
+                                <path class="detail" d="M2 52 Q14 47 26 52"/>
+                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
+                                <path class="detail" d="M7 61 H21"/>
+                                <path class="detail" d="M14 55 V67"/>
+                                </g>
+                                <text x="527.5" y="398" text-anchor="middle">38</text>
+                                </g>
+                            </svg>
                             </div>
-
-                            {# FILA 2: temporales superiores #}
-
-                            <div class="flex items-center gap-1 border-b-2 border-slate-400 pb-3 w-full justify-center mb-1">
-
-                                <div class="flex gap-1">
-
-                                    {% for n in [55,54,53,52,51] %}
-
-                                    <div class="border border-slate-300 bg-white p-0.5 rounded text-center w-9">
-
-                                        <span class="text-[8px] font-bold text-amber-700 block">{{n}}</span>
-
-                                        <svg viewBox="0 0 30 40" class="w-7 h-9 mx-auto border border-dashed border-slate-300">
-
-                                            {% if n == 55 %}
-
-                                                <path d="M3,27 h24 v11 h-24 z M5,27 l6,-21 l6,21 l6,-21 l6,21" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                            {% elif n in [54,53] %}
-
-                                                <path d="M5,28 h20 v10 h-20 z M8,28 l7,-22 l7,22" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                            {% else %}
-
-                                                <path d="M5,28 h20 v10 h-20 z M8,28 l7,-22 l7,22" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                                <line x1="15" y1="28" x2="15" y2="8" stroke="#000000" stroke-width="1"/>
-
-                                            {% endif %}
-
-                                        </svg>
-
-                                    </div>
-
+                            {# Anotaciones inferiores (alineadas con los dientes del grafico) #}
+                            <div class="w-full max-w-[800px] border-t border-slate-300 pt-2">
+                                <div class="relative w-full" style="height: 24px;">
+                                    {% for n in [85,84,83,82,81, 71,72,73,74,75] %}
+                                    {% set x = (255.5 - ((n % 10) - 1) * 31) if (n // 10) in [1,4,5,8] else (296.5 + ((n % 10) - 1) * 31) %}
+                                    <input type="text" name="rec_temp_inf_{{n}}" maxlength="4" style="left: {{ '%.3f'|format(x / 5.8) }}%; width: 4.828%;" class="absolute top-0 h-6 border border-slate-400 text-[9px] text-center font-bold uppercase bg-white outline-none">
                                     {% endfor %}
-
+                                <div class="absolute top-0 h-6 border-r-2 border-slate-800" style="left: 50%;"></div>
                                 </div>
-
-                                <div class="border-r-2 border-slate-800 h-12 mx-1"></div>
-
-                                <div class="flex gap-1">
-
-                                    {% for n in [61,62,63,64,65] %}
-
-                                    <div class="border border-slate-300 bg-white p-0.5 rounded text-center w-9">
-
-                                        <span class="text-[8px] font-bold text-amber-700 block">{{n}}</span>
-
-                                        <svg viewBox="0 0 30 40" class="w-7 h-9 mx-auto border border-dashed border-slate-300">
-
-                                            {% if n == 65 %}
-
-                                                <path d="M3,27 h24 v11 h-24 z M5,27 l6,-21 l6,21 l6,-21 l6,21" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                            {% else %}
-
-                                                <path d="M5,28 h20 v10 h-20 z M8,28 l7,-22 l7,22" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                            {% endif %}
-
-                                        </svg>
-
-                                    </div>
-
-                                    {% endfor %}
-
-                                </div>
-
                             </div>
-
-                            {# FILA 3: temporales inferiores #}
-
-                            <div class="flex items-center gap-1 border-b-2 border-slate-400 pb-3 w-full justify-center mb-1">
-
-                                <div class="flex gap-1">
-
-                                    {% for n in [71,72,73,74,75] %}
-
-                                    <div class="border border-slate-300 bg-white p-0.5 rounded text-center w-9">
-
-                                        <span class="text-[8px] font-bold text-amber-700 block">{{n}}</span>
-
-                                        <svg viewBox="0 0 30 40" class="w-7 h-9 mx-auto border border-dashed border-slate-300">
-
-                                            {% if n == 75 %}
-
-                                                <path d="M3,2 h24 v11 h-24 z M5,13 l6,21 l6,-21 l6,21 l6,-21" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                                <line x1="5" y1="7" x2="25" y2="7" stroke="#000000" stroke-width="1"/>
-
-                                                <line x1="15" y1="2" x2="15" y2="13" stroke="#000000" stroke-width="1"/>
-
-                                            {% elif n in [72,73] %}
-
-                                                <path d="M5,2 h20 v10 h-20 z M8,12 l7,22 l7,-22" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                                <line x1="15" y1="2" x2="15" y2="12" stroke="#000000" stroke-width="1"/>
-
-                                            {% else %}
-
-                                                <path d="M5,2 h20 v10 h-20 z M8,12 l7,22 l7,-22" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                            {% endif %}
-
-                                        </svg>
-
-                                    </div>
-
+                            <div class="w-full max-w-[800px] border-t border-slate-300 pt-1">
+                                <div class="relative w-full" style="height: 24px;">
+                                    {% for n in [48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38] %}
+                                    {% set x = (255.5 - ((n % 10) - 1) * 31) if (n // 10) in [1,4,5,8] else (296.5 + ((n % 10) - 1) * 31) %}
+                                    <input type="text" name="rec_inf2_{{n}}" maxlength="4" style="left: {{ '%.3f'|format(x / 5.8) }}%; width: 4.828%;" class="absolute top-0 h-6 border border-slate-400 text-[10px] text-center font-bold uppercase bg-white outline-none">
                                     {% endfor %}
-
                                 </div>
-
-                                <div class="border-r-2 border-slate-800 h-12 mx-1"></div>
-
-                                <div class="flex gap-1">
-
-                                    {% for n in [81,82,83,84,85] %}
-
-                                    <div class="border border-slate-300 bg-white p-0.5 rounded text-center w-9">
-
-                                        <span class="text-[8px] font-bold text-amber-700 block">{{n}}</span>
-
-                                        <svg viewBox="0 0 30 40" class="w-7 h-9 mx-auto border border-dashed border-slate-300">
-
-                                            {% if n == 85 %}
-
-                                                <path d="M3,2 h24 v11 h-24 z M5,13 l6,21 l6,-21 l6,21 l6,-21" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                                <line x1="5" y1="7" x2="25" y2="7" stroke="#000000" stroke-width="1"/>
-
-                                                <line x1="15" y1="2" x2="15" y2="13" stroke="#000000" stroke-width="1"/>
-
-                                            {% elif n in [82,83] %}
-
-                                                <path d="M5,2 h20 v10 h-20 z M8,12 l7,22 l7,-22" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                                <line x1="15" y1="2" x2="15" y2="12" stroke="#000000" stroke-width="1"/>
-
-                                            {% else %}
-
-                                                <path d="M5,2 h20 v10 h-20 z M8,12 l7,22 l7,-22" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                            {% endif %}
-
-                                        </svg>
-
-                                    </div>
-
-                                    {% endfor %}
-
-                                </div>
-
-                            </div>
-
-                            {# FILA 4: adultos inferiores #}
-
-                            <div class="flex items-center gap-1 pt-1 w-full justify-center">
-
-                                <div class="flex gap-1">
-
-                                    {% for n in [48,47,46,45,44,43,42,41] %}
-
-                                    <div class="border border-slate-300 bg-white p-0.5 rounded text-center w-9">
-
-                                        <span class="text-[8px] font-bold text-amber-700 block">{{n}}</span>
-
-                                        <svg viewBox="0 0 30 40" class="w-7 h-9 mx-auto border border-dashed border-slate-300">
-
-                                            {% if n in [48,47,46,45] %}
-
-                                                <path d="M2,2 h26 v13 h-26 z M4,15 l6,23 l6,-23 l6,23 l6,-23" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                                <line x1="4" y1="7" x2="26" y2="7" stroke="#000000" stroke-width="1"/>
-
-                                                <line x1="15" y1="2" x2="15" y2="15" stroke="#000000" stroke-width="1"/>
-
-                                            {% else %}
-
-                                                <path d="M4,2 h22 v11 h-22 z M7,13 l8,24 l8,-24" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                                <line x1="15" y1="2" x2="15" y2="13" stroke="#000000" stroke-width="1"/>
-
-                                            {% endif %}
-
-                                        </svg>
-
-                                    </div>
-
-                                    {% endfor %}
-
-                                </div>
-
-                                <div class="border-r-2 border-slate-800 h-12 mx-1"></div>
-
-                                <div class="flex gap-1">
-
-                                    {% for n in [31,32,33,34,35,36,37,38] %}
-
-                                    <div class="border border-slate-300 bg-white p-0.5 rounded text-center w-9">
-
-                                        <span class="text-[8px] font-bold text-amber-700 block">{{n}}</span>
-
-                                        <svg viewBox="0 0 30 40" class="w-7 h-9 mx-auto border border-dashed border-slate-300">
-
-                                            {% if n in [35,36,37,38] %}
-
-                                                <path d="M2,2 h26 v13 h-26 z M4,15 l6,23 l6,-23 l6,23 l6,-23" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                                <line x1="4" y1="7" x2="26" y2="7" stroke="#000000" stroke-width="1"/>
-
-                                                <line x1="15" y1="2" x2="15" y2="15" stroke="#000000" stroke-width="1"/>
-
-                                            {% else %}
-
-                                                <path d="M4,2 h22 v11 h-22 z M7,13 l8,24 l8,-24" fill="none" stroke="#000000" stroke-width="1.2"/>
-
-                                                <line x1="15" y1="2" x2="15" y2="13" stroke="#000000" stroke-width="1"/>
-
-                                            {% endif %}
-
-                                        </svg>
-
-                                    </div>
-
-                                    {% endfor %}
-
-                                </div>
-
-                            </div>
-
-                            <div class="flex justify-center gap-1 w-full pt-2 border-t border-slate-300 pt-1">
-
-                                <div class="flex gap-1">
-
-                                    {% for n in [85,84,83,82,81] %}
-
-                                    <input type="text" name="rec_temp_inf_{{n}}" maxlength="4" class="w-9 h-6 border border-slate-400 text-[9px] text-center font-bold uppercase bg-white outline-none">
-
-                                    {% endfor %}
-
-                                </div>
-
-                                <div class="border-r-2 border-slate-800 h-6 mx-1"></div>
-
-                                <div class="flex gap-1">
-
-                                    {% for n in [71,72,73,74,75] %}
-
-                                    <input type="text" name="rec_temp_inf_{{n}}" maxlength="4" class="w-9 h-6 border border-slate-400 text-[9px] text-center font-bold uppercase bg-white outline-none">
-
-                                    {% endfor %}
-
-                                </div>
-
-                            </div>
-
-                            <div class="flex justify-center gap-1 w-full border-t border-slate-300 pt-1">
-
-                                {% for n in [48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38] %}
-
-                                <input type="text" name="rec_inf2_{{n}}" maxlength="4" class="w-10 h-6 border border-slate-400 text-[10px] text-center font-bold uppercase bg-white outline-none">
-
-                                {% endfor %}
-
                             </div>
 
                         </div>
@@ -1517,28 +1659,27 @@
 
             if (op.codigo === "1.8") {
 
-                const svg = elemento.querySelector('svg');
-
-                if (svg) {
-
-                    svg.querySelectorAll('.marca-ausente').forEach(p => p.remove());
-
+                const grupoDiente = elemento.querySelector('g');
+                if (grupoDiente) {
+                    grupoDiente.querySelectorAll('.marca-ausente').forEach(p => p.remove());
+                    let bb = { x: 2, y: 2, width: 24, height: 71 };
+                    try {
+                        const forma = grupoDiente.querySelector('.tooth-shape');
+                        const medida = forma ? forma.getBBox() : null;
+                        if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+                    } catch (err) {}
                     const x = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-
                     x.setAttribute('class', 'marca-ausente');
-
-                    x.setAttribute('d', 'M6,6 L24,24 M24,6 L6,24');
-
+                    x.setAttribute('d', `M${bb.x + 1},${bb.y + 1} L${bb.x + bb.width - 1},${bb.y + bb.height - 1} M${bb.x + bb.width - 1},${bb.y + 1} L${bb.x + 1},${bb.y + bb.height - 1}`);
                     x.setAttribute('stroke', '#2563eb');
-
                     x.setAttribute('stroke-width', '2.5');
-
                     x.setAttribute('fill', 'none');
-
                     x.setAttribute('stroke-linecap', 'round');
-
-                    svg.appendChild(x);
-
+                    x.style.stroke = '#2563eb';
+                    x.style.strokeWidth = '2.5';
+                    x.style.fill = 'none';
+                    x.style.strokeLinecap = 'round';
+                    grupoDiente.appendChild(x);
                 }
 
             } else if (op.codigo === "1.9") {
@@ -1563,46 +1704,22 @@
 
         }
 
-        document.querySelectorAll('.border.border-slate-300.bg-white.rounded.text-center').forEach(div => {
-
-            const span = div.querySelector('span');
-
-            const svg = div.querySelector('svg');
-
-            if (span && svg) {
-
-                const num = span.textContent.trim();
-
-                const n = parseInt(num, 10);
-
-                let tipo = '';
-
-                if (!isNaN(n)) {
-
-                    if (n >= 11 && n <= 28) tipo = 'adulto-sup';
-
-                    else if (n >= 51 && n <= 65) tipo = 'temp-sup';
-
-                    else if (n >= 71 && n <= 85) tipo = 'temp-inf';
-
-                    else if (n >= 31 && n <= 48) tipo = 'adulto-inf';
-
-                }
-
-                if (tipo) {
-
-                    div.dataset.diente = num;
-
-                    div.dataset.tipo = tipo;
-
-                    div.classList.add('pieza-dentaria');
-
-                    div.addEventListener('click', () => abrirModal(num, tipo, div));
-
-                }
-
+        document.querySelectorAll('#odontogram .tooth').forEach(el => {
+            const num = (el.dataset.tooth || '').trim();
+            const n = parseInt(num, 10);
+            let tipo = '';
+            if (!isNaN(n)) {
+                if (n >= 11 && n <= 28) tipo = 'adulto-sup';
+                else if (n >= 51 && n <= 65) tipo = 'temp-sup';
+                else if (n >= 71 && n <= 85) tipo = 'temp-inf';
+                else if (n >= 31 && n <= 48) tipo = 'adulto-inf';
             }
-
+            if (tipo) {
+                el.dataset.diente = num;
+                el.dataset.tipo = tipo;
+                el.classList.add('pieza-dentaria');
+                el.addEventListener('click', () => abrirModal(num, tipo, el));
+            }
         });
 
         document.getElementById('cerrarModal')?.addEventListener('click', cerrarModal);
@@ -1878,6 +1995,5 @@
 </body>
 
 </html>
-
 
 
