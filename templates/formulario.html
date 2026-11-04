@@ -1,868 +1,1883 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
+
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
+
     <title>Nueva Historia Clinica - M&N Dental</title>
+
     <link rel="icon" href="/static/favicon.ico?v=2" type="image/x-icon">
+
     <link rel="shortcut icon" href="/static/favicon.ico?v=2" type="image/x-icon">
+
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
+
         .radio-x { appearance: none; -webkit-appearance: none; width: 1.25rem; height: 1.25rem; border: 1px solid #8b92a3; background-color: #fff; display: grid; place-content: center; cursor: pointer; border-radius: 2px; }
+
         .radio-x::before { content: "X"; font-size: 0.85rem; font-weight: bold; color: #3b82f6; transform: scale(0); transition: 100ms transform ease-in-out; }
+
         .radio-x:checked::before { transform: scale(1); }
+
         .table-paper th, .table-paper td { border: 1px solid #8b92a3; padding: 4px; }
+
         .una-casilla { appearance: none; -webkit-appearance: none; width: 1.25rem; height: 1.25rem; border: 1px solid #8b92a3; background-color: #fff; border-radius: 0; cursor: pointer; display: grid; place-content: center; font-weight: bold; color: transparent; }
+
         .una-casilla:checked { color: #3b82f6; }
+
         .una-casilla:checked::before { content: "X"; color: #3b82f6; }
+
         .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); display: none; justify-content: center; align-items: center; z-index: 60; backdrop-filter: blur(2px); }
+
         .modal { background: #fff; border-radius: 0.75rem; padding: 1.5rem; max-width: 24rem; width: 100%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); border: 1px solid #000000; position: relative; }
+@media (min-width: 1024px) { .modal { max-width: 1200px; } }
+
         .modal h3 { margin-bottom: 1rem; font-size: 1.125rem; font-weight: 700; }
+
         .modal ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; max-height: 24rem; overflow-y: auto; }
+
         .modal li button { width: 100%; text-align: left; padding: 0.5rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; background: #fff; font-size: 0.875rem; cursor: pointer; transition: all 0.1s; }
+
         .modal li button:hover { background: #eff6ff; border-color: #2563eb; color: #2563eb; }
+
         .pieza-dentaria { cursor: pointer; }
+
         .tabs-container { display: flex; gap: 0; border-bottom: 2px solid #000000; margin-bottom: 1.5rem; }
+
         .tab-btn { padding: 0.75rem 1.5rem; font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s ease; border-bottom: 2px solid transparent; color: #64748b; background: #f8fafc; }
+
         .tab-btn:hover { color: #0f766e; background: #f0fdfa; }
+
         .tab-btn.active { color: #0f766e; background: #ffffff; border-bottom: 2px solid #0f766e; }
+
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
+
         .tab-content.active { display: block; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
         @media print {
+
             body { background: #ffffff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
             .no-print, .tabs-container, .no-print-btn, .modal-overlay, .no-print * { display: none !important; }
+
             .tab-content { display: block !important; visibility: visible !important; opacity: 1 !important; }
+
             .tab-content > * { break-inside: avoid; }
+
             .table-paper { break-inside: auto; }
+
             .table-paper tr { break-inside: avoid; }
+
             .max-w-5xl { max-width: none !important; margin: 0 !important; padding: 0 !important; border: none !important; box-shadow: none !important; background: white !important; }
+
         }
+
     </style>
+
 </head>
+
 <body class="bg-slate-100 font-sans text-slate-800 py-8" data-historia="{{ historia|tojson if historia else '{}' }}">
+
     <div class="max-w-5xl mx-auto bg-white p-8 rounded-none shadow-md border border-slate-300">
+
         <div class="flex justify-between items-center border-b-2 border-slate-800 pb-4 mb-6 no-print">
+
             <div>
+
                 <div class="flex items-center gap-2">
+
                     <span class="font-bold text-xl text-teal-800">M&N</span>
+
                     <span class="text-xs text-slate-500 tracking-widest font-semibold uppercase">Consultorio Odontologico</span>
+
                 </div>
+
                 <h1 class="text-2xl font-bold text-slate-900 tracking-tight mt-1">HISTORIA CLINICA ODONTOLOGICA</h1>
+
             </div>
+
             <a href="/dashboard" class="bg-teal-700 hover:bg-teal-800 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm transition-colors"> Volver al Panel</a>
+
         </div>
+
         <div class="tabs-container no-print">
+
             <button class="tab-btn active" onclick="openTab(event, 'diagnostico')">1. Diagnostico y Odontograma</button>
+
             <button class="tab-btn" onclick="openTab(event, 'presupuesto')">2. Presupuesto y Evolucion</button>
+
         </div>
+
         <form method="POST" class="space-y-6 no-print-btn">
+
+            <input type="hidden" name="imagenes_dientes" id="inputImagenesDientes" value="" />
+
             <div id="diagnostico" class="tab-content active">
+
                 <div>
+
                     <div class="flex justify-between items-center mb-1">
+
                         <h2 class="text-sm font-bold uppercase text-slate-900">1. FILIACION:</h2>
+
                         <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold uppercase">№  HISTORIA:</span>
+
+                            <span class="text-xs font-bold uppercase">?  HISTORIA:</span>
+
                             <input type="text" name="n_historia" value="{{ siguiente_n }}" readonly class="w-16 p-1 border border-slate-800 text-center font-bold text-sm bg-slate-50">
+
                         </div>
+
                     </div>
+
                     <table class="w-full text-xs table-paper border-collapse">
+
                         <thead>
+
                             <tr class="bg-slate-100 text-slate-700 font-bold text-center">
+
                                 <td colspan="4" class="p-1">Nombre y Apellido</td>
+
                                 <td class="p-1">Fecha de Nac.</td>
+
                                 <td class="p-1">DNI</td>
+
                                 <td class="p-1">Sexo</td>
+
                                 <td class="p-1">Edad</td>
+
                             </tr>
+
                         </thead>
+
                         <tbody>
+
                             <tr>
+
                                 <td colspan="4" class="p-0"><input type="text" name="nombre_apellido" required class="w-full p-1.5 outline-none"></td>
+
                                 <td class="p-0"><input type="date" name="fecha_nacimiento" class="w-full p-1 text-center outline-none"></td>
+
                                 <td class="p-0"><input type="text" name="dni" required class="w-full p-1 text-center outline-none"></td>
+
                                 <td class="p-0"><select name="sexo" class="w-full p-1 outline-none text-center bg-transparent"><option value="M">M</option><option value="F">F</option></select></td>
+
                                 <td class="p-0"><input type="number" name="edad" class="w-full p-1 text-center outline-none"></td>
+
                             </tr>
+
                             <tr class="bg-slate-100 text-slate-700 font-bold text-center">
+
                                 <td colspan="3" class="p-1">Nombre y Apellido del Familiar</td>
+
                                 <td class="p-1">Parentesco</td>
+
                                 <td class="p-1">DNI</td>
+
                                 <td class="p-1">Telefono</td>
+
                                 <td colspan="2" class="p-1">Fecha de Atencion</td>
+
                             </tr>
+
                             <tr>
+
                                 <td colspan="3" class="p-0"><input type="text" name="nombre_familiar" class="w-full p-1.5 outline-none"></td>
+
                                 <td class="p-0"><input type="text" name="parentesco" class="w-full p-1 text-center outline-none"></td>
+
                                 <td class="p-0"><input type="text" name="dni_familiar" class="w-full p-1 text-center outline-none"></td>
+
                                 <td class="p-0"><input type="text" name="telefono" class="w-full p-1 text-center outline-none"></td>
+
                                 <td colspan="2" class="p-0"><input type="date" name="fecha_atencion" class="w-full p-1 text-center outline-none"></td>
+
                             </tr>
+
                         </tbody>
+
                     </table>
+
                 </div>
+
                 <div>
+
                     <h2 class="text-sm font-bold uppercase text-slate-900 mb-1">2. MOTIVO DE CONSULTA:</h2>
+
                     <textarea name="motivo_consulta" rows="2" class="w-full p-2 border border-slate-400 text-sm outline-none focus:ring-2 focus:ring-teal-700 bg-white" placeholder="Motivo por el cual el paciente acude al consultorio..."></textarea>
+
                 </div>
+
                 <div>
+
                     <h2 class="text-sm font-bold uppercase text-slate-900 mb-1">3. ANTECEDENTES:</h2>
+
                     <div class="grid md:grid-cols-3 gap-3 text-xs">
+
                         <table class="w-full table-paper border-collapse">
+
                             <thead>
+
                                 <tr class="bg-slate-100 text-slate-700 font-bold text-center">
+
                                     <th class="p-1"></th>
+
                                     <th class="p-1">SI</th>
+
                                     <th class="p-1">NO</th>
+
                                 </tr>
+
                             </thead>
+
                             <tbody>
+
                                 <tr>
+
                                     <td class="p-1">Diabetes</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_diabetes" value="SI" class="una-casilla mx-auto ant-checkbox"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_diabetes" value="NO" class="una-casilla mx-auto ant-checkbox"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Tuberculosis</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_tuberculosis" value="SI" class="una-casilla mx-auto ant-checkbox"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_tuberculosis" value="NO" class="una-casilla mx-auto ant-checkbox"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Anemia</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_anemia" value="SI" class="una-casilla mx-auto ant-checkbox"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_anemia" value="NO" class="una-casilla mx-auto ant-checkbox"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Fiebre Reum&aacute;tica</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_fiebre_reumatica" value="SI" class="una-casilla mx-auto ant-checkbox"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_fiebre_reumatica" value="NO" class="una-casilla mx-auto ant-checkbox"></td>
+
                                 </tr>
+
                             </tbody>
+
                         </table>
+
                         <table class="w-full table-paper border-collapse">
+
                             <thead>
+
                                 <tr class="bg-slate-100 text-slate-700 font-bold text-center">
+
                                     <th class="p-1"></th>
+
                                     <th class="p-1">SI</th>
+
                                     <th class="p-1">NO</th>
+
                                 </tr>
+
                             </thead>
+
                             <tbody>
+
                                 <tr>
+
                                     <td class="p-1">Enfermedad Cardiovascular</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_cardiovascular" value="SI" class="una-casilla mx-auto ant-checkbox"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_cardiovascular" value="NO" class="una-casilla mx-auto ant-checkbox"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Enfermedad Renal</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_renal" value="SI" class="una-casilla mx-auto ant-checkbox"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_renal" value="NO" class="una-casilla mx-auto ant-checkbox"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Enfermedad Hep&aacute;tica</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_hepatica" value="SI" class="una-casilla mx-auto ant-checkbox"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_hepatica" value="NO" class="una-casilla mx-auto ant-checkbox"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Reacci&oacute;n anormal a la anestesia local</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_anestesia" value="SI" class="una-casilla mx-auto ant-checkbox"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_anestesia" value="NO" class="una-casilla mx-auto ant-checkbox"></td>
+
                                 </tr>
+
                             </tbody>
+
                         </table>
+
                         <table class="w-full table-paper border-collapse">
+
                             <thead>
+
                                 <tr class="bg-slate-100 text-slate-700 font-bold text-center">
+
                                     <th class="p-1"></th>
+
                                     <th class="p-1">SI</th>
+
                                     <th class="p-1">NO</th>
+
                                 </tr>
+
                             </thead>
+
                             <tbody>
+
                                 <tr>
+
                                     <td class="p-1">Reacci&oacute;n anormal a otras drogas</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_drogas" value="SI" class="una-casilla mx-auto ant-checkbox"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_drogas" value="NO" class="una-casilla mx-auto ant-checkbox"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Hemorragias</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_hemorragias1" value="SI" class="una-casilla mx-auto ant-checkbox"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_hemorragias1" value="NO" class="una-casilla mx-auto ant-checkbox"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Hemorragias</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_hemorragias2" value="SI" class="una-casilla mx-auto ant-checkbox"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ant_hemorragias2" value="NO" class="una-casilla mx-auto ant-checkbox"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-0" colspan="3"><input type="text" name="ant_otros" placeholder="Otros:" class="w-full p-1 outline-none font-medium"></td>
+
                                 </tr>
+
                             </tbody>
+
                         </table>
+
                     </div>
+
                 </div>
+
                 <script>
+
                     // Antecedentes: permitir desmarcar y mantener SI/NO excluyentes
+
                     document.querySelectorAll('.ant-checkbox').forEach(cb => {
+
                         cb.addEventListener('change', function () {
+
                             const name = this.name;
+
                             const value = this.value;
+
                             document.querySelectorAll(`.ant-checkbox[name="${name}"]`).forEach(other => {
+
                                 if (other !== this) {
+
                                     other.checked = false;
+
                                 }
+
                             });
+
                         });
+
                     });
+
                 </script>
+
                 <div>
+
                     <h2 class="text-sm font-bold uppercase text-slate-900 mb-1">4. FUNCIONES VITALES:</h2>
+
                     <table class="w-full text-xs table-paper border-collapse">
+
                         <thead>
+
                             <tr class="bg-slate-100 text-slate-700 font-bold text-center">
+
                                 <td class="p-1">Peso</td><td class="p-1">FC</td><td class="p-1">FR</td><td class="p-1">Talla</td><td class="p-1">PA</td><td class="p-1">Temp.</td>
+
                             </tr>
+
                         </thead>
+
                         <tbody>
+
                             <tr>
+
                                 <td class="p-0 text-center"><input type="text" name="fv_peso" class="w-full p-1 text-center outline-none"></td>
+
                                 <td class="p-0 text-center"><input type="text" name="fv_fc" class="w-full p-1 text-center outline-none"></td>
+
                                 <td class="p-0 text-center"><input type="text" name="fv_fr" class="w-full p-1 text-center outline-none"></td>
+
                                 <td class="p-0 text-center"><input type="text" name="fv_talla" class="w-full p-1 text-center outline-none"></td>
+
                                 <td class="p-0 text-center"><input type="text" name="fv_pa" class="w-full p-1 text-center outline-none"></td>
+
                                 <td class="p-0 text-center"><input type="text" name="fv_temp" class="w-full p-1 text-center outline-none"></td>
+
                             </tr>
+
                         </tbody>
+
                     </table>
+
                 </div>
+
                 <div>
+
                     <h2 class="text-sm font-bold uppercase text-slate-900 mb-1">5. EXAMEN CLINICO ODONTOLOGICO:</h2>
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+
                         <table class="w-full table-paper border-collapse">
+
                             <thead>
+
                                 <tr class="bg-slate-100 text-slate-700 font-bold text-center">
+
                                     <th class="p-1"></th>
+
                                     <th class="p-1">P</th>
+
                                     <th class="p-1">N</th>
+
                                 </tr>
+
                             </thead>
+
                             <tbody>
+
                                 <tr>
+
                                     <td class="p-1">Ex. Extraoral</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_extraoral_p" value="SI" class="una-casilla mx-auto"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_extraoral_n" value="SI" class="una-casilla mx-auto"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Cara</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_cara_p" value="SI" class="una-casilla mx-auto"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_cara_n" value="SI" class="una-casilla mx-auto"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Cuello</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_cuello_p" value="SI" class="una-casilla mx-auto"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_cuello_n" value="SI" class="una-casilla mx-auto"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Piel</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_piel_p" value="SI" class="una-casilla mx-auto"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_piel_n" value="SI" class="una-casilla mx-auto"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Ganglios</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_ganglios_p" value="SI" class="una-casilla mx-auto"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_ganglios_n" value="SI" class="una-casilla mx-auto"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">ATM</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_atm_p" value="SI" class="una-casilla mx-auto"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_atm_n" value="SI" class="una-casilla mx-auto"></td>
+
                                 </tr>
+
                             </tbody>
+
                         </table>
+
                         <table class="w-full table-paper border-collapse">
+
                             <thead>
+
                                 <tr class="bg-slate-100 text-slate-700 font-bold text-center">
+
                                     <th class="p-1"></th>
+
                                     <th class="p-1">P</th>
+
                                     <th class="p-1">N</th>
+
                                 </tr>
+
                             </thead>
+
                             <tbody>
+
                                 <tr>
+
                                     <td class="p-1">Ex. Intraoral</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_intraoral_p" value="SI" class="una-casilla mx-auto"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_intraoral_n" value="SI" class="una-casilla mx-auto"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Labios</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_labios_p" value="SI" class="una-casilla mx-auto"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_labios_n" value="SI" class="una-casilla mx-auto"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Carrillo</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_carrillo_p" value="SI" class="una-casilla mx-auto"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_carrillo_n" value="SI" class="una-casilla mx-auto"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Fondo de Surco</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_fondo_surco_p" value="SI" class="una-casilla mx-auto"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_fondo_surco_n" value="SI" class="una-casilla mx-auto"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Periodoncia</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_periodoncia_p" value="SI" class="una-casilla mx-auto"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_periodoncia_n" value="SI" class="una-casilla mx-auto"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Zona Retromolar</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_zona_retromolar_p" value="SI" class="una-casilla mx-auto"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_zona_retromolar_n" value="SI" class="una-casilla mx-auto"></td>
+
                                 </tr>
+
                             </tbody>
+
                         </table>
+
                         <table class="w-full table-paper border-collapse">
+
                             <thead>
+
                                 <tr class="bg-slate-100 text-slate-700 font-bold text-center">
+
                                     <th class="p-1"></th>
+
                                     <th class="p-1">P</th>
+
                                     <th class="p-1">N</th>
+
                                 </tr>
+
                             </thead>
+
                             <tbody>
+
                                 <tr>
+
                                     <td class="p-1">Paladar Duro</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_paladar_duro_p" value="SI" class="una-casilla mx-auto"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_paladar_duro_n" value="SI" class="una-casilla mx-auto"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Paladar Blanco</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_paladar_blanco_p" value="SI" class="una-casilla mx-auto"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_paladar_blanco_n" value="SI" class="una-casilla mx-auto"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Vitalidad Pulpar</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_vitalidad_pulpar_p" value="SI" class="una-casilla mx-auto"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_vitalidad_pulpar_n" value="SI" class="una-casilla mx-auto"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Oclusi&oacute;n</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_oclusion_p" value="SI" class="una-casilla mx-auto"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_oclusion_n" value="SI" class="una-casilla mx-auto"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-1">Contactos Prematuros</td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_contactos_prematuros_p" value="SI" class="una-casilla mx-auto"></td>
+
                                     <td class="p-0 text-center"><input type="checkbox" name="ex_contactos_prematuros_n" value="SI" class="una-casilla mx-auto"></td>
+
                                 </tr>
+
                                 <tr>
+
                                     <td class="p-0" colspan="3"><input type="text" name="ex_otros" placeholder="Otros:" class="w-full p-1 outline-none font-medium"></td>
+
                                 </tr>
+
                             </tbody>
+
                         </table>
+
                     </div>
+
                 </div>
+
                 <div class="border-t-2 border-slate-800 pt-4">
+
                     <div class="flex justify-between items-center mb-2">
+
                         <h2 class="text-sm font-bold uppercase text-slate-900">6. ODONTOGRAMA:</h2>
+
                         <span class="text-[11px] text-slate-500 font-semibold">Sistema FDI (Permanentes y Temporales)</span>
+
                     </div>
+
                     <div class="bg-slate-50 p-6 rounded border border-slate-300 relative">
+
                         <div class="absolute top-1 left-1 z-10 text-[20px] font-bold text-slate-800">D</div>
+
                         <div class="absolute top-1 right-1 z-10 text-[20px] font-bold text-slate-800">I</div>
+
                         <div class="absolute bottom-1 left-1 z-10 text-[20px] font-bold text-slate-800">D</div>
+
                         <div class="absolute bottom-1 right-1 z-10 text-[20px] font-bold text-slate-800">I</div>
+
                         <div class="min-w-[850px] flex flex-col items-center gap-2">
+
                             <div class="flex justify-center gap-1 w-full border-b border-slate-300 pb-1">
+
                                 {% for n in [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28] %}
+
                                 <input type="text" name="rec_sup2_{{n}}" maxlength="4" class="w-10 h-6 border border-slate-400 text-[10px] text-center font-bold uppercase bg-white outline-none">
+
                                 {% endfor %}
+
                             </div>
+
                             <div class="flex justify-center gap-1 w-full pb-2">
+
                                 <div class="flex gap-1">
+
                                     {% for n in [55,54,53,52,51] %}
+
                                     <input type="text" name="rec_temp_sup_{{n}}" maxlength="4" class="w-9 h-6 border border-slate-400 text-[9px] text-center font-bold uppercase bg-white outline-none">
+
                                     {% endfor %}
+
                                 </div>
+
                                 <div class="border-r-2 border-slate-800 h-6 mx-1"></div>
+
                                 <div class="flex gap-1">
+
                                     {% for n in [61,62,63,64,65] %}
+
                                     <input type="text" name="rec_temp_sup_{{n}}" maxlength="4" class="w-9 h-6 border border-slate-400 text-[9px] text-center font-bold uppercase bg-white outline-none">
+
                                     {% endfor %}
+
                                 </div>
+
                             </div>
+
                             {# FILA 1: adultos superiores #}
+
                             <div class="flex items-center gap-1 border-b-2 border-slate-400 pb-3 w-full justify-center mb-1">
+
                                 <div class="flex gap-1">
+
                                     {% for n in [18,17,16,15,14,13,12,11] %}
+
                                     <div class="border border-slate-300 bg-white p-0.5 rounded text-center w-9">
+
                                         <span class="text-[8px] font-bold text-amber-700 block">{{n}}</span>
+
                                         <svg viewBox="0 0 30 40" class="w-7 h-9 mx-auto border border-dashed border-slate-300">
+
                                             {% if n in [18,17,16,15] %}
+
                                                 <path d="M2,27 h26 v12 h-26 z M4,27 l6,-23 l6,23 l6,-23 l6,23" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                                 <line x1="4" y1="33" x2="26" y2="33" stroke="#000000" stroke-width="1"/>
+
                                                 <line x1="15" y1="27" x2="15" y2="4" stroke="#000000" stroke-width="1"/>
+
                                             {% elif n in [14,13] %}
+
                                                 <path d="M4,28 h22 v10 h-22 z M7,28 l8,-24 l8,24" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                             {% else %}
+
                                                 <path d="M4,28 h22 v10 h-22 z M7,28 l8,-24 l8,24" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                                 <line x1="15" y1="28" x2="15" y2="4" stroke="#000000" stroke-width="1"/>
+
                                             {% endif %}
+
                                         </svg>
+
                                     </div>
+
                                     {% endfor %}
+
                                 </div>
+
                                 <div class="border-r-2 border-slate-800 h-12 mx-1"></div>
+
                                 <div class="flex gap-1">
+
                                     {% for n in [21,22,23,24,25,26,27,28] %}
+
                                     <div class="border border-slate-300 bg-white p-0.5 rounded text-center w-9">
+
                                         <span class="text-[8px] font-bold text-amber-700 block">{{n}}</span>
+
                                         <svg viewBox="0 0 30 40" class="w-7 h-9 mx-auto border border-dashed border-slate-300">
+
                                             {% if n in [25,26,27,28] %}
+
                                                 <path d="M2,27 h26 v12 h-26 z M4,27 l6,-23 l6,23 l6,-23 l6,23" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                                 <line x1="4" y1="33" x2="26" y2="33" stroke="#000000" stroke-width="1"/>
+
                                                 <line x1="15" y1="27" x2="15" y2="4" stroke="#000000" stroke-width="1"/>
+
                                             {% elif n in [23,24] %}
+
                                                 <path d="M4,28 h22 v10 h-22 z M7,28 l8,-24 l8,24" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                             {% else %}
+
                                                 <path d="M4,28 h22 v10 h-22 z M7,28 l8,-24 l8,24" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                                 <line x1="15" y1="28" x2="15" y2="4" stroke="#000000" stroke-width="1"/>
+
                                             {% endif %}
+
                                         </svg>
+
                                     </div>
+
                                     {% endfor %}
+
                                 </div>
+
                             </div>
+
                             {# FILA 2: temporales superiores #}
+
                             <div class="flex items-center gap-1 border-b-2 border-slate-400 pb-3 w-full justify-center mb-1">
+
                                 <div class="flex gap-1">
+
                                     {% for n in [55,54,53,52,51] %}
+
                                     <div class="border border-slate-300 bg-white p-0.5 rounded text-center w-9">
+
                                         <span class="text-[8px] font-bold text-amber-700 block">{{n}}</span>
+
                                         <svg viewBox="0 0 30 40" class="w-7 h-9 mx-auto border border-dashed border-slate-300">
+
                                             {% if n == 55 %}
+
                                                 <path d="M3,27 h24 v11 h-24 z M5,27 l6,-21 l6,21 l6,-21 l6,21" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                             {% elif n in [54,53] %}
+
                                                 <path d="M5,28 h20 v10 h-20 z M8,28 l7,-22 l7,22" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                             {% else %}
+
                                                 <path d="M5,28 h20 v10 h-20 z M8,28 l7,-22 l7,22" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                                 <line x1="15" y1="28" x2="15" y2="8" stroke="#000000" stroke-width="1"/>
+
                                             {% endif %}
+
                                         </svg>
+
                                     </div>
+
                                     {% endfor %}
+
                                 </div>
+
                                 <div class="border-r-2 border-slate-800 h-12 mx-1"></div>
+
                                 <div class="flex gap-1">
+
                                     {% for n in [61,62,63,64,65] %}
+
                                     <div class="border border-slate-300 bg-white p-0.5 rounded text-center w-9">
+
                                         <span class="text-[8px] font-bold text-amber-700 block">{{n}}</span>
+
                                         <svg viewBox="0 0 30 40" class="w-7 h-9 mx-auto border border-dashed border-slate-300">
+
                                             {% if n == 65 %}
+
                                                 <path d="M3,27 h24 v11 h-24 z M5,27 l6,-21 l6,21 l6,-21 l6,21" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                             {% else %}
+
                                                 <path d="M5,28 h20 v10 h-20 z M8,28 l7,-22 l7,22" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                             {% endif %}
+
                                         </svg>
+
                                     </div>
+
                                     {% endfor %}
+
                                 </div>
+
                             </div>
+
                             {# FILA 3: temporales inferiores #}
+
                             <div class="flex items-center gap-1 border-b-2 border-slate-400 pb-3 w-full justify-center mb-1">
+
                                 <div class="flex gap-1">
+
                                     {% for n in [71,72,73,74,75] %}
+
                                     <div class="border border-slate-300 bg-white p-0.5 rounded text-center w-9">
+
                                         <span class="text-[8px] font-bold text-amber-700 block">{{n}}</span>
+
                                         <svg viewBox="0 0 30 40" class="w-7 h-9 mx-auto border border-dashed border-slate-300">
+
                                             {% if n == 75 %}
+
                                                 <path d="M3,2 h24 v11 h-24 z M5,13 l6,21 l6,-21 l6,21 l6,-21" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                                 <line x1="5" y1="7" x2="25" y2="7" stroke="#000000" stroke-width="1"/>
+
                                                 <line x1="15" y1="2" x2="15" y2="13" stroke="#000000" stroke-width="1"/>
+
                                             {% elif n in [72,73] %}
+
                                                 <path d="M5,2 h20 v10 h-20 z M8,12 l7,22 l7,-22" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                                 <line x1="15" y1="2" x2="15" y2="12" stroke="#000000" stroke-width="1"/>
+
                                             {% else %}
+
                                                 <path d="M5,2 h20 v10 h-20 z M8,12 l7,22 l7,-22" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                             {% endif %}
+
                                         </svg>
+
                                     </div>
+
                                     {% endfor %}
+
                                 </div>
+
                                 <div class="border-r-2 border-slate-800 h-12 mx-1"></div>
+
                                 <div class="flex gap-1">
+
                                     {% for n in [81,82,83,84,85] %}
+
                                     <div class="border border-slate-300 bg-white p-0.5 rounded text-center w-9">
+
                                         <span class="text-[8px] font-bold text-amber-700 block">{{n}}</span>
+
                                         <svg viewBox="0 0 30 40" class="w-7 h-9 mx-auto border border-dashed border-slate-300">
+
                                             {% if n == 85 %}
+
                                                 <path d="M3,2 h24 v11 h-24 z M5,13 l6,21 l6,-21 l6,21 l6,-21" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                                 <line x1="5" y1="7" x2="25" y2="7" stroke="#000000" stroke-width="1"/>
+
                                                 <line x1="15" y1="2" x2="15" y2="13" stroke="#000000" stroke-width="1"/>
+
                                             {% elif n in [82,83] %}
+
                                                 <path d="M5,2 h20 v10 h-20 z M8,12 l7,22 l7,-22" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                                 <line x1="15" y1="2" x2="15" y2="12" stroke="#000000" stroke-width="1"/>
+
                                             {% else %}
+
                                                 <path d="M5,2 h20 v10 h-20 z M8,12 l7,22 l7,-22" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                             {% endif %}
+
                                         </svg>
+
                                     </div>
+
                                     {% endfor %}
+
                                 </div>
+
                             </div>
+
                             {# FILA 4: adultos inferiores #}
+
                             <div class="flex items-center gap-1 pt-1 w-full justify-center">
+
                                 <div class="flex gap-1">
+
                                     {% for n in [48,47,46,45,44,43,42,41] %}
+
                                     <div class="border border-slate-300 bg-white p-0.5 rounded text-center w-9">
+
                                         <span class="text-[8px] font-bold text-amber-700 block">{{n}}</span>
+
                                         <svg viewBox="0 0 30 40" class="w-7 h-9 mx-auto border border-dashed border-slate-300">
+
                                             {% if n in [48,47,46,45] %}
+
                                                 <path d="M2,2 h26 v13 h-26 z M4,15 l6,23 l6,-23 l6,23 l6,-23" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                                 <line x1="4" y1="7" x2="26" y2="7" stroke="#000000" stroke-width="1"/>
+
                                                 <line x1="15" y1="2" x2="15" y2="15" stroke="#000000" stroke-width="1"/>
+
                                             {% else %}
+
                                                 <path d="M4,2 h22 v11 h-22 z M7,13 l8,24 l8,-24" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                                 <line x1="15" y1="2" x2="15" y2="13" stroke="#000000" stroke-width="1"/>
+
                                             {% endif %}
+
                                         </svg>
+
                                     </div>
+
                                     {% endfor %}
+
                                 </div>
+
                                 <div class="border-r-2 border-slate-800 h-12 mx-1"></div>
+
                                 <div class="flex gap-1">
+
                                     {% for n in [31,32,33,34,35,36,37,38] %}
+
                                     <div class="border border-slate-300 bg-white p-0.5 rounded text-center w-9">
+
                                         <span class="text-[8px] font-bold text-amber-700 block">{{n}}</span>
+
                                         <svg viewBox="0 0 30 40" class="w-7 h-9 mx-auto border border-dashed border-slate-300">
+
                                             {% if n in [35,36,37,38] %}
+
                                                 <path d="M2,2 h26 v13 h-26 z M4,15 l6,23 l6,-23 l6,23 l6,-23" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                                 <line x1="4" y1="7" x2="26" y2="7" stroke="#000000" stroke-width="1"/>
+
                                                 <line x1="15" y1="2" x2="15" y2="15" stroke="#000000" stroke-width="1"/>
+
                                             {% else %}
+
                                                 <path d="M4,2 h22 v11 h-22 z M7,13 l8,24 l8,-24" fill="none" stroke="#000000" stroke-width="1.2"/>
+
                                                 <line x1="15" y1="2" x2="15" y2="13" stroke="#000000" stroke-width="1"/>
+
                                             {% endif %}
+
                                         </svg>
+
                                     </div>
+
                                     {% endfor %}
+
                                 </div>
+
                             </div>
+
                             <div class="flex justify-center gap-1 w-full pt-2 border-t border-slate-300 pt-1">
+
                                 <div class="flex gap-1">
+
                                     {% for n in [85,84,83,82,81] %}
+
                                     <input type="text" name="rec_temp_inf_{{n}}" maxlength="4" class="w-9 h-6 border border-slate-400 text-[9px] text-center font-bold uppercase bg-white outline-none">
+
                                     {% endfor %}
+
                                 </div>
+
                                 <div class="border-r-2 border-slate-800 h-6 mx-1"></div>
+
                                 <div class="flex gap-1">
+
                                     {% for n in [71,72,73,74,75] %}
+
                                     <input type="text" name="rec_temp_inf_{{n}}" maxlength="4" class="w-9 h-6 border border-slate-400 text-[9px] text-center font-bold uppercase bg-white outline-none">
+
                                     {% endfor %}
+
                                 </div>
+
                             </div>
+
                             <div class="flex justify-center gap-1 w-full border-t border-slate-300 pt-1">
+
                                 {% for n in [48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38] %}
+
                                 <input type="text" name="rec_inf2_{{n}}" maxlength="4" class="w-10 h-6 border border-slate-400 text-[10px] text-center font-bold uppercase bg-white outline-none">
+
                                 {% endfor %}
+
                             </div>
+
                         </div>
+
                         <div class="mt-3">
+
                             <label class="block text-xs font-bold uppercase text-slate-900 mb-1">ESPECIFICACIONES:</label>
+
                             <textarea name="especificaciones_odontograma" rows="3" class="w-full p-2 border border-slate-400 text-xs outline-none focus:ring-2 focus:ring-teal-700 bg-white" placeholder="Detallar anomalias multiples, tipo de aparatologia, materiales de pr&oacute;tesis u observaciones segun norma..."></textarea>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div id="presupuesto" class="tab-content">
+
+                <div>
+
+                    <h2 class="text-sm font-bold uppercase text-slate-900 mb-1">7. PRESUPUESTO:</h2>
+
+                    <table class="w-full text-xs table-paper border-collapse">
+
+                        <thead>
+
+                            <tr class="bg-slate-100 text-slate-700 font-bold text-center">
+
+                                <td class="p-1">#</td>
+
+                                <td class="p-1">Descripci&oacute;n del Tratamiento</td>
+
+                                <td class="p-1">Cant.</td>
+
+                                <td class="p-1">Valor Unitario</td>
+
+                                <td class="p-1">Valor Total</td>
+
+                                <td class="p-1">Observaciones</td>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for i in range(1, 11) %}
+
+                            <tr>
+
+                                <td class="p-0 text-center"><input type="text" name="pres_item_{{i}}" class="w-full p-1 text-center outline-none text-xs"></td>
+
+                                <td class="p-0"><input type="text" name="pres_desc_{{i}}" class="w-full p-1 outline-none text-xs" onclick="abrirModalPresupuesto(this)" placeholder="Haz clic para seleccionar"></td>
+
+                                <td class="p-0 text-center"><input type="number" name="pres_cant_{{i}}" class="w-full p-1 text-center outline-none text-xs"></td>
+
+                                <td class="p-0 text-center"><input type="number" name="pres_unit_{{i}}" step="0.01" class="w-full p-1 text-center outline-none text-xs"></td>
+
+                                <td class="p-0 text-center"><input type="number" name="pres_total_{{i}}" step="0.01" class="w-full p-1 text-center outline-none text-xs"></td>
+
+                                <td class="p-0"><input type="text" name="pres_obs_{{i}}" class="w-full p-1 outline-none text-xs"></td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                            <tr class="bg-slate-50 font-bold text-center">
+
+                                <td colspan="4" class="p-1 text-right">TOTAL PRESUPUESTO:</td>
+
+                                <td class="p-0 text-center"><input type="number" name="pres_total_general" step="0.01" class="w-full p-1 text-center outline-none text-xs font-bold"></td>
+
+                                <td class="p-0"></td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="mt-6">
+
+                    <h2 class="text-sm font-bold uppercase text-slate-900 mb-1">8. EVOLUCION DE TRATAMIENTOS:</h2>
+
+                    <table class="w-full text-xs table-paper border-collapse">
+
+                        <thead>
+
+                            <tr class="bg-slate-100 text-slate-700 font-bold text-center">
+
+                                <td class="p-1">FECHA</td>
+
+                                <td class="p-1">TRATAMIENTOS REALIZADOS</td>
+
+                                <td class="p-1">A CUENTA</td>
+
+                                <td class="p-1">ADELANTO</td>
+
+                                <td class="p-1">SALDO</td>
+
+                                <td class="p-1">OBSERVACIONES</td>
+
+                                <td class="p-1">ESTADO</td>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for i in range(1, 31) %}
+
+                            <tr>
+
+                                <td class="p-0"><input type="date" name="evo_fecha_{{i}}" class="w-full p-1 text-center outline-none text-xs"></td>
+
+                                <td class="p-0"><input type="text" name="evo_tratamiento_{{i}}" class="w-full p-1 outline-none text-xs"></td>
+
+                                <td class="p-0 text-center"><input type="number" name="evo_cuenta_{{i}}" step="0.01" class="w-full p-1 text-center outline-none text-xs"></td>
+
+                                <td class="p-0 text-center"><input type="number" name="evo_adelanto_{{i}}" step="0.01" class="w-full p-1 text-center outline-none text-xs"></td>
+
+                                <td class="p-0 text-center"><input type="number" name="evo_saldo_{{i}}" step="0.01" class="w-full p-1 text-center outline-none text-xs"></td>
+
+                                <td class="p-0"><input type="text" name="evo_observaciones_{{i}}" class="w-full p-1 outline-none text-xs"></td>
+
+                                <td class="p-0 text-center"><select name="evo_estado_{{i}}" class="w-full p-1 text-center outline-none text-xs">
+
+                                    <option value="pendiente">Pendiente</option>
+
+                                    <option value="pagado">Pagado</option>
+
+                                    <option value="parcial">Parcial</option>
+
+                                </select></td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4 border-t border-slate-300 no-print">
+
+                <a href="/dashboard" class="px-5 py-2 border border-slate-400 text-slate-700 hover:bg-slate-100 text-xs font-bold uppercase">Cancelar</a>
+
+                <button type="submit" class="px-6 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold uppercase tracking-wider">Guardar Historia Clinica</button>
+
+            </div>
+
+        </form>
+
+        <div id="modalDiente" class="modal-overlay" aria-hidden="true">
+
+            <div class="modal max-h-[90vh] flex flex-col overflow-hidden">
+
+                <button id="cerrarModal" class="absolute top-2 right-2 bg-red-50 text-red-600 rounded-full text-xl hover:bg-red-600 hover:text-white">&times;</button>
+
+                <div class="grid grid-cols-1 lg:grid-cols-[2.5fr,1fr] gap-4 lg:gap-6 items-stretch">
+                    <div class="space-y-3 h-full">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-bold">Diente seleccionado: <span id="dienteNum" class="text-teal-700 font-bold"></span></h3>
+                            <button id="btnAgregarImagen" type="button" class="flex items-center gap-1.5 px-2 py-1 bg-teal-50 hover:bg-teal-100 text-teal-700 text-xs font-semibold border border-teal-200 rounded" title="Agregar imagen al diente">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z" /></svg>
+                                Agregar Imagen
+                            </button>
+                        </div>
+                        <input type="file" id="inputImagenDiente" accept="image/*" class="hidden" />
+                        <div id="previewImagenDiente" class="border border-slate-200 rounded bg-slate-50 p-3 text-center h-full flex flex-col justify-center items-center">
+                            <img id="imgPreviewDiente" src="" alt="Imagen del diente" class="max-h-full max-w-full mx-auto rounded border border-slate-200 object-contain" />
+                            <button type="button" id="btnEliminarImagenDiente" class="mt-2 text-xs text-red-600 hover:text-red-800 underline">Eliminar imagen</button>
                         </div>
                     </div>
+                    <div class="space-y-2 h-full">
+                        <ul id="listaOpcionesCOP" class="h-full overflow-y-auto pr-2"></ul>
+                    </div>
                 </div>
+
             </div>
-            <div id="presupuesto" class="tab-content">
-                <div>
-                    <h2 class="text-sm font-bold uppercase text-slate-900 mb-1">7. PRESUPUESTO:</h2>
-                    <table class="w-full text-xs table-paper border-collapse">
-                        <thead>
-                            <tr class="bg-slate-100 text-slate-700 font-bold text-center">
-                                <td class="p-1">#</td>
-                                <td class="p-1">Descripci&oacute;n del Tratamiento</td>
-                                <td class="p-1">Cant.</td>
-                                <td class="p-1">Valor Unitario</td>
-                                <td class="p-1">Valor Total</td>
-                                <td class="p-1">Observaciones</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for i in range(1, 11) %}
-                            <tr>
-                                <td class="p-0 text-center"><input type="text" name="pres_item_{{i}}" class="w-full p-1 text-center outline-none text-xs"></td>
-                                <td class="p-0"><input type="text" name="pres_desc_{{i}}" class="w-full p-1 outline-none text-xs" onclick="abrirModalPresupuesto(this)" placeholder="Haz clic para seleccionar"></td>
-                                <td class="p-0 text-center"><input type="number" name="pres_cant_{{i}}" class="w-full p-1 text-center outline-none text-xs"></td>
-                                <td class="p-0 text-center"><input type="number" name="pres_unit_{{i}}" step="0.01" class="w-full p-1 text-center outline-none text-xs"></td>
-                                <td class="p-0 text-center"><input type="number" name="pres_total_{{i}}" step="0.01" class="w-full p-1 text-center outline-none text-xs"></td>
-                                <td class="p-0"><input type="text" name="pres_obs_{{i}}" class="w-full p-1 outline-none text-xs"></td>
-                            </tr>
-                            {% endfor %}
-                            <tr class="bg-slate-50 font-bold text-center">
-                                <td colspan="4" class="p-1 text-right">TOTAL PRESUPUESTO:</td>
-                                <td class="p-0 text-center"><input type="number" name="pres_total_general" step="0.01" class="w-full p-1 text-center outline-none text-xs font-bold"></td>
-                                <td class="p-0"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="mt-6">
-                    <h2 class="text-sm font-bold uppercase text-slate-900 mb-1">8. EVOLUCION DE TRATAMIENTOS:</h2>
-                    <table class="w-full text-xs table-paper border-collapse">
-                        <thead>
-                            <tr class="bg-slate-100 text-slate-700 font-bold text-center">
-                                <td class="p-1">FECHA</td>
-                                <td class="p-1">TRATAMIENTOS REALIZADOS</td>
-                                <td class="p-1">A CUENTA</td>
-                                <td class="p-1">ADELANTO</td>
-                                <td class="p-1">SALDO</td>
-                                <td class="p-1">OBSERVACIONES</td>
-                                <td class="p-1">ESTADO</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for i in range(1, 31) %}
-                            <tr>
-                                <td class="p-0"><input type="date" name="evo_fecha_{{i}}" class="w-full p-1 text-center outline-none text-xs"></td>
-                                <td class="p-0"><input type="text" name="evo_tratamiento_{{i}}" class="w-full p-1 outline-none text-xs"></td>
-                                <td class="p-0 text-center"><input type="number" name="evo_cuenta_{{i}}" step="0.01" class="w-full p-1 text-center outline-none text-xs"></td>
-                                <td class="p-0 text-center"><input type="number" name="evo_adelanto_{{i}}" step="0.01" class="w-full p-1 text-center outline-none text-xs"></td>
-                                <td class="p-0 text-center"><input type="number" name="evo_saldo_{{i}}" step="0.01" class="w-full p-1 text-center outline-none text-xs"></td>
-                                <td class="p-0"><input type="text" name="evo_observaciones_{{i}}" class="w-full p-1 outline-none text-xs"></td>
-                                <td class="p-0 text-center"><select name="evo_estado_{{i}}" class="w-full p-1 text-center outline-none text-xs">
-                                    <option value="pendiente">Pendiente</option>
-                                    <option value="pagado">Pagado</option>
-                                    <option value="parcial">Parcial</option>
-                                </select></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="flex justify-end gap-3 pt-4 border-t border-slate-300 no-print">
-                <a href="/dashboard" class="px-5 py-2 border border-slate-400 text-slate-700 hover:bg-slate-100 text-xs font-bold uppercase">Cancelar</a>
-                <button type="submit" class="px-6 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold uppercase tracking-wider">Guardar Historia Clinica</button>
-            </div>
-        </form>
-        <div id="modalDiente" class="modal-overlay" aria-hidden="true">
-            <div class="modal">
-                <button id="cerrarModal" class="absolute top-2 right-2 text-slate-400 hover:text-slate-700 text-xl">&times;</button>
-                <h3>Diente seleccionado: <span id="dienteNum" class="text-teal-700 font-bold"></span></h3>
-                <ul id="listaOpcionesCOP"></ul>
-            </div>
+
         </div>
+
         <div id="modalPresupuesto" class="modal-overlay" aria-hidden="true">
+
             <div class="modal">
+
                 <button id="cerrarModalPresupuesto" class="absolute top-2 right-2 text-slate-400 hover:text-slate-700 text-xl">&times;</button>
+
                 <h3>Seleccionar Tratamiento</h3>
+
                 <ul id="listaOpcionesPresupuesto"></ul>
+
             </div>
+
         </div>
+
     </div>
+
     <script>
+
         const opcionesCOP = [
+
             { codigo: "1.1", texto: "Aparato ortodóntico fijo" },
+
             { codigo: "1.2", texto: "Aparato ortodóntico removible" },
+
             { codigo: "1.3", texto: "Corona" },
+
             { codigo: "1.4", texto: "Puente fijo" },
+
             { codigo: "1.5", texto: "Implante" },
+
             { codigo: "1.6", texto: "Prótesis removible parcial" },
+
             { codigo: "1.7", texto: "Prótesis total" },
+
             { codigo: "1.8", texto: "DIENTE AUSENTE", accion: "ausente" },
+
             { codigo: "1.9", texto: "DIENTE DISCROMICO", accion: "discromico" },
+
             { codigo: "1.10", texto: "Obturaci&oacute;n" },
+
             { codigo: "1.11", texto: "Endodoncia" },
+
             { codigo: "1.12", texto: "Coronoplastia" },
+
             { codigo: "1.13", texto: "Sellador de fisuras" },
+
             { codigo: "1.14", texto: "Fluorizaci&oacute;n" },
+
             { codigo: "1.15", texto: "Extracci&oacute;n indicada" },
+
             { codigo: "1.16", texto: "Movilidad grado I" },
+
             { codigo: "1.17", texto: "Movilidad grado II" },
+
             { codigo: "1.18", texto: "Movilidad grado III" },
+
             { codigo: "1.19", texto: "Fistula" },
+
             { codigo: "1.20", texto: "Absceso" },
+
             { codigo: "1.21", texto: "Lesi&oacute;n de mucosa" },
+
             { codigo: "1.22", texto: "Caries" },
+
             { codigo: "1.23", texto: "Fractura coronal" },
+
             { codigo: "1.24", texto: "Fractura radicular" },
+
             { codigo: "1.25", texto: "Retenci&oacute;n" },
+
             { codigo: "1.26", texto: "Inclusi&oacute;n &oacute;sea" },
+
             { codigo: "1.27", texto: "Supernumerario" },
+
             { codigo: "1.28", texto: "Diente impactado" },
+
             { codigo: "1.29", texto: "Hipoplasia" },
+
             { codigo: "1.30", texto: "Fluorosis" },
+
             { codigo: "1.31", texto: "Amelogenesis imperfecta" },
+
             { codigo: "1.32", texto: "Dentinogenesis imperfecta" },
+
             { codigo: "1.33", texto: "Tratamiento pulpar" }
+
         ];
+
         let dienteSeleccionado = { numero: null, tipo: null, elemento: null };
+
+        const imagenesDientes = {};
+
         function nombreInputParaDiente(tipo, numero) {
+
             switch (tipo) {
+
                 case 'adulto-sup': return `rec_sup2_${numero}`;
+
                 case 'temp-sup':   return `rec_temp_sup_${numero}`;
+
                 case 'temp-inf':   return `rec_temp_inf_${numero}`;
+
                 case 'adulto-inf': return `rec_inf2_${numero}`;
+
                 default:           return null;
+
             }
+
         }
+
         function abrirModal(numero, tipo, elemento) {
+
             dienteSeleccionado = { numero, tipo, elemento };
+
             document.getElementById('dienteNum').textContent = numero;
+
             const lista = document.getElementById('listaOpcionesCOP');
+
             lista.innerHTML = '';
+
             opcionesCOP.forEach(op => {
+
                 const li = document.createElement('li');
+
                 const btn = document.createElement('button');
+
                 btn.textContent = `${op.codigo} ${op.texto}`;
+
                 btn.className = 'w-full text-left p-2 border border-slate-300 rounded bg-white text-sm hover:bg-blue-50 hover:border-blue-500 transition';
+
                 btn.onclick = (e) => {
+
                     e.stopPropagation();
+
                     aplicarOpcion(op);
+
                     cerrarModal();
+
                 };
+
                 li.appendChild(btn);
+
                 lista.appendChild(li);
+
             });
+
+            // Mostrar preview si existe imagen guardada para este diente
+
+            const preview = document.getElementById('previewImagenDiente');
+
+            const imgPreview = document.getElementById('imgPreviewDiente');
+
+            if (imagenesDientes[numero]) {
+
+                imgPreview.src = imagenesDientes[numero];
+
+                preview.classList.remove('hidden');
+
+            } else {
+
+                imgPreview.src = '';
+
+                preview.classList.add('hidden');
+
+            }
+
             const modal = document.getElementById('modalDiente');
+
             modal.style.display = 'flex';
+
             modal.setAttribute('aria-hidden', 'false');
+
         }
+
         function cerrarModal() {
+
             const modal = document.getElementById('modalDiente');
+
             modal.style.display = 'none';
+
             modal.setAttribute('aria-hidden', 'true');
+
             dienteSeleccionado = { numero: null, tipo: null, elemento: null };
+
         }
+
         function aplicarOpcion(op) {
+
             if (!dienteSeleccionado.elemento) return;
+
             const { numero, tipo, elemento } = dienteSeleccionado;
+
             if (op.codigo === "1.8") {
+
                 const svg = elemento.querySelector('svg');
+
                 if (svg) {
+
                     svg.querySelectorAll('.marca-ausente').forEach(p => p.remove());
+
                     const x = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
                     x.setAttribute('class', 'marca-ausente');
+
                     x.setAttribute('d', 'M6,6 L24,24 M24,6 L6,24');
+
                     x.setAttribute('stroke', '#2563eb');
+
                     x.setAttribute('stroke-width', '2.5');
+
                     x.setAttribute('fill', 'none');
+
                     x.setAttribute('stroke-linecap', 'round');
+
                     svg.appendChild(x);
+
                 }
+
             } else if (op.codigo === "1.9") {
+
                 const inputName = nombreInputParaDiente(tipo, numero);
+
                 if (inputName) {
+
                     const input = document.querySelector(`input[name="${inputName}"]`);
+
                     if (input) {
+
                         input.value = 'DIS';
+
                         input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+
                     }
+
                 }
+
             }
+
         }
+
         document.querySelectorAll('.border.border-slate-300.bg-white.rounded.text-center').forEach(div => {
+
             const span = div.querySelector('span');
+
             const svg = div.querySelector('svg');
+
             if (span && svg) {
+
                 const num = span.textContent.trim();
+
                 const n = parseInt(num, 10);
+
                 let tipo = '';
+
                 if (!isNaN(n)) {
+
                     if (n >= 11 && n <= 28) tipo = 'adulto-sup';
+
                     else if (n >= 51 && n <= 65) tipo = 'temp-sup';
+
                     else if (n >= 71 && n <= 85) tipo = 'temp-inf';
+
                     else if (n >= 31 && n <= 48) tipo = 'adulto-inf';
+
                 }
+
                 if (tipo) {
+
                     div.dataset.diente = num;
+
                     div.dataset.tipo = tipo;
+
                     div.classList.add('pieza-dentaria');
+
                     div.addEventListener('click', () => abrirModal(num, tipo, div));
+
                 }
+
             }
+
         });
+
         document.getElementById('cerrarModal')?.addEventListener('click', cerrarModal);
+
         document.getElementById('modalDiente')?.addEventListener('click', (e) => {
+
             if (e.target.id === 'modalDiente') cerrarModal();
+
         });
+
+
+
+        // --- Manejo de imagenes por diente ---
+
+        const btnAgregarImagen = document.getElementById('btnAgregarImagen');
+
+        const inputImagenDiente = document.getElementById('inputImagenDiente');
+
+        const btnEliminarImagenDiente = document.getElementById('btnEliminarImagenDiente');
+
+
+
+        btnAgregarImagen?.addEventListener('click', (e) => {
+
+            e.stopPropagation();
+
+            inputImagenDiente.value = '';
+
+            inputImagenDiente.click();
+
+        });
+
+
+
+        inputImagenDiente?.addEventListener('change', (e) => {
+
+            const file = e.target.files?.[0];
+
+            if (!file) return;
+
+            const reader = new FileReader();
+
+            reader.onload = (ev) => {
+
+                const { numero } = dienteSeleccionado;
+
+                if (!numero) return;
+
+                imagenesDientes[numero] = ev.target.result;
+
+                const preview = document.getElementById('previewImagenDiente');
+
+                const imgPreview = document.getElementById('imgPreviewDiente');
+
+                imgPreview.src = ev.target.result;
+
+                preview.classList.remove('hidden');
+
+            };
+
+            reader.readAsDataURL(file);
+
+        });
+
+
+
+        btnEliminarImagenDiente?.addEventListener('click', (e) => {
+
+            e.stopPropagation();
+
+            const { numero } = dienteSeleccionado;
+
+            if (!numero) return;
+
+            delete imagenesDientes[numero];
+
+            const preview = document.getElementById('previewImagenDiente');
+
+            const imgPreview = document.getElementById('imgPreviewDiente');
+
+            imgPreview.src = '';
+
+            preview.classList.add('hidden');
+
+            inputImagenDiente.value = '';
+
+        });
+
+
+
+        // Serializar imagenes al enviar el formulario
+
+        document.querySelector('form').addEventListener('submit', () => {
+
+            document.getElementById('inputImagenesDientes').value = JSON.stringify(imagenesDientes);
+
+        });
+
+
 
         let inputPresupuestoSeleccionado = null;
 
+
+
         function abrirModalPresupuesto(inputElement) {
+
             inputPresupuestoSeleccionado = inputElement;
+
             const lista = document.getElementById('listaOpcionesPresupuesto');
+
             lista.innerHTML = '';
+
             opcionesCOP.forEach(op => {
+
                 const li = document.createElement('li');
+
                 const btn = document.createElement('button');
+
                 btn.textContent = `${op.codigo} ${op.texto}`;
+
                 btn.className = 'w-full text-left p-2 border border-slate-300 rounded bg-white text-sm hover:bg-blue-50 hover:border-blue-500 transition';
+
                 btn.onclick = (e) => {
+
                     e.stopPropagation();
+
                     aplicarOpcionPresupuesto(op);
+
                     cerrarModalPresupuesto();
+
                 };
+
                 li.appendChild(btn);
+
                 lista.appendChild(li);
+
             });
+
             const modal = document.getElementById('modalPresupuesto');
+
             modal.style.display = 'flex';
+
             modal.setAttribute('aria-hidden', 'false');
+
         }
+
+
 
         function cerrarModalPresupuesto() {
+
             const modal = document.getElementById('modalPresupuesto');
+
             modal.style.display = 'none';
+
             modal.setAttribute('aria-hidden', 'true');
+
             inputPresupuestoSeleccionado = null;
+
         }
+
+
 
         function aplicarOpcionPresupuesto(op) {
+
             if (!inputPresupuestoSeleccionado) return;
+
             inputPresupuestoSeleccionado.value = op.texto;
+
             inputPresupuestoSeleccionado.classList.add('border-blue-500', 'bg-blue-50');
+
         }
+
+
 
         document.getElementById('cerrarModalPresupuesto')?.addEventListener('click', cerrarModalPresupuesto);
+
         document.getElementById('modalPresupuesto')?.addEventListener('click', (e) => {
+
             if (e.target.id === 'modalPresupuesto') cerrarModalPresupuesto();
+
         });
 
+
+
         function openTab(evt, tabName) {
+
             var i, tabcontent, tablinks;
+
             tabcontent = document.getElementsByClassName("tab-content");
+
             for (i = 0; i < tabcontent.length; i++) {
+
                 tabcontent[i].style.display = "none";
+
                 tabcontent[i].classList.remove("active");
+
             }
+
             tablinks = document.getElementsByClassName("tab-btn");
+
             for (i = 0; i < tablinks.length; i++) {
+
                 tablinks[i].classList.remove("active", "border-teal-700", "text-teal-700", "bg-white");
+
                 tablinks[i].classList.add("border-transparent", "text-slate-500", "bg-slate-50");
+
             }
+
             document.getElementById(tabName).style.display = "block";
+
             document.getElementById(tabName).classList.add("active");
+
             evt.currentTarget.classList.remove("border-transparent", "text-slate-500", "bg-slate-50");
+
             evt.currentTarget.classList.add("active", "border-teal-700", "text-teal-700", "bg-white");
+
         }
+
         // Precargar datos de historia existente si se está viendo una historia guardada
+
         const historiaData = JSON.parse(document.body.dataset.historia || '{}');
+
         if (historiaData && Object.keys(historiaData).length > 0) {
+
             document.querySelectorAll('input[name], select[name], textarea[name]').forEach(el => {
+
                 const name = el.name;
+
                 if (name in historiaData) {
+
                     const val = historiaData[name];
+
                     if (val === null || val === undefined) return;
+
                     if (el.type === 'checkbox') {
+
                         el.checked = (val === 'SI');
+
                     } else if (el.type === 'radio') {
+
                         el.checked = (el.value === val);
+
                     } else {
+
                         el.value = val;
+
                     }
+
                 }
+
             });
+
+            // Cargar imagenes guardadas por diente
+
+            if (historiaData.imagenes_dientes) {
+
+                try {
+
+                    Object.assign(imagenesDientes, JSON.parse(historiaData.imagenes_dientes));
+
+                } catch (e) {
+
+                    console.error('Error cargando imagenes de dientes:', e);
+
+                }
+
+            }
+
         }
+
     </script>
+
 </body>
+
 </html>
+
+
+
