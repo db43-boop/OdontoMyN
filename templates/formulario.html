@@ -1489,65 +1489,65 @@
 
             { codigo: "1.2", texto: "Aparato ortodóntico removible" },
 
-            { codigo: "1.3", texto: "Corona" },
+            { codigo: "1.3", texto: "Caries" },
 
-            { codigo: "1.4", texto: "Puente fijo" },
+            { codigo: "1.4", texto: "Corona definitiva" },
 
-            { codigo: "1.5", texto: "Implante" },
+            { codigo: "1.5", texto: "Corona temporal" },
 
-            { codigo: "1.6", texto: "Prótesis removible parcial" },
+            { codigo: "1.6", texto: "Desgaste oclusal/incisal" },
 
-            { codigo: "1.7", texto: "Prótesis total" },
+            { codigo: "1.7", texto: "Diastema" },
 
             { codigo: "1.8", texto: "DIENTE AUSENTE", accion: "ausente" },
 
             { codigo: "1.9", texto: "DIENTE DISCROMICO", accion: "discromico" },
 
-            { codigo: "1.10", texto: "Obturaci&oacute;n" },
+            { codigo: "1.10", texto: "Diente ectópico" },
 
-            { codigo: "1.11", texto: "Endodoncia" },
+            { codigo: "1.11", texto: "Diente en clavija" },
 
-            { codigo: "1.12", texto: "Coronoplastia" },
+            { codigo: "1.12", texto: "Diente extruido" },
 
-            { codigo: "1.13", texto: "Sellador de fisuras" },
+            { codigo: "1.13", texto: "Diente intruido" },
 
-            { codigo: "1.14", texto: "Fluorizaci&oacute;n" },
+            { codigo: "1.14", texto: "Edéntulo total" },
 
-            { codigo: "1.15", texto: "Extracci&oacute;n indicada" },
+            { codigo: "1.15", texto: "Fractura" },
 
-            { codigo: "1.16", texto: "Movilidad grado I" },
+            { codigo: "1.16", texto: "Geminación / Fusión" },
 
-            { codigo: "1.17", texto: "Movilidad grado II" },
+            { codigo: "1.17", texto: "Giroversión" },
 
-            { codigo: "1.18", texto: "Movilidad grado III" },
+            { codigo: "1.18", texto: "Impactación" },
 
-            { codigo: "1.19", texto: "Fistula" },
+            { codigo: "1.19", texto: "Implante" },
 
-            { codigo: "1.20", texto: "Absceso" },
+            { codigo: "1.20", texto: "Macrodoncia" },
 
-            { codigo: "1.21", texto: "Lesi&oacute;n de mucosa" },
+            { codigo: "1.21", texto: "Microdoncia" },
 
-            { codigo: "1.22", texto: "Caries" },
+            { codigo: "1.22", texto: "Migración" },
 
-            { codigo: "1.23", texto: "Fractura coronal" },
+            { codigo: "1.23", texto: "Movilidad" },
 
-            { codigo: "1.24", texto: "Fractura radicular" },
+            { codigo: "1.24", texto: "Prótesis fija" },
 
-            { codigo: "1.25", texto: "Retenci&oacute;n" },
+            { codigo: "1.25", texto: "Prótesis removible" },
 
-            { codigo: "1.26", texto: "Inclusi&oacute;n &oacute;sea" },
+            { codigo: "1.26", texto: "Prótesis total" },
 
-            { codigo: "1.27", texto: "Supernumerario" },
+            { codigo: "1.27", texto: "Remanente radicular" },
 
-            { codigo: "1.28", texto: "Diente impactado" },
+            { codigo: "1.28", texto: "Restauración" },
 
-            { codigo: "1.29", texto: "Hipoplasia" },
+            { codigo: "1.29", texto: "Restauración temporal" },
 
-            { codigo: "1.30", texto: "Fluorosis" },
+            { codigo: "1.30", texto: "Semi-impactación" },
 
-            { codigo: "1.31", texto: "Amelogenesis imperfecta" },
+            { codigo: "1.31", texto: "Supernumerario" },
 
-            { codigo: "1.32", texto: "Dentinogenesis imperfecta" },
+            { codigo: "1.32", texto: "Transposición" },
 
             { codigo: "1.33", texto: "Tratamiento pulpar" }
 
@@ -1682,6 +1682,24 @@
                     grupoDiente.appendChild(x);
                 }
 
+            } else if (op.codigo === "1.6") {
+
+                const inputName = nombreInputParaDiente(tipo, numero);
+
+                if (inputName) {
+
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+
+                    if (input) {
+
+                        input.value = 'DES';
+
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+
+                    }
+
+                }
+
             } else if (op.codigo === "1.9") {
 
                 const inputName = nombreInputParaDiente(tipo, numero);
@@ -1693,6 +1711,114 @@
                     if (input) {
 
                         input.value = 'DIS';
+
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+
+                    }
+
+                }
+
+            } else if (op.codigo === "1.10") {
+
+                const inputName = nombreInputParaDiente(tipo, numero);
+
+                if (inputName) {
+
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+
+                    if (input) {
+
+                        input.value = 'E';
+
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+
+                    }
+
+                }
+
+            } else if (op.codigo === "1.18") {
+
+                const inputName = nombreInputParaDiente(tipo, numero);
+
+                if (inputName) {
+
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+
+                    if (input) {
+
+                        input.value = 'I';
+
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+
+                    }
+
+                }
+
+            } else if (op.codigo === "1.19") {
+
+                const inputName = nombreInputParaDiente(tipo, numero);
+
+                if (inputName) {
+
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+
+                    if (input) {
+
+                        input.value = 'IMP';
+
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+
+                    }
+
+                }
+
+            } else if (op.codigo === "1.20") {
+
+                const inputName = nombreInputParaDiente(tipo, numero);
+
+                if (inputName) {
+
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+
+                    if (input) {
+
+                        input.value = 'MAC';
+
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+
+                    }
+
+                }
+
+            } else if (op.codigo === "1.21") {
+
+                const inputName = nombreInputParaDiente(tipo, numero);
+
+                if (inputName) {
+
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+
+                    if (input) {
+
+                        input.value = 'MIC';
+
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+
+                    }
+
+                }
+
+            } else if (op.codigo === "1.30") {
+
+                const inputName = nombreInputParaDiente(tipo, numero);
+
+                if (inputName) {
+
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+
+                    if (input) {
+
+                        input.value = 'SI';
 
                         input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
 
@@ -1995,5 +2121,4 @@
 </body>
 
 </html>
-
 
