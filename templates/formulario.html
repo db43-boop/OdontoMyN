@@ -2098,6 +2098,85 @@
 
             }
 
+            else if (op.codigo === "1.23") {
+
+                const inputName = nombreInputParaDiente(tipo, numero);
+
+                if (inputName) {
+
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+
+                    if (input) {
+
+                        input.value = 'M1';
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+
+                    }
+
+                }
+
+            }
+
+            else if (op.codigo === "1.12") {
+
+                const grupoDiente = elemento.querySelector('g');
+                if (grupoDiente) {
+
+                    grupoDiente.querySelectorAll('.marca-extruido').forEach(p => p.remove());
+                    let bb = { x: 2, y: 2, width: 24, height: 71 };
+                    try {
+                        const forma = grupoDiente.querySelector('.tooth-shape');
+                        const medida = forma ? forma.getBBox() : null;
+                        if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+                    } catch (err) {}
+                    // Llenar el campo de texto del diente para que se guarde en la BD
+                    const inputName = nombreInputParaDiente(tipo, numero);
+                    if (inputName) {
+                        const input = document.querySelector(`input[name="${inputName}"]`);
+                        if (input) {
+                            input.value = 'EX';
+                            input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+                        }
+                    }
+
+                    const cx = bb.x + bb.width / 2;
+                    const cy = bb.y + bb.height / 2;
+                    const esSuperior = (tipo === 'adulto-sup' || tipo === 'temp-sup');
+// Si es superior baja (1), si es inferior suba (-1 aplicado al sentido del SVG)
+const dir = esSuperior ? 1 : 1; // 1 = abajo (SVG), -1 = arriba (SVG)
+const sentidoY = esSuperior ? 1 : -1; // <--- Usa esto para la posición vertical
+                    
+                    const inicioY = cy + (dir * bb.height * 0.08);
+                    const largo = bb.height * 0.45;
+                    const offset = bb.height * 0.14;
+                    const puntaAncho = bb.width * 0.16;
+
+                    const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    linea.setAttribute('class', 'marca-extruido');
+                    linea.setAttribute('x1', cx);
+                    linea.setAttribute('y1', inicioY);
+                    linea.setAttribute('x2', cx);
+                    linea.setAttribute('y2', inicioY + (dir * largo));
+                    linea.setAttribute('stroke', '#2563eb');
+                    linea.setAttribute('stroke-width', '2');
+                    linea.setAttribute('fill', 'none');
+                    linea.style.stroke = '#2563eb';
+                    linea.style.strokeWidth = '2';
+                    linea.style.fill = 'none';
+                    grupoDiente.appendChild(linea);
+
+                    const puntaY = inicioY + (dir * largo);
+                    const punta = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                    punta.setAttribute('class', 'marca-extruido');
+                    punta.setAttribute('points', `${cx},${puntaY + (dir * offset)} ${cx - puntaAncho},${puntaY} ${cx + puntaAncho},${puntaY}`);
+                    punta.setAttribute('fill', '#2563eb');
+                    punta.style.fill = '#2563eb';
+                    grupoDiente.appendChild(punta);
+
+                }
+
+            }
+
         }
 
         document.querySelectorAll('#odontogram .tooth').forEach(el => {
