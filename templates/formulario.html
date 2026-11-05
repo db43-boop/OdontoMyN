@@ -1736,6 +1736,70 @@
 
                 }
 
+            } else if (op.codigo === "1.11") {
+
+                const inputName = nombreInputParaDiente(tipo, numero);
+
+                if (inputName) {
+
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+
+                    if (input) {
+
+                        input.value = 'DC';
+
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+
+                    }
+
+                }
+
+                // Dibujar triángulo azul alrededor del número del diente (Diente en clavija)
+
+                const grupoDiente = elemento.querySelector('g');
+
+                if (grupoDiente) {
+
+                    grupoDiente.querySelectorAll('.marca-clavija').forEach(p => p.remove());
+
+                    const texto = elemento.querySelector('text');
+
+                    if (texto) {
+
+                        const bb = texto.getBBox();
+
+                        const cx = bb.x + bb.width / 2;
+
+                        const cy = bb.y + bb.height / 2;
+
+                        const r = Math.max(bb.width, bb.height) * 0.85;
+
+                        const h = r * Math.sqrt(3) / 2;
+
+                        const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+
+                        polygon.setAttribute('class', 'marca-clavija');
+
+                        polygon.setAttribute('points', `${cx},${cy - h / 2} ${cx - r / 2},${cy + h / 2} ${cx + r / 2},${cy + h / 2}`);
+
+                        polygon.setAttribute('stroke', '#2563eb');
+
+                        polygon.setAttribute('stroke-width', '2');
+
+                        polygon.setAttribute('fill', 'none');
+
+                        polygon.style.stroke = '#2563eb';
+
+                        polygon.style.strokeWidth = '2';
+
+                        polygon.style.fill = 'none';
+
+                        elemento.appendChild(polygon);
+
+                    }
+
+                }
+
             } else if (op.codigo === "1.18") {
 
                 const inputName = nombreInputParaDiente(tipo, numero);
@@ -1805,6 +1869,212 @@
                         input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
 
                     }
+
+                }
+
+            } else if (op.codigo === "1.5") {
+
+                const inputName = nombreInputParaDiente(tipo, numero);
+
+                if (inputName) {
+
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+
+                    if (input) {
+
+                        input.value = 'CT';
+
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+
+                    }
+
+                }
+
+                // Dibujar círculo rojo alrededor de la corona del diente (Corona temporal)
+
+                const grupoDiente = elemento.querySelector('g');
+
+                if (grupoDiente) {
+
+                    grupoDiente.querySelectorAll('.marca-corona-temporal').forEach(p => p.remove());
+
+                    let bb = { x: 2, y: 2, width: 24, height: 71 };
+
+                    try {
+
+                        const forma = grupoDiente.querySelector('.tooth-shape');
+
+                        const medida = forma ? forma.getBBox() : null;
+
+                        if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+
+                    } catch (err) {}
+
+                    const cx = bb.x + bb.width / 2;
+
+                    const cy = bb.y + bb.height * 0.78;
+
+                    const r = bb.width * 0.55;
+
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+
+                    circle.setAttribute('class', 'marca-corona-temporal');
+
+                    circle.setAttribute('cx', cx);
+
+                    circle.setAttribute('cy', cy);
+
+                    circle.setAttribute('r', r);
+
+                    circle.setAttribute('stroke', '#dc2626');
+
+                    circle.setAttribute('stroke-width', '2');
+
+                    circle.setAttribute('fill', 'none');
+
+                    circle.style.stroke = '#dc2626';
+
+                    circle.style.strokeWidth = '2';
+
+                    circle.style.fill = 'none';
+
+                    grupoDiente.appendChild(circle);
+
+                }
+
+            } else if (op.codigo === "1.15") {
+
+                const inputName = nombreInputParaDiente(tipo, numero);
+
+                if (inputName) {
+
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+
+                    if (input) {
+
+                        input.value = 'FR';
+
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+
+                    }
+
+                }
+
+                // Dibujar línea diagonal roja para fractura (1.15)
+
+                const grupoDiente = elemento.querySelector('g');
+
+                if (grupoDiente) {
+
+                    grupoDiente.querySelectorAll('.marca-fractura').forEach(p => p.remove());
+
+                    let bb = { x: 2, y: 2, width: 24, height: 71 };
+
+                    try {
+
+                        const forma = grupoDiente.querySelector('.tooth-shape');
+
+                        const medida = forma ? forma.getBBox() : null;
+
+                        if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+
+                    } catch (err) {}
+
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+
+                    line.setAttribute('class', 'marca-fractura');
+
+                    line.setAttribute('x1', bb.x + 3);
+
+                    line.setAttribute('y1', bb.y + 3);
+
+                    line.setAttribute('x2', bb.x + bb.width - 3);
+
+                    line.setAttribute('y2', bb.y + bb.height - 3);
+
+                    line.setAttribute('stroke', '#dc2626');
+
+                    line.setAttribute('stroke-width', '2');
+
+                    line.setAttribute('fill', 'none');
+
+                    line.style.stroke = '#dc2626';
+
+                    line.style.strokeWidth = '2';
+
+                    line.style.fill = 'none';
+
+                    grupoDiente.appendChild(line);
+
+                }
+
+            } else if (op.codigo === "1.27") {
+
+                const inputName = nombreInputParaDiente(tipo, numero);
+
+                if (inputName) {
+
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+
+                    if (input) {
+
+                        input.value = 'RR';
+
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+
+                    }
+
+                }
+
+                // Dibujar letras "RR" en rojo sobre la raíz del diente (Remanente radicular)
+
+                const grupoDiente = elemento.querySelector('g');
+
+                if (grupoDiente) {
+
+                    grupoDiente.querySelectorAll('.marca-remanente-radicular').forEach(p => p.remove());
+
+                    let bb = { x: 2, y: 2, width: 24, height: 71 };
+
+                    try {
+
+                        const forma = grupoDiente.querySelector('.tooth-shape');
+
+                        const medida = forma ? forma.getBBox() : null;
+
+                        if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+
+                    } catch (err) {}
+
+                    const cx = bb.x + bb.width / 2;
+
+                    const cy = bb.y + bb.height * 0.65;
+
+                    const textoRR = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+
+                    textoRR.setAttribute('class', 'marca-remanente-radicular');
+
+                    textoRR.setAttribute('x', cx);
+
+                    textoRR.setAttribute('y', cy);
+
+                    textoRR.setAttribute('text-anchor', 'middle');
+
+                    textoRR.setAttribute('fill', '#dc2626');
+
+                    textoRR.setAttribute('font-weight', 'bold');
+
+                    textoRR.setAttribute('font-size', '10');
+
+                    textoRR.textContent = 'RR';
+
+                    textoRR.style.fill = '#dc2626';
+
+                    textoRR.style.fontWeight = 'bold';
+
+                    textoRR.style.fontSize = '10px';
+
+                    grupoDiente.appendChild(textoRR);
 
                 }
 
