@@ -91,7 +91,7 @@
 
 </head>
 
-<body class="bg-slate-100 font-sans text-slate-800 py-8" data-historia="{{ historia|tojson if historia else '{}' }}">
+<body class="bg-slate-100 font-sans text-slate-800 py-8" data-historia='{{ historia|tojson|safe if historia else "{}" }}'>
 
     <div class="max-w-5xl mx-auto bg-white p-8 rounded-none shadow-md border border-slate-300">
 
@@ -123,9 +123,12 @@
 
         </div>
 
-        <form method="POST" class="space-y-6 no-print-btn">
+        <form method="POST"  class="space-y-6 no-print-btn">
 
             <input type="hidden" name="imagenes_dientes" id="inputImagenesDientes" value="" />
+            {% if historia and historia.get('id') %}
+            <input type="hidden" name="id_historia" value="{{ historia.id }}" />
+            {% endif %}
 
             <div id="diagnostico" class="tab-content active">
 
@@ -1321,7 +1324,7 @@
 
                         <tbody>
 
-                            {% for i in range(1, 11) %}
+                            {% for i in range(1, 12) %}
 
                             <tr>
 
@@ -1387,7 +1390,7 @@
 
                         <tbody>
 
-                            {% for i in range(1, 31) %}
+                            {% for i in range(1, 12) %}
 
                             <tr>
 
@@ -1657,8 +1660,19 @@
 
             const { numero, tipo, elemento } = dienteSeleccionado;
 
-            if (op.codigo === "1.8") {
+          if (op.codigo === "1.8") {
+                
+                // 👇 ESTO ES LO QUE FALTABA: Guardar 'AUS' en el input para que viaje a la BD
+                const inputName = nombreInputParaDiente(tipo, numero);
+                if (inputName) {
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+                    if (input) {
+                        input.value = 'AUS';
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+                    }
+                }
 
+                // Tu código gráfico actual (intacto)
                 const grupoDiente = elemento.querySelector('g');
                 if (grupoDiente) {
                     grupoDiente.querySelectorAll('.marca-ausente').forEach(p => p.remove());
@@ -1681,6 +1695,7 @@
                     x.style.strokeLinecap = 'round';
                     grupoDiente.appendChild(x);
                 }
+            
 
             } else if (op.codigo === "1.6") {
 
@@ -2129,22 +2144,12 @@
                         const medida = forma ? forma.getBBox() : null;
                         if (medida && medida.width > 0 && medida.height > 0) bb = medida;
                     } catch (err) {}
-                    // Llenar el campo de texto del diente para que se guarde en la BD
-                    const inputName = nombreInputParaDiente(tipo, numero);
-                    if (inputName) {
-                        const input = document.querySelector(`input[name="${inputName}"]`);
-                        if (input) {
-                            input.value = 'EX';
-                            input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
-                        }
-                    }
 
                     const cx = bb.x + bb.width / 2;
                     const cy = bb.y + bb.height / 2;
                     const esSuperior = (tipo === 'adulto-sup' || tipo === 'temp-sup');
-// Si es superior baja (1), si es inferior suba (-1 aplicado al sentido del SVG)
-const dir = esSuperior ? 1 : 1; // 1 = abajo (SVG), -1 = arriba (SVG)
-const sentidoY = esSuperior ? 1 : -1; // <--- Usa esto para la posición vertical
+                    const dir = esSuperior ? 1 : 1;
+                    const sentidoY = esSuperior ? 1 : -1;
                     
                     const inicioY = cy + (dir * bb.height * 0.08);
                     const largo = bb.height * 0.45;
@@ -2173,6 +2178,16 @@ const sentidoY = esSuperior ? 1 : -1; // <--- Usa esto para la posición vertica
                     punta.style.fill = '#2563eb';
                     grupoDiente.appendChild(punta);
 
+                }
+
+                // Llenar el campo de texto del diente para que se guarde en la BD (fuera del if grupoDiente)
+                const inputName = nombreInputParaDiente(tipo, numero);
+                if (inputName) {
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+                    if (input) {
+                        input.value = 'EX';
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+                    }
                 }
 
             }
@@ -2413,58 +2428,177 @@ const sentidoY = esSuperior ? 1 : -1; // <--- Usa esto para la posición vertica
 
         }
 
-        // Precargar datos de historia existente si se está viendo una historia guardada
-
         const historiaData = JSON.parse(document.body.dataset.historia || '{}');
 
         if (historiaData && Object.keys(historiaData).length > 0) {
+            
+            // --- PASO 1: ASIGNACIÓN DIRECTA Y SEGURA DE CAMPOS CLAVE ---
+            if (historiaData.n_historia) document.querySelector('input[name="n_historia"]').value = historiaData.n_historia;
+            if (historiaData.nombre_apellido) document.querySelector('input[name="nombre_apellido"]').value = historiaData.nombre_apellido;
+            if (historiaData.dni) document.querySelector('input[name="dni"]').value = historiaData.dni;
+            if (historiaData.fecha_nacimiento) document.querySelector('input[name="fecha_nacimiento"]').value = historiaData.fecha_nacimiento;
+            if (historiaData.sexo) document.querySelector('select[name="sexo"]').value = historiaData.sexo;
+            if (historiaData.edad) document.querySelector('input[name="edad"]').value = historiaData.edad;
+            if (historiaData.telefono) document.querySelector('input[name="telefono"]').value = historiaData.telefono;
+            if (historiaData.fecha_atencion) document.querySelector('input[name="fecha_atencion"]').value = historiaData.fecha_atencion;
+            if (historiaData.motivo_consulta) document.querySelector('textarea[name="motivo_consulta"]').value = historiaData.motivo_consulta;
 
+            // 1. Rellenar el resto de inputs (antecedentes, exámenes, odontograma, etc.)
             document.querySelectorAll('input[name], select[name], textarea[name]').forEach(el => {
-
                 const name = el.name;
+                
+                // Ignoramos los campos clave que ya asignamos de forma directa arriba
+                if (['n_historia', 'nombre_apellido', 'dni', 'fecha_nacimiento', 'sexo', 'edad', 'telefono', 'fecha_atencion', 'motivo_consulta'].includes(name)) return;
 
                 if (name in historiaData) {
-
                     const val = historiaData[name];
-
                     if (val === null || val === undefined) return;
 
                     if (el.type === 'checkbox') {
-
                         el.checked = (val === 'SI');
-
                     } else if (el.type === 'radio') {
-
                         el.checked = (el.value === val);
-
                     } else {
-
                         el.value = val;
-
+                        // Resaltar en azul únicamente las casillas que tienen texto real
+                        if (name.startsWith('rec_') && val.trim() !== '') {
+                            el.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+                        }
                     }
-
                 }
-
             });
 
-            // Cargar imagenes guardadas por diente
-
+            // 2. Cargar imágenes guardadas por diente
             if (historiaData.imagenes_dientes) {
-
                 try {
-
                     Object.assign(imagenesDientes, JSON.parse(historiaData.imagenes_dientes));
-
                 } catch (e) {
-
-                    console.error('Error cargando imagenes de dientes:', e);
-
+                    console.error('Error cargando imágenes de dientes:', e);
                 }
-
             }
 
-        }
+            // 3. RESTAURAR LOS GRÁFICOS SVG SEGÚN EL VALOR EXACTO DE CADA CASILLA
+           // 3. RESTAURAR LOS GRÁFICOS SVG SEGÚN EL VALOR EXACTO DE CADA CASILLA
+            document.querySelectorAll('#odontogram .tooth').forEach(el => {
+                const num = (el.dataset.tooth || '').trim();
+                const tipo = el.dataset.tipo;
+                const inputName = nombreInputParaDiente(tipo, num);
 
+                if (inputName && historiaData[inputName]) {
+                    const valorCasilla = historiaData[inputName];
+                    const grupoDiente = el.querySelector('g');
+                    if (!grupoDiente) return;
+
+                    // --- A. EXTRUIDO (EX) ---
+                    if (valorCasilla === 'EX') {
+                        grupoDiente.querySelectorAll('.marca-extruido').forEach(p => p.remove());
+                        let bb = { x: 2, y: 2, width: 24, height: 71 };
+                        try {
+                            const forma = grupoDiente.querySelector('.tooth-shape');
+                            const medida = forma ? forma.getBBox() : null;
+                            if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+                        } catch (err) {}
+
+                        const cx = bb.x + bb.width / 2;
+                        const cy = bb.y + bb.height / 2;
+                        const dir = 1;
+                        const inicioY = cy + (dir * bb.height * 0.08);
+                        const largo = bb.height * 0.45;
+                        const offset = bb.height * 0.14;
+                        const puntaAncho = bb.width * 0.16;
+
+                        const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        linea.setAttribute('class', 'marca-extruido');
+                        linea.setAttribute('x1', cx);
+                        linea.setAttribute('y1', inicioY);
+                        linea.setAttribute('x2', cx);
+                        linea.setAttribute('y2', inicioY + (dir * largo));
+                        linea.setAttribute('stroke', '#2563eb');
+                        linea.setAttribute('stroke-width', '2');
+                        linea.setAttribute('fill', 'none');
+                        grupoDiente.appendChild(linea);
+
+                        const puntaY = inicioY + (dir * largo);
+                        const punta = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                        punta.setAttribute('class', 'marca-extruido');
+                        punta.setAttribute('points', `${cx},${puntaY + (dir * offset)} ${cx - puntaAncho},${puntaY} ${cx + puntaAncho},${puntaY}`);
+                        punta.setAttribute('fill', '#2563eb');
+                        grupoDiente.appendChild(punta);
+                    }
+
+                    // --- B. CORONA TEMPORAL (CT) ---
+                    else if (valorCasilla === 'CT') {
+                        grupoDiente.querySelectorAll('.marca-corona-temporal').forEach(p => p.remove());
+                        let bb = { x: 2, y: 2, width: 24, height: 71 };
+                        try {
+                            const forma = grupoDiente.querySelector('.tooth-shape');
+                            const medida = forma ? forma.getBBox() : null;
+                            if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+                        } catch (err) {}
+
+                        const cx = bb.x + bb.width / 2;
+                        const cy = bb.y + bb.height * 0.78;
+                        const r = bb.width * 0.55;
+
+                        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                        circle.setAttribute('class', 'marca-corona-temporal');
+                        circle.setAttribute('cx', cx);
+                        circle.setAttribute('cy', cy);
+                        circle.setAttribute('r', r);
+                        circle.setAttribute('stroke', '#dc2626');
+                        circle.setAttribute('stroke-width', '2');
+                        circle.setAttribute('fill', 'none');
+                        grupoDiente.appendChild(circle);
+                    }
+
+                    // --- C. FRACTURA (FR) ---
+                    else if (valorCasilla === 'FR') {
+                        grupoDiente.querySelectorAll('.marca-fractura').forEach(p => p.remove());
+                        let bb = { x: 2, y: 2, width: 24, height: 71 };
+                        try {
+                            const forma = grupoDiente.querySelector('.tooth-shape');
+                            const medida = forma ? forma.getBBox() : null;
+                            if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+                        } catch (err) {}
+
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        line.setAttribute('class', 'marca-fractura');
+                        line.setAttribute('x1', bb.x + 3);
+                        line.setAttribute('y1', bb.y + 3);
+                        line.setAttribute('x2', bb.x + bb.width - 3);
+                        line.setAttribute('y2', bb.y + bb.height - 3);
+                        line.setAttribute('stroke', '#dc2626');
+                        line.setAttribute('stroke-width', '2');
+                        line.setAttribute('fill', 'none');
+                        grupoDiente.appendChild(line);
+                    }
+
+                    // --- D. DIENTE AUSENTE (AUS) -> DIBUJA LA X AZUL EN EL DIENTE ---
+                    else if (valorCasilla === 'AUS') {
+                        grupoDiente.querySelectorAll('.marca-ausente').forEach(p => p.remove());
+                        let bb = { x: 2, y: 2, width: 24, height: 71 };
+                        try {
+                            const forma = grupoDiente.querySelector('.tooth-shape');
+                            const medida = forma ? forma.getBBox() : null;
+                            if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+                        } catch (err) {}
+
+                        const x = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        x.setAttribute('class', 'marca-ausente');
+                        x.setAttribute('d', `M${bb.x + 1},${bb.y + 1} L${bb.x + bb.width - 1},${bb.y + bb.height - 1} M${bb.x + bb.width - 1},${bb.y + 1} L${bb.x + 1},${bb.y + bb.height - 1}`);
+                        x.setAttribute('stroke', '#2563eb');
+                        x.setAttribute('stroke-width', '2.5');
+                        x.setAttribute('fill', 'none');
+                        x.setAttribute('stroke-linecap', 'round');
+                        x.style.stroke = '#2563eb';
+                        x.style.strokeWidth = '2.5';
+                        x.style.fill = 'none';
+                        x.style.strokeLinecap = 'round';
+                        grupoDiente.appendChild(x);
+                    }
+                }
+            });
+        }
     </script>
 
 </body>

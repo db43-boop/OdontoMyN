@@ -53,6 +53,8 @@ def _columnas_evolucion():
             f"evo_cuenta_{i}",
             f"evo_adelanto_{i}",
             f"evo_saldo_{i}",
+            f"evo_observaciones_{i}",
+            f"evo_estado_{i}",
         ]
     return cols
 
@@ -219,30 +221,47 @@ def dashboard():
 def nueva_historia():
     if request.method == "POST":
         data = request.form
+        id_historia = data.get("id_historia")
         nombres = _nombres_columnas()
         placeholders = ", ".join(["?"] * len(nombres))
         columnas_sql = ", ".join(nombres)
-        valores = tuple(data.get(nombre) for nombre in nombres)
 
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        cursor.execute(
-            f"""
-            INSERT INTO historias ({columnas_sql})
-            VALUES ({placeholders})
-        """,
-            valores,
-        )
+
+        if id_historia:
+            # Modo edición: actualizar historia existente
+            set_clause = ", ".join([f"{nombre} = ?" for nombre in nombres])
+            valores = tuple(data.get(nombre) for nombre in nombres) + (id_historia,)
+            cursor.execute(
+                f"""
+                UPDATE historias
+                SET {set_clause}
+                WHERE id = ?
+            """,
+                valores,
+            )
+        else:
+            # Modo creación: insertar nueva historia
+            valores = tuple(data.get(nombre) for nombre in nombres)
+            cursor.execute(
+                f"""
+                INSERT INTO historias ({columnas_sql})
+                VALUES ({placeholders})
+            """,
+                valores,
+            )
+
         conn.commit()
         conn.close()
         return redirect(url_for("dashboard"))
     
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) FROM historias")
-    count = cursor.fetchone()[0]
+    cursor.execute("SELECT MAX(CAST(n_historia AS INTEGER)) FROM historias")
+    max_n = cursor.fetchone()[0]
+    siguiente_n = str((max_n or 0) + 1).zfill(2)
     conn.close()
-    siguiente_n = str(count + 1).zfill(2)
 
     return render_template("formulario.html", siguiente_n=siguiente_n)
 
@@ -250,14 +269,21 @@ def nueva_historia():
 @app.route("/ver/<int:id>")
 def ver_historia(id):
     conn = sqlite3.connect(db_path)
+    
+    # LÍNEA Mágica: Hace que SQLite devuelva los datos como un diccionario basado en los nombres reales de las columnas
+    conn.row_factory = sqlite3.Row 
+    
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM historias WHERE id = ?", (id,))
     row = cursor.fetchone()
     conn.close()
+    
     if not row:
         return redirect(url_for("dashboard"))
-    nombres = _nombres_columnas()
-    historia = dict(zip(nombres, row))
+    
+    # Convertimos la fila de sqlite3 directamente a un diccionario limpio
+    historia = dict(row)
+    
     siguiente_n = historia.get("n_historia") or str(1).zfill(2)
     return render_template("formulario.html", siguiente_n=siguiente_n, historia=historia)
 
