@@ -765,7 +765,7 @@
                                 <div class="relative w-full" style="height: 24px;">
                                     {% for n in [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28] %}
                                     {% set x = (255.5 - ((n % 10) - 1) * 31) if (n // 10) in [1,4,5,8] else (296.5 + ((n % 10) - 1) * 31) %}
-                                    <input type="text" name="rec_sup2_{{n}}" maxlength="4" style="left: {{ '%.3f'|format(x / 5.8) }}%; width: 4.828%;" class="absolute top-0 h-6 border border-slate-400 text-[10px] text-center font-bold uppercase bg-white outline-none">
+                                    <input type="text" name="rec_sup2_{{n}}" maxlength="8" style="left: {{ '%.3f'|format(x / 5.8) }}%; width: 4.828%;" class="absolute top-0 h-6 border border-slate-400 text-[10px] text-center font-bold uppercase bg-white outline-none">
                                     {% endfor %}
                                 </div>
                             </div>
@@ -773,7 +773,7 @@
                                 <div class="relative w-full" style="height: 24px;">
                                     {% for n in [55,54,53,52,51, 61,62,63,64,65] %}
                                     {% set x = (255.5 - ((n % 10) - 1) * 31) if (n // 10) in [1,4,5,8] else (296.5 + ((n % 10) - 1) * 31) %}
-                                    <input type="text" name="rec_temp_sup_{{n}}" maxlength="4" style="left: {{ '%.3f'|format(x / 5.8) }}%; width: 4.828%;" class="absolute top-0 h-6 border border-slate-400 text-[9px] text-center font-bold uppercase bg-white outline-none">
+                                    <input type="text" name="rec_temp_sup_{{n}}" maxlength="8" style="left: {{ '%.3f'|format(x / 5.8) }}%; width: 4.828%;" class="absolute top-0 h-6 border border-slate-400 text-[9px] text-center font-bold uppercase bg-white outline-none">
                                     {% endfor %}
                                 <div class="absolute top-0 h-6 border-r-2 border-slate-800" style="left: 50%;"></div>
                                 </div>
@@ -2151,8 +2151,8 @@
                     const dir = esSuperior ? 1 : 1;
                     const sentidoY = esSuperior ? 1 : -1;
                     
-                    const inicioY = cy + (dir * bb.height * 0.08);
-                    const largo = bb.height * 0.45;
+                    const inicioY = cy + (dir * bb.height * 0.45);
+                    const largo = bb.height * 0.15;
                     const offset = bb.height * 0.14;
                     const puntaAncho = bb.width * 0.16;
 
@@ -2191,7 +2191,122 @@
                 }
 
             }
+            else if (op.codigo === "1.13") {
+                const grupoDiente = elemento.querySelector('g');
+                if (grupoDiente) {
+                    grupoDiente.querySelectorAll('.marca-intruido').forEach(p => p.remove());
+                    let bb = { x: 2, y: 2, width: 24, height: 71 };
+                    try {
+                        const forma = grupoDiente.querySelector('.tooth-shape');
+                        const medida = forma ? forma.getBBox() : null;
+                        if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+                    } catch (err) {}
 
+                    const cx = bb.x + bb.width / 2;
+                    // Cambiamos el punto de inicio para que la flecha nazca justo debajo/encima del cuerpo del diente
+                    const inicioY = bb.y + bb.height * 1.20; 
+                    const largo = bb.height * 0.15;
+                    const dir = -1; 
+                    const offset = bb.height * 0.12;
+                    const puntaAncho = bb.width * 0.18;
+
+                    const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    linea.setAttribute('class', 'marca-intruido');
+                    linea.setAttribute('x1', cx);
+                    linea.setAttribute('y1', inicioY);
+                    linea.setAttribute('x2', cx);
+                    linea.setAttribute('y2', inicioY + (dir * largo));
+                    linea.setAttribute('stroke', '#2563eb');
+                    linea.setAttribute('stroke-width', '2');
+                    linea.setAttribute('fill', 'none');
+                    linea.style.stroke = '#2563eb';
+                    linea.style.strokeWidth = '2';
+                    linea.style.fill = 'none';
+                    grupoDiente.appendChild(linea);
+
+                    const puntaY = inicioY + (dir * largo);
+                    const punta = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                    punta.setAttribute('class', 'marca-intruido');
+                    punta.setAttribute('points', `${cx},${puntaY + (dir * offset)} ${cx - puntaAncho},${puntaY} ${cx + puntaAncho},${puntaY}`);
+                    punta.setAttribute('fill', '#2563eb');
+                    punta.style.fill = '#2563eb';
+                    grupoDiente.appendChild(punta);
+                }
+
+                const inputName = nombreInputParaDiente(tipo, numero);
+                if (inputName) {
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+                    if (input) {
+                        input.value = 'IN';
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+                    }
+                }
+            }
+else if (op.codigo === "1.22") {
+                const inputName = nombreInputParaDiente(tipo, numero);
+                if (inputName) {
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+                    if (input) {
+                        let valorActual = input.value;
+                        // Ciclo: Si está vacío o apuntaba a la izquierda, cambia a derecha; si estaba a la derecha, pasa a izquierda
+                        if (!valorActual || valorActual === 'MIG-IZQ') {
+                            input.value = 'MIG-DER';
+                        } else {
+                            input.value = 'MIG-IZQ';
+                        }
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+                    }
+                }
+
+                // Dibujar inmediatamente la flecha de migración en pantalla
+                const grupoDiente = elemento.querySelector('g');
+                if (grupoDiente) {
+                    const valorCasilla = document.querySelector(`input[name="${nombreInputParaDiente(tipo, numero)}"]`).value;
+                    dibujarMigracionDiente(grupoDiente, valorCasilla);
+                }
+            }
+        }
+        function dibujarMigracionDiente(grupoDiente, valorCasilla) {
+            grupoDiente.querySelectorAll('.marca-migracion').forEach(p => p.remove());
+            if (!valorCasilla || !valorCasilla.startsWith('MIG')) return;
+
+            const esIzquierda = valorCasilla.includes('IZQ');
+            let bb = { x: 2, y: 2, width: 24, height: 71 };
+            try {
+                const forma = grupoDiente.querySelector('.tooth-shape');
+                const medida = forma ? forma.getBBox() : null;
+                if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+            } catch (err) {}
+
+            const cx = bb.x + bb.width / 2;
+            const yOclusal = bb.y + bb.height * 1.10; 
+            const largoLinea = bb.width * 1.2; 
+            const dir = esIzquierda ? -1 : 1;
+
+            // 1. Línea horizontal de la flecha
+            const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            linea.setAttribute('class', 'marca-migracion');
+            linea.setAttribute('x1', cx - (largoLinea / 2) * dir);
+            linea.setAttribute('y1', yOclusal);
+            linea.setAttribute('x2', cx + (largoLinea / 2) * dir);
+            linea.setAttribute('y2', yOclusal);
+            linea.setAttribute('stroke', '#2563eb');
+            linea.setAttribute('stroke-width', '2');
+            grupoDiente.appendChild(linea);
+
+            // 2. Punta de la flecha
+            const puntaX = cx + (largoLinea / 2) * dir;
+            const punta = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            punta.setAttribute('class', 'marca-migracion');
+            
+            if (esIzquierda) {
+                punta.setAttribute('points', `${puntaX},${yOclusal} ${puntaX + 5},${yOclusal - 4} ${puntaX + 5},${yOclusal + 4}`);
+            } else {
+                punta.setAttribute('points', `${puntaX},${yOclusal} ${puntaX - 5},${yOclusal - 4} ${puntaX - 5},${yOclusal + 4}`);
+            }
+            
+            punta.setAttribute('fill', '#2563eb');
+            grupoDiente.appendChild(punta);
         }
 
         document.querySelectorAll('#odontogram .tooth').forEach(el => {
@@ -2208,9 +2323,28 @@
                 el.dataset.diente = num;
                 el.dataset.tipo = tipo;
                 el.classList.add('pieza-dentaria');
-                el.addEventListener('click', () => abrirModal(num, tipo, el));
+          el.addEventListener('click', () => {
+                    const inputName = nombreInputParaDiente(tipo, num);
+                    const input = inputName ? document.querySelector(`input[name="${inputName}"]`) : null;
+                    
+                    if (input && input.value && input.value.startsWith('MIG')) {
+                        if (input.value.includes('IZQ')) {
+                            input.value = 'MIG-DER';
+                        } else {
+                            input.value = 'MIG-IZQ';
+                        }
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+                        
+                        const grupoDiente = el.querySelector('g');
+                        if (grupoDiente) {
+                            dibujarMigracionDiente(grupoDiente, input.value);
+                        }
+                    } else {
+                        abrirModal(num, tipo, el);
+                    }
+                });
             }
-        });
+                });
 
         document.getElementById('cerrarModal')?.addEventListener('click', cerrarModal);
 
@@ -2477,7 +2611,7 @@
                 }
             }
 
-            // 3. RESTAURAR LOS GRÁFICOS SVG SEGÚN EL VALOR EXACTO DE CADA CASILLA
+            
            // 3. RESTAURAR LOS GRÁFICOS SVG SEGÚN EL VALOR EXACTO DE CADA CASILLA
             document.querySelectorAll('#odontogram .tooth').forEach(el => {
                 const num = (el.dataset.tooth || '').trim();
@@ -2502,8 +2636,8 @@
                         const cx = bb.x + bb.width / 2;
                         const cy = bb.y + bb.height / 2;
                         const dir = 1;
-                        const inicioY = cy + (dir * bb.height * 0.08);
-                        const largo = bb.height * 0.45;
+                        const inicioY = cy + (dir * bb.height * 0.45);
+                        const largo = bb.height * 0.14;
                         const offset = bb.height * 0.14;
                         const puntaAncho = bb.width * 0.16;
 
@@ -2526,7 +2660,7 @@
                         grupoDiente.appendChild(punta);
                     }
 
-                    // --- B. CORONA TEMPORAL (CT) ---
+                 // --- B. CORONA TEMPORAL (CT) ---
                     else if (valorCasilla === 'CT') {
                         grupoDiente.querySelectorAll('.marca-corona-temporal').forEach(p => p.remove());
                         let bb = { x: 2, y: 2, width: 24, height: 71 };
@@ -2596,8 +2730,78 @@
                         x.style.strokeLinecap = 'round';
                         grupoDiente.appendChild(x);
                     }
+
+                    // --- E. DIENTE EN CLAVIJA (DC) ---
+                    else if (valorCasilla === 'DC') {
+                        grupoDiente.querySelectorAll('.marca-clavija').forEach(p => p.remove());
+                        let bb = { x: 2, y: 2, width: 24, height: 71 };
+                        try {
+                            const forma = grupoDiente.querySelector('.tooth-shape');
+                            const medida = forma ? forma.getBBox() : null;
+                            if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+                        } catch (err) {}
+
+                        const cx = bb.x + bb.width / 2;
+                        const esInferior = grupoDiente.getAttribute('transform') && grupoDiente.getAttribute('transform').includes('scale(1 -1)');
+                        const numY = esInferior ? (bb.y + bb.height + 14) : (bb.y - 14);
+                        const tam = 9;
+
+                        const triangulo = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                        triangulo.setAttribute('class', 'marca-clavija');
+                        triangulo.setAttribute('points', `${cx},${numY - tam} ${cx - tam},${numY + tam} ${cx + tam},${numY + tam}`);
+                        triangulo.setAttribute('stroke', '#2563eb');
+                        triangulo.setAttribute('stroke-width', '1.5');
+                        triangulo.setAttribute('fill', 'none');
+                        
+                        if (esInferior) {
+                            triangulo.setAttribute('transform', `rotate(180, ${cx}, ${numY})`);
+                        }
+
+                        grupoDiente.appendChild(triangulo);
+                    }
+                
+                // --- E. INTRUIDO (IN) ---
+                    else if (valorCasilla === 'IN') {
+                        grupoDiente.querySelectorAll('.marca-intruido').forEach(p => p.remove());
+                        let bb = { x: 2, y: 2, width: 24, height: 71 };
+                        try {
+                            const forma = grupoDiente.querySelector('.tooth-shape');
+                            const medida = forma ? forma.getBBox() : null;
+                            if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+                        } catch (err) {}
+
+                        const cx = bb.x + bb.width / 2;
+                        const inicioY = bb.y + bb.height * 1.20; 
+                        const largo = bb.height * 0.15;
+                        const dir = -1; 
+                        const offset = bb.height * 0.12;
+                        const puntaAncho = bb.width * 0.18;
+
+                        const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        linea.setAttribute('class', 'marca-intruido');
+                        linea.setAttribute('x1', cx);
+                        linea.setAttribute('y1', inicioY);
+                        linea.setAttribute('x2', cx);
+                        linea.setAttribute('y2', inicioY + (dir * largo));
+                        linea.setAttribute('stroke', '#2563eb');
+                        linea.setAttribute('stroke-width', '2');
+                        linea.setAttribute('fill', 'none');
+                        grupoDiente.appendChild(linea);
+
+                        const puntaY = inicioY + (dir * largo);
+                        const punta = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                        punta.setAttribute('class', 'marca-intruido');
+                        punta.setAttribute('points', `${cx},${puntaY + (dir * offset)} ${cx - puntaAncho},${puntaY} ${cx + puntaAncho},${puntaY}`);
+                        punta.setAttribute('fill', '#2563eb');
+                        grupoDiente.appendChild(punta);
+                    }
+                    // --- F. MIGRACIÓN (MIG-DER / MIG-IZQ) ---
+                    else if (valorCasilla.startsWith('MIG')) {
+                        dibujarMigracionDiente(grupoDiente, valorCasilla);
                 }
+            }
             });
+            
         }
     </script>
 
