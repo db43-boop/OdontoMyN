@@ -1604,7 +1604,11 @@
 
                     aplicarOpcion(op);
 
-                    cerrarModal();
+                    // 👇 AGREGAR ESTO: Si es 1.7, NO cerramos el modal para ver los sub-botones
+                    if (op.codigo !== "1.7") {
+                        cerrarModal();
+                    }
+                    
 
                 };
 
@@ -2265,6 +2269,55 @@ else if (op.codigo === "1.22") {
                     dibujarMigracionDiente(grupoDiente, valorCasilla);
                 }
             }
+else if (op.codigo === "1.17") {
+                const inputName = nombreInputParaDiente(tipo, numero);
+                if (inputName) {
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+                    if (input) {
+                        let valorActual = input.value;
+                        if (!valorActual || valorActual === 'GIV-IZQ') {
+                            input.value = 'GIV-DER';
+                        } else {
+                            input.value = 'GIV-IZQ';
+                        }
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+                    }
+                }
+
+                const grupoDiente = elemento.querySelector('g');
+                if (grupoDiente) {
+                    const valorCasilla = document.querySelector(`input[name="${nombreInputParaDiente(tipo, numero)}"]`).value;
+                    dibujarGiroversionDiente(grupoDiente, valorCasilla);
+                }
+            } // <--- ¡AQUÍ FALTABA ESTA LLAVE PARA CERRAR EL 1.17!
+
+            else if (op.codigo === "1.7") { // <--- Este va afuera, limpio y ordenado
+                // Al elegir 1.7 Diastema, cambiamos dinámicamente la lista del modal 
+                const lista = document.getElementById('listaOpcionesCOP');
+                lista.innerHTML = `
+                    <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-blue-50 p-2 rounded border border-blue-200">
+                        Seleccione el lado del Diastema para el diente ${dienteSeleccionado.numero}:
+                    </li>
+                    <li>
+                        <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarDiastema('IZQ')">
+                            <span>Diastema (Izquierda)</span>
+                            <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">DIA-IZQ</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarDiastema('DER')">
+                            <span>Diastema (Derecha)</span>
+                            <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">DIA-DER</span>
+                        </button>
+                    </li>
+                    <li class="mt-4">
+                        <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
+                            &larr; Volver a la lista principal
+                        </button>
+                    </li>
+                `;
+                return; // Mantiene el modal abierto para permitir elegir el lado
+            }
         }
         function dibujarMigracionDiente(grupoDiente, valorCasilla) {
             grupoDiente.querySelectorAll('.marca-migracion').forEach(p => p.remove());
@@ -2308,6 +2361,119 @@ else if (op.codigo === "1.22") {
             punta.setAttribute('fill', '#2563eb');
             grupoDiente.appendChild(punta);
         }
+function dibujarGiroversionDiente(grupoDiente, valorCasilla) {
+            grupoDiente.querySelectorAll('.marca-giroversion').forEach(p => p.remove());
+            if (!valorCasilla || !valorCasilla.startsWith('GIV')) return;
+
+            const esIzquierda = valorCasilla.includes('IZQ');
+            let bb = { x: 2, y: 2, width: 24, height: 71 };
+            try {
+                const forma = grupoDiente.querySelector('.tooth-shape');
+                const medida = forma ? forma.getBBox() : null;
+                if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+            } catch (err) {}
+
+            const cx = bb.x + bb.width / 2;
+            const cy = bb.y + bb.height * 1.08; 
+
+            const pathElem = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            pathElem.setAttribute('class', 'marca-giroversion');
+            
+            let dAttr = '';
+            let puntaPoints = '';
+            
+            if (esIzquierda) {
+                dAttr = `M ${cx + 10} ${cy} Q ${cx} ${cy + 10} ${cx - 10} ${cy}`;
+                puntaPoints = `${cx - 10},${cy} ${cx - 4},${cy - 4} ${cx - 4},${cy + 4}`;
+            } else {
+                // Desplazamos ligeramente el fin del arco y la punta hacia afuera (11 en vez de 10) para que no quede solapada
+                dAttr = `M ${cx - 10} ${cy} Q ${cx} ${cy + 10} ${cx + 11} ${cy}`;
+                // La punta arranca limpia en el borde exterior (cx + 11) y se proyecta hacia la derecha
+                puntaPoints = `${cx + 11},${cy} ${cx + 5},${cy - 4} ${cx + 5},${cy + 4}`;
+            }
+
+            pathElem.setAttribute('d', dAttr);
+            pathElem.setAttribute('stroke', '#2563eb');
+            pathElem.setAttribute('stroke-width', '2');
+            pathElem.setAttribute('stroke-linecap', 'round');
+            pathElem.setAttribute('fill', 'none');
+            grupoDiente.appendChild(pathElem);
+
+            const punta = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            punta.setAttribute('class', 'marca-giroversion');
+            punta.setAttribute('points', puntaPoints);
+            punta.setAttribute('fill', '#2563eb');
+            grupoDiente.appendChild(punta);
+        }
+
+        function guardarYMarcarDiastema(lado) {
+            if (!dienteSeleccionado.elemento) return;
+            const { numero, tipo, elemento } = dienteSeleccionado;
+
+            const inputName = nombreInputParaDiente(tipo, numero);
+            if (inputName) {
+                const input = document.querySelector(`input[name="${inputName}"]`);
+                if (input) {
+                    input.value = `DIA-${lado}`;
+                    input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+                }
+            }
+
+            const grupoDiente = elemento.querySelector('g');
+            if (grupoDiente) {
+                dibujarDiastemaDiente(grupoDiente, `DIA-${lado}`);
+            }
+
+            cerrarModal();
+        }
+
+       function dibujarDiastemaDiente(grupoDiente, valorCasilla) {
+            grupoDiente.querySelectorAll('.marca-diastema').forEach(p => p.remove());
+            if (!valorCasilla || !valorCasilla.startsWith('DIA')) return;
+
+            const esIzquierda = valorCasilla.includes('IZQ');
+            let bb = { x: 2, y: 2, width: 24, height: 71 };
+            try {
+                const forma = grupoDiente.querySelector('.tooth-shape');
+                const medida = forma ? forma.getBBox() : null;
+                if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+            } catch (err) {}
+
+            // 1. VARIABLE VERTICAL: Ajusta la altura
+            const cy = bb.y + bb.height * 0.85; 
+            
+            // 2. VARIABLE HORIZONTAL: Ajusta la distancia respecto al borde del diente
+            const xBase = esIzquierda ? (bb.x - 4) : (bb.x + bb.width + 4);
+            
+            // 3. VARIABLE DE SEPARACIÓN: Distancia entre las líneas del símbolo
+            const sep = 2.5; 
+
+            // 4. VARIABLE DE CURVATURA Y SENTIDO: 
+            // Controla hacia dónde se abren los paréntesis. Si necesitas invertir el sentido, 
+            // solo cambia el 3 por un valor negativo (ej. -3).
+            const curvatura = 3; 
+
+            const pathElem = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            pathElem.setAttribute('class', 'marca-diastema');
+            
+            const dAttr = `
+                M ${xBase - sep} ${cy - 8} Q ${xBase - sep + curvatura} ${cy} ${xBase - sep} ${cy + 8}
+                M ${xBase + sep} ${cy - 8} Q ${xBase + sep - curvatura} ${cy} ${xBase + sep} ${cy + 8}
+            `;
+
+            pathElem.setAttribute('d', dAttr);
+            pathElem.setAttribute('stroke', '#2563eb'); // Forzar color azul
+            pathElem.setAttribute('stroke-width', '2');
+            pathElem.setAttribute('stroke-linecap', 'round');
+            pathElem.setAttribute('fill', 'none');
+            
+            // Estilos en línea para garantizar visibilidad y color azul exacto
+            pathElem.style.stroke = '#2563eb';
+            pathElem.style.strokeWidth = '2px';
+            pathElem.style.fill = 'none';
+
+            grupoDiente.appendChild(pathElem);
+        }
 
         document.querySelectorAll('#odontogram .tooth').forEach(el => {
             const num = (el.dataset.tooth || '').trim();
@@ -2338,6 +2504,18 @@ else if (op.codigo === "1.22") {
                         const grupoDiente = el.querySelector('g');
                         if (grupoDiente) {
                             dibujarMigracionDiente(grupoDiente, input.value);
+                        }
+                    } else if (input && input.value && input.value.startsWith('GIV')) {
+                        if (input.value.includes('IZQ')) {
+                            input.value = 'GIV-DER';
+                        } else {
+                            input.value = 'GIV-IZQ';
+                        }
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+                        
+                        const grupoDiente = el.querySelector('g');
+                        if (grupoDiente) {
+                            dibujarGiroversionDiente(grupoDiente, input.value);
                         }
                     } else {
                         abrirModal(num, tipo, el);
@@ -2796,9 +2974,18 @@ else if (op.codigo === "1.22") {
                         grupoDiente.appendChild(punta);
                     }
                     // --- F. MIGRACIÓN (MIG-DER / MIG-IZQ) ---
-                    else if (valorCasilla.startsWith('MIG')) {
+                                      else if (valorCasilla.startsWith('MIG')) {
                         dibujarMigracionDiente(grupoDiente, valorCasilla);
-                }
+                    }
+                    // --- G. GIROVERSIÓN (GIV-DER / GIV-IZQ) ---
+                    else if (valorCasilla.startsWith('GIV')) {
+                        dibujarGiroversionDiente(grupoDiente, valorCasilla);
+                    }
+// --- H. DIASTEMA (DIA-DER / DIA-IZQ) ---
+                    else if (valorCasilla.startsWith('DIA')) {
+                        dibujarDiastemaDiente(grupoDiente, valorCasilla);
+                    }
+                
             }
             });
             
