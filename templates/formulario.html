@@ -126,6 +126,7 @@
         <form method="POST"  class="space-y-6 no-print-btn">
 
             <input type="hidden" name="imagenes_dientes" id="inputImagenesDientes" value="" />
+            <input type="hidden" name="notas_endodoncia" id="inputNotasEndodoncia" value="" />
             {% if historia and historia.get('id') %}
             <input type="hidden" name="id_historia" value="{{ historia.id }}" />
             {% endif %}
@@ -837,31 +838,185 @@
                                 </g>
                                 <g id="tooth-16" data-tooth="16" class="tooth">
                                 <g transform="translate(100.5 30)">
-                                <path class="tooth-shape" d="M2 52 L3 2 L10 27 L14 2 L18 27 L25 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
-                                <path class="detail" d="M2 52 Q14 47 26 52"/>
-                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
-                                <path class="detail" d="M7 61 H21"/>
-                                <path class="detail" d="M14 55 V67"/>
+                              <path class="tooth-shape" d="M 2 42 C 8 40, 20 40, 26 42 L 26 1.5 L 18 32 L 14 1.5 L 10 32 L 2 1.5 Z" />
+
+<!-- CARAS INTERACTIVAS DE LA CORONA (5 polígonos cerrados) -->
+
+<!-- Cara Superior (Vestibular) -->
+<path class="tooth-shape cara" data-cara="superior" d="
+    M 2 42
+    C 8 40, 20 40, 26 42
+    C 24 48, 20.5 48.5, 20.5 48.5
+    C 14 47.5, 7.5 47.5, 7.5 48.5
+    C 4 48, 2 42, 2 42
+    Z
+" />
+
+<!-- Cara Izquierda (Mesial/Distal) -->
+<path class="tooth-shape cara" data-cara="izquierda" d="
+    M 2 42
+    C 0.5 50, 0.5 60, 2 68
+    L 7.5 62.5
+    C 6 57, 6 54, 7.5 48.5
+    Z
+" />
+
+<!-- Cara Inferior (Palatina/Lingual) -->
+<path class="tooth-shape cara" data-cara="inferior" d="
+    M 2 68
+    C 3.5 70.5, 24.5 70.5, 26 68
+    C 24 62, 20.5 62.5, 20.5 62.5
+    C 14 63.5, 7.5 63.5, 7.5 62.5
+    C 4 63, 2 68, 2 68
+    Z
+" />
+
+<!-- Cara Derecha (Mesial/Distal) -->
+<path class="tooth-shape cara" data-cara="derecha" d="
+    M 26 42
+    C 27.5 50, 27.5 60, 26 68
+    L 20.5 62.5
+    C 22 57, 22 54, 20.5 48.5
+    Z
+" />
+
+<!-- Cara Central (Oclusal) -->
+<path class="tooth-shape cara" data-cara="central" d="
+    M 7.5 48.5
+    C 14 47.5, 20.5 47.5, 20.5 48.5
+    C 22 54, 22 57, 20.5 62.5
+    C 14 63.5, 7.5 63.5, 7.5 62.5
+    C 6 57, 6 54, 7.5 48.5
+    Z
+" />
+
+<!-- DETALLES INTERNOS (Surcos oclusales dentro de la cara central) -->
+<path class="detail" d="M 14 48 L 14 63" />
+<path class="detail" d="M 9.5 58 C 11.5 57, 12.5 55.5, 14 55.5" />
+<path class="detail" d="M 18.5 58.5 C 16.5 57, 15.5 55.5, 14 55.5" />
                                 </g>
                                 <text x="114.5" y="22" text-anchor="middle">16</text>
                                 </g>
                                 <g id="tooth-17" data-tooth="17" class="tooth">
                                 <g transform="translate(69.5 30)">
-                                <path class="tooth-shape" d="M2 52 L3 2 L10 27 L14 2 L18 27 L25 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
-                                <path class="detail" d="M2 52 Q14 47 26 52"/>
-                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
-                                <path class="detail" d="M7 61 H21"/>
-                                <path class="detail" d="M14 55 V67"/>
+                                <!-- RAÍCES: 3 espinas con base adaptada a la curvatura superior de la corona -->
+<path class="tooth-shape" d="M 2 42 C 8 40, 20 40, 26 42 L 26 1.5 L 18 32 L 14 1.5 L 10 32 L 2 1.5 Z" />
+
+<!-- CARAS INTERACTIVAS DE LA CORONA (5 polígonos cerrados) -->
+
+<!-- Cara Superior (Vestibular) -->
+<path class="tooth-shape cara" data-cara="superior" d="
+    M 2 42
+    C 8 40, 20 40, 26 42
+    C 24 48, 20.5 48.5, 20.5 48.5
+    C 14 47.5, 7.5 47.5, 7.5 48.5
+    C 4 48, 2 42, 2 42
+    Z
+" />
+
+<!-- Cara Izquierda (Mesial/Distal) -->
+<path class="tooth-shape cara" data-cara="izquierda" d="
+    M 2 42
+    C 0.5 50, 0.5 60, 2 68
+    L 7.5 62.5
+    C 6 57, 6 54, 7.5 48.5
+    Z
+" />
+
+<!-- Cara Inferior (Palatina/Lingual) -->
+<path class="tooth-shape cara" data-cara="inferior" d="
+    M 2 68
+    C 3.5 70.5, 24.5 70.5, 26 68
+    C 24 62, 20.5 62.5, 20.5 62.5
+    C 14 63.5, 7.5 63.5, 7.5 62.5
+    C 4 63, 2 68, 2 68
+    Z
+" />
+
+<!-- Cara Derecha (Mesial/Distal) -->
+<path class="tooth-shape cara" data-cara="derecha" d="
+    M 26 42
+    C 27.5 50, 27.5 60, 26 68
+    L 20.5 62.5
+    C 22 57, 22 54, 20.5 48.5
+    Z
+" />
+
+<!-- Cara Central (Oclusal) -->
+<path class="tooth-shape cara" data-cara="central" d="
+    M 7.5 48.5
+    C 14 47.5, 20.5 47.5, 20.5 48.5
+    C 22 54, 22 57, 20.5 62.5
+    C 14 63.5, 7.5 63.5, 7.5 62.5
+    C 6 57, 6 54, 7.5 48.5
+    Z
+" />
+
+<!-- DETALLES INTERNOS (Surcos oclusales dentro de la cara central) -->
+<path class="detail" d="M 14 48 L 14 63" />
+<path class="detail" d="M 9.5 58 C 11.5 57, 12.5 55.5, 14 55.5" />
+<path class="detail" d="M 18.5 58.5 C 16.5 57, 15.5 55.5, 14 55.5" />
                                 </g>
                                 <text x="83.5" y="22" text-anchor="middle">17</text>
                                 </g>
                                 <g id="tooth-18" data-tooth="18" class="tooth">
                                 <g transform="translate(38.5 30)">
-                                <path class="tooth-shape" d="M2 52 L3 2 L10 27 L14 2 L18 27 L25 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
-                                <path class="detail" d="M2 52 Q14 47 26 52"/>
-                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
-                                <path class="detail" d="M7 61 H21"/>
-                                <path class="detail" d="M14 55 V67"/>
+                                <path class="tooth-shape" d="M 2 42 C 8 40, 20 40, 26 42 L 26 1.5 L 18 32 L 14 1.5 L 10 32 L 2 1.5 Z" />
+
+<!-- CARAS INTERACTIVAS DE LA CORONA (5 polígonos cerrados) -->
+
+<!-- Cara Superior (Vestibular) -->
+<path class="tooth-shape cara" data-cara="superior" d="
+    M 2 42
+    C 8 40, 20 40, 26 42
+    C 24 48, 20.5 48.5, 20.5 48.5
+    C 14 47.5, 7.5 47.5, 7.5 48.5
+    C 4 48, 2 42, 2 42
+    Z
+" />
+
+<!-- Cara Izquierda (Mesial/Distal) -->
+<path class="tooth-shape cara" data-cara="izquierda" d="
+    M 2 42
+    C 0.5 50, 0.5 60, 2 68
+    L 7.5 62.5
+    C 6 57, 6 54, 7.5 48.5
+    Z
+" />
+
+<!-- Cara Inferior (Palatina/Lingual) -->
+<path class="tooth-shape cara" data-cara="inferior" d="
+    M 2 68
+    C 3.5 70.5, 24.5 70.5, 26 68
+    C 24 62, 20.5 62.5, 20.5 62.5
+    C 14 63.5, 7.5 63.5, 7.5 62.5
+    C 4 63, 2 68, 2 68
+    Z
+" />
+
+<!-- Cara Derecha (Mesial/Distal) -->
+<path class="tooth-shape cara" data-cara="derecha" d="
+    M 26 42
+    C 27.5 50, 27.5 60, 26 68
+    L 20.5 62.5
+    C 22 57, 22 54, 20.5 48.5
+    Z
+" />
+
+<!-- Cara Central (Oclusal) -->
+<path class="tooth-shape cara" data-cara="central" d="
+    M 7.5 48.5
+    C 14 47.5, 20.5 47.5, 20.5 48.5
+    C 22 54, 22 57, 20.5 62.5
+    C 14 63.5, 7.5 63.5, 7.5 62.5
+    C 6 57, 6 54, 7.5 48.5
+    Z
+" />
+
+<!-- DETALLES INTERNOS (Surcos oclusales dentro de la cara central) -->
+<path class="detail" d="M 14 48 L 14 63" />
+<path class="detail" d="M 9.5 58 C 11.5 57, 12.5 55.5, 14 55.5" />
+<path class="detail" d="M 18.5 58.5 C 16.5 57, 15.5 55.5, 14 55.5" />
                                 </g>
                                 <text x="52.5" y="22" text-anchor="middle">18</text>
                                 </g>
@@ -919,31 +1074,184 @@
                                 </g>
                                 <g id="tooth-26" data-tooth="26" class="tooth">
                                 <g transform="translate(451.5 30)">
-                                <path class="tooth-shape" d="M2 52 L3 2 L10 27 L14 2 L18 27 L25 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
-                                <path class="detail" d="M2 52 Q14 47 26 52"/>
-                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
-                                <path class="detail" d="M7 61 H21"/>
-                                <path class="detail" d="M14 55 V67"/>
+                                <path class="tooth-shape" d="M 2 42 C 8 40, 20 40, 26 42 L 26 1.5 L 18 32 L 14 1.5 L 10 32 L 2 1.5 Z" />
+
+<!-- CARAS INTERACTIVAS DE LA CORONA (5 polígonos cerrados) -->
+
+<!-- Cara Superior (Vestibular) -->
+<path class="tooth-shape cara" data-cara="superior" d="
+    M 2 42
+    C 8 40, 20 40, 26 42
+    C 24 48, 20.5 48.5, 20.5 48.5
+    C 14 47.5, 7.5 47.5, 7.5 48.5
+    C 4 48, 2 42, 2 42
+    Z
+" />
+
+<!-- Cara Izquierda (Mesial/Distal) -->
+<path class="tooth-shape cara" data-cara="izquierda" d="
+    M 2 42
+    C 0.5 50, 0.5 60, 2 68
+    L 7.5 62.5
+    C 6 57, 6 54, 7.5 48.5
+    Z
+" />
+
+<!-- Cara Inferior (Palatina/Lingual) -->
+<path class="tooth-shape cara" data-cara="inferior" d="
+    M 2 68
+    C 3.5 70.5, 24.5 70.5, 26 68
+    C 24 62, 20.5 62.5, 20.5 62.5
+    C 14 63.5, 7.5 63.5, 7.5 62.5
+    C 4 63, 2 68, 2 68
+    Z
+" />
+
+<!-- Cara Derecha (Mesial/Distal) -->
+<path class="tooth-shape cara" data-cara="derecha" d="
+    M 26 42
+    C 27.5 50, 27.5 60, 26 68
+    L 20.5 62.5
+    C 22 57, 22 54, 20.5 48.5
+    Z
+" />
+
+<!-- Cara Central (Oclusal) -->
+<path class="tooth-shape cara" data-cara="central" d="
+    M 7.5 48.5
+    C 14 47.5, 20.5 47.5, 20.5 48.5
+    C 22 54, 22 57, 20.5 62.5
+    C 14 63.5, 7.5 63.5, 7.5 62.5
+    C 6 57, 6 54, 7.5 48.5
+    Z
+" />
+
+<!-- DETALLES INTERNOS (Surcos oclusales dentro de la cara central) -->
+<path class="detail" d="M 14 48 L 14 63" />
+<path class="detail" d="M 9.5 58 C 11.5 57, 12.5 55.5, 14 55.5" />
+<path class="detail" d="M 18.5 58.5 C 16.5 57, 15.5 55.5, 14 55.5" />
                                 </g>
                                 <text x="465.5" y="22" text-anchor="middle">26</text>
                                 </g>
                                 <g id="tooth-27" data-tooth="27" class="tooth">
                                 <g transform="translate(482.5 30)">
-                                <path class="tooth-shape" d="M2 52 L3 2 L10 27 L14 2 L18 27 L25 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
-                                <path class="detail" d="M2 52 Q14 47 26 52"/>
-                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
-                                <path class="detail" d="M7 61 H21"/>
-                                <path class="detail" d="M14 55 V67"/>
+                                <path class="tooth-shape" d="M 2 42 C 8 40, 20 40, 26 42 L 26 1.5 L 18 32 L 14 1.5 L 10 32 L 2 1.5 Z" />
+
+<!-- CARAS INTERACTIVAS DE LA CORONA (5 polígonos cerrados) -->
+
+<!-- Cara Superior (Vestibular) -->
+<path class="tooth-shape cara" data-cara="superior" d="
+    M 2 42
+    C 8 40, 20 40, 26 42
+    C 24 48, 20.5 48.5, 20.5 48.5
+    C 14 47.5, 7.5 47.5, 7.5 48.5
+    C 4 48, 2 42, 2 42
+    Z
+" />
+
+<!-- Cara Izquierda (Mesial/Distal) -->
+<path class="tooth-shape cara" data-cara="izquierda" d="
+    M 2 42
+    C 0.5 50, 0.5 60, 2 68
+    L 7.5 62.5
+    C 6 57, 6 54, 7.5 48.5
+    Z
+" />
+
+<!-- Cara Inferior (Palatina/Lingual) -->
+<path class="tooth-shape cara" data-cara="inferior" d="
+    M 2 68
+    C 3.5 70.5, 24.5 70.5, 26 68
+    C 24 62, 20.5 62.5, 20.5 62.5
+    C 14 63.5, 7.5 63.5, 7.5 62.5
+    C 4 63, 2 68, 2 68
+    Z
+" />
+
+<!-- Cara Derecha (Mesial/Distal) -->
+<path class="tooth-shape cara" data-cara="derecha" d="
+    M 26 42
+    C 27.5 50, 27.5 60, 26 68
+    L 20.5 62.5
+    C 22 57, 22 54, 20.5 48.5
+    Z
+" />
+
+<!-- Cara Central (Oclusal) -->
+<path class="tooth-shape cara" data-cara="central" d="
+    M 7.5 48.5
+    C 14 47.5, 20.5 47.5, 20.5 48.5
+    C 22 54, 22 57, 20.5 62.5
+    C 14 63.5, 7.5 63.5, 7.5 62.5
+    C 6 57, 6 54, 7.5 48.5
+    Z
+" />
+
+<!-- DETALLES INTERNOS (Surcos oclusales dentro de la cara central) -->
+<path class="detail" d="M 14 48 L 14 63" />
+<path class="detail" d="M 9.5 58 C 11.5 57, 12.5 55.5, 14 55.5" />
+<path class="detail" d="M 18.5 58.5 C 16.5 57, 15.5 55.5, 14 55.5" />
                                 </g>
                                 <text x="496.5" y="22" text-anchor="middle">27</text>
                                 </g>
                                 <g id="tooth-28" data-tooth="28" class="tooth">
                                 <g transform="translate(513.5 30)">
-                                <path class="tooth-shape" d="M2 52 L3 2 L10 27 L14 2 L18 27 L25 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
-                                <path class="detail" d="M2 52 Q14 47 26 52"/>
-                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
-                                <path class="detail" d="M7 61 H21"/>
-                                <path class="detail" d="M14 55 V67"/>
+                             <path class="tooth-shape" d="M 2 42 C 8 40, 20 40, 26 42 L 26 1.5 L 18 32 L 14 1.5 L 10 32 L 2 1.5 Z" />
+
+<!-- CARAS INTERACTIVAS DE LA CORONA (5 polígonos cerrados) -->
+
+<!-- Cara Superior (Vestibular) -->
+<path class="tooth-shape cara" data-cara="superior" d="
+    M 2 42
+    C 8 40, 20 40, 26 42
+    C 24 48, 20.5 48.5, 20.5 48.5
+    C 14 47.5, 7.5 47.5, 7.5 48.5
+    C 4 48, 2 42, 2 42
+    Z
+" />
+
+<!-- Cara Izquierda (Mesial/Distal) -->
+<path class="tooth-shape cara" data-cara="izquierda" d="
+    M 2 42
+    C 0.5 50, 0.5 60, 2 68
+    L 7.5 62.5
+    C 6 57, 6 54, 7.5 48.5
+    Z
+" />
+
+<!-- Cara Inferior (Palatina/Lingual) -->
+<path class="tooth-shape cara" data-cara="inferior" d="
+    M 2 68
+    C 3.5 70.5, 24.5 70.5, 26 68
+    C 24 62, 20.5 62.5, 20.5 62.5
+    C 14 63.5, 7.5 63.5, 7.5 62.5
+    C 4 63, 2 68, 2 68
+    Z
+" />
+
+<!-- Cara Derecha (Mesial/Distal) -->
+<path class="tooth-shape cara" data-cara="derecha" d="
+    M 26 42
+    C 27.5 50, 27.5 60, 26 68
+    L 20.5 62.5
+    C 22 57, 22 54, 20.5 48.5
+    Z
+" />
+
+<!-- Cara Central (Oclusal) -->
+<path class="tooth-shape cara" data-cara="central" d="
+    M 7.5 48.5
+    C 14 47.5, 20.5 47.5, 20.5 48.5
+    C 22 54, 22 57, 20.5 62.5
+    C 14 63.5, 7.5 63.5, 7.5 62.5
+    C 6 57, 6 54, 7.5 48.5
+    Z
+" />
+
+<!-- DETALLES INTERNOS (Surcos oclusales dentro de la cara central) -->
+<path class="detail" d="M 14 48 L 14 63" />
+<path class="detail" d="M 9.5 58 C 11.5 57, 12.5 55.5, 14 55.5" />
+<path class="detail" d="M 18.5 58.5 C 16.5 57, 15.5 55.5, 14 55.5" />
                                 </g>
                                 <text x="527.5" y="22" text-anchor="middle">28</text>
                                 </g>
@@ -1061,21 +1369,87 @@
                                 </g>
                                 <g id="tooth-84" data-tooth="84" class="tooth">
                                 <g transform="translate(162.5 306) scale(1 -1)">
-                                <path class="tooth-shape" d="M2 52 L5 18 L14 35 L23 18 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
-                                <path class="detail" d="M2 52 Q14 47 26 52"/>
-                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
-                                <path class="detail" d="M7 61 H21"/>
-                                <path class="detail" d="M14 55 V67"/>
+                                <!-- Contorno principal para molares temporales inferiores de dos raíces (84, 85, 74, 75) corregido en altura -->
+<path class="tooth-shape" d="
+    M 4 71
+    C 4 72.5, 24 72.5, 24 71
+    C 27.5 69, 27.5 53, 27 49
+    L 27 22
+    C 27 21, 25 21, 24 22.5
+    L 14 43
+    L 4 22.5
+    C 3 21, 1 21, 1 22
+    L 1 49
+    C 0.5 53, 0.5 69, 4 71
+    Z
+" />
+
+<!-- Detalles oclusales adaptados a la proporción corta -->
+<path class="detail" d="
+    M 6 69
+    C 6 69, 14 71, 22 69
+    C 26 68, 26 54, 22 52
+    C 14 50, 6 50, 6 52
+    C 2 54, 2 68, 6 69
+    Z
+" />
+<path class="detail" d="
+    M 7.5 60.5
+    C 7.5 64, 20.5 64, 20.5 60.5
+    C 20.5 57, 7.5 57, 7.5 60.5
+    Z
+" />
+<path class="detail" d="M 4 71 L 7.5 60.5" />
+<path class="detail" d="M 24 71 L 20.5 60.5" />
+<path class="detail" d="M 27 49 L 20.5 57" />
+<path class="detail" d="M 1 49 L 7.5 57" />
+<path class="detail" d="M 8.5 60.5 C 11 61, 16 60, 19.5 60.5" />
+<path class="detail" d="M 14 64 C 13.5 61, 14.5 58, 14 55" />
+<path class="detail" d="M 11 62.5 C 12.5 61, 15.5 58, 17 56.5" />
+<path class="detail" d="M 1 49 C 8 47, 20 47, 27 49" />
                                 </g>
                                 <text x="176.5" y="226" text-anchor="middle">84</text>
                                 </g>
                                 <g id="tooth-85" data-tooth="85" class="tooth">
                                 <g transform="translate(131.5 306) scale(1 -1)">
-                                <path class="tooth-shape" d="M2 52 L5 18 L14 35 L23 18 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
-                                <path class="detail" d="M2 52 Q14 47 26 52"/>
-                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
-                                <path class="detail" d="M7 61 H21"/>
-                                <path class="detail" d="M14 55 V67"/>
+                               <!-- Contorno principal para molares temporales inferiores de dos raíces (84, 85, 74, 75) corregido en altura -->
+<path class="tooth-shape" d="
+    M 4 71
+    C 4 72.5, 24 72.5, 24 71
+    C 27.5 69, 27.5 53, 27 49
+    L 27 22
+    C 27 21, 25 21, 24 22.5
+    L 14 43
+    L 4 22.5
+    C 3 21, 1 21, 1 22
+    L 1 49
+    C 0.5 53, 0.5 69, 4 71
+    Z
+" />
+
+<!-- Detalles oclusales adaptados a la proporción corta -->
+<path class="detail" d="
+    M 6 69
+    C 6 69, 14 71, 22 69
+    C 26 68, 26 54, 22 52
+    C 14 50, 6 50, 6 52
+    C 2 54, 2 68, 6 69
+    Z
+" />
+<path class="detail" d="
+    M 7.5 60.5
+    C 7.5 64, 20.5 64, 20.5 60.5
+    C 20.5 57, 7.5 57, 7.5 60.5
+    Z
+" />
+<path class="detail" d="M 4 71 L 7.5 60.5" />
+<path class="detail" d="M 24 71 L 20.5 60.5" />
+<path class="detail" d="M 27 49 L 20.5 57" />
+<path class="detail" d="M 1 49 L 7.5 57" />
+<path class="detail" d="M 8.5 60.5 C 11 61, 16 60, 19.5 60.5" />
+<path class="detail" d="M 14 64 C 13.5 61, 14.5 58, 14 55" />
+<path class="detail" d="M 11 62.5 C 12.5 61, 15.5 58, 17 56.5" />
+<path class="detail" d="M 1 49 C 8 47, 20 47, 27 49" />
                                 </g>
                                 <text x="145.5" y="226" text-anchor="middle">85</text>
                                 </g>
@@ -1105,21 +1479,87 @@
                                 </g>
                                 <g id="tooth-74" data-tooth="74" class="tooth">
                                 <g transform="translate(389.5 306) scale(1 -1)">
-                                <path class="tooth-shape" d="M2 52 L5 18 L14 35 L23 18 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
-                                <path class="detail" d="M2 52 Q14 47 26 52"/>
-                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
-                                <path class="detail" d="M7 61 H21"/>
-                                <path class="detail" d="M14 55 V67"/>
+                               <!-- Contorno principal para molares temporales inferiores de dos raíces (84, 85, 74, 75) corregido en altura -->
+<path class="tooth-shape" d="
+    M 4 71
+    C 4 72.5, 24 72.5, 24 71
+    C 27.5 69, 27.5 53, 27 49
+    L 27 22
+    C 27 21, 25 21, 24 22.5
+    L 14 43
+    L 4 22.5
+    C 3 21, 1 21, 1 22
+    L 1 49
+    C 0.5 53, 0.5 69, 4 71
+    Z
+" />
+
+<!-- Detalles oclusales adaptados a la proporción corta -->
+<path class="detail" d="
+    M 6 69
+    C 6 69, 14 71, 22 69
+    C 26 68, 26 54, 22 52
+    C 14 50, 6 50, 6 52
+    C 2 54, 2 68, 6 69
+    Z
+" />
+<path class="detail" d="
+    M 7.5 60.5
+    C 7.5 64, 20.5 64, 20.5 60.5
+    C 20.5 57, 7.5 57, 7.5 60.5
+    Z
+" />
+<path class="detail" d="M 4 71 L 7.5 60.5" />
+<path class="detail" d="M 24 71 L 20.5 60.5" />
+<path class="detail" d="M 27 49 L 20.5 57" />
+<path class="detail" d="M 1 49 L 7.5 57" />
+<path class="detail" d="M 8.5 60.5 C 11 61, 16 60, 19.5 60.5" />
+<path class="detail" d="M 14 64 C 13.5 61, 14.5 58, 14 55" />
+<path class="detail" d="M 11 62.5 C 12.5 61, 15.5 58, 17 56.5" />
+<path class="detail" d="M 1 49 C 8 47, 20 47, 27 49" />
                                 </g>
                                 <text x="403.5" y="226" text-anchor="middle">74</text>
                                 </g>
                                 <g id="tooth-75" data-tooth="75" class="tooth">
                                 <g transform="translate(420.5 306) scale(1 -1)">
-                                <path class="tooth-shape" d="M2 52 L5 18 L14 35 L23 18 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
-                                <path class="detail" d="M2 52 Q14 47 26 52"/>
-                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
-                                <path class="detail" d="M7 61 H21"/>
-                                <path class="detail" d="M14 55 V67"/>
+                               <!-- Contorno principal para molares temporales inferiores de dos raíces (84, 85, 74, 75) corregido en altura -->
+<path class="tooth-shape" d="
+    M 4 71
+    C 4 72.5, 24 72.5, 24 71
+    C 27.5 69, 27.5 53, 27 49
+    L 27 22
+    C 27 21, 25 21, 24 22.5
+    L 14 43
+    L 4 22.5
+    C 3 21, 1 21, 1 22
+    L 1 49
+    C 0.5 53, 0.5 69, 4 71
+    Z
+" />
+
+<!-- Detalles oclusales adaptados a la proporción corta -->
+<path class="detail" d="
+    M 6 69
+    C 6 69, 14 71, 22 69
+    C 26 68, 26 54, 22 52
+    C 14 50, 6 50, 6 52
+    C 2 54, 2 68, 6 69
+    Z
+" />
+<path class="detail" d="
+    M 7.5 60.5
+    C 7.5 64, 20.5 64, 20.5 60.5
+    C 20.5 57, 7.5 57, 7.5 60.5
+    Z
+" />
+<path class="detail" d="M 4 71 L 7.5 60.5" />
+<path class="detail" d="M 24 71 L 20.5 60.5" />
+<path class="detail" d="M 27 49 L 20.5 57" />
+<path class="detail" d="M 1 49 L 7.5 57" />
+<path class="detail" d="M 8.5 60.5 C 11 61, 16 60, 19.5 60.5" />
+<path class="detail" d="M 14 64 C 13.5 61, 14.5 58, 14 55" />
+<path class="detail" d="M 11 62.5 C 12.5 61, 15.5 58, 17 56.5" />
+<path class="detail" d="M 1 49 C 8 47, 20 47, 27 49" />
                                 </g>
                                 <text x="434.5" y="226" text-anchor="middle">75</text>
                                 </g>
@@ -1169,31 +1609,130 @@
                                 </g>
                                 <g id="tooth-46" data-tooth="46" class="tooth">
                                 <g transform="translate(100.5 379) scale(1 -1)">
-                                <path class="tooth-shape" d="M2 52 L5 2 L14 27 L23 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
-                                <path class="detail" d="M2 52 Q14 47 26 52"/>
-                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
-                                <path class="detail" d="M7 61 H21"/>
-                                <path class="detail" d="M14 55 V67"/>
+                               <!-- Contorno principal corregido (Corona abajo en espacio local, raíces arriba) -->
+<path class="tooth-shape" d="
+    M 4 71
+    C 4 72.5, 24 72.5, 24 71
+    C 27.5 69, 27.5 53, 27 49
+    L 27 2
+    C 27 0.5, 25 0, 24 1.5
+    L 14 47
+    L 4 1.5
+    C 3 0, 1 0.5, 1 2
+    L 1 49
+    C 0.5 53, 0.5 69, 4 71
+    Z
+" />
+
+<!-- Detalles oclusales corregidos (ubicados en la base de la corona) -->
+<path class="detail" d="
+    M 6 69
+    C 6 69, 14 71, 22 69
+    C 26 68, 26 54, 22 52
+    C 14 50, 6 50, 6 52
+    C 2 54, 2 68, 6 69
+    Z
+" />
+<path class="detail" d="
+    M 7.5 60.5
+    C 7.5 65.5, 20.5 65.5, 20.5 60.5
+    C 20.5 55.5, 7.5 55.5, 7.5 60.5
+    Z
+" />
+<path class="detail" d="M 4 71 L 7.5 65.5" />
+<path class="detail" d="M 24 71 L 20.5 65.5" />
+<path class="detail" d="M 27 49 L 20.5 55.5" />
+<path class="detail" d="M 1 49 L 7.5 55.5" />
+<path class="detail" d="M 8.5 60.5 C 11 61, 16 60, 19.5 60.5" />
+<path class="detail" d="M 14 65 C 13.5 62, 14.5 59, 14 56" />
+<path class="detail" d="M 11 63.5 C 12.5 62, 15.5 59, 17 57.5" />
+<path class="detail" d="M 1 49 C 8 47, 20 47, 27 49" />
                                 </g>
                                 <text x="114.5" y="398" text-anchor="middle">46</text>
                                 </g>
                                 <g id="tooth-47" data-tooth="47" class="tooth">
                                 <g transform="translate(69.5 379) scale(1 -1)">
-                                <path class="tooth-shape" d="M2 52 L5 2 L14 27 L23 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
-                                <path class="detail" d="M2 52 Q14 47 26 52"/>
-                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
-                                <path class="detail" d="M7 61 H21"/>
-                                <path class="detail" d="M14 55 V67"/>
+                                <!-- Contorno principal corregido (Corona abajo en espacio local, raíces arriba) -->
+<path class="tooth-shape" d="
+    M 4 71
+    C 4 72.5, 24 72.5, 24 71
+    C 27.5 69, 27.5 53, 27 49
+    L 27 2
+    C 27 0.5, 25 0, 24 1.5
+    L 14 47
+    L 4 1.5
+    C 3 0, 1 0.5, 1 2
+    L 1 49
+    C 0.5 53, 0.5 69, 4 71
+    Z
+" />
+
+<!-- Detalles oclusales corregidos (ubicados en la base de la corona) -->
+<path class="detail" d="
+    M 6 69
+    C 6 69, 14 71, 22 69
+    C 26 68, 26 54, 22 52
+    C 14 50, 6 50, 6 52
+    C 2 54, 2 68, 6 69
+    Z
+" />
+<path class="detail" d="
+    M 7.5 60.5
+    C 7.5 65.5, 20.5 65.5, 20.5 60.5
+    C 20.5 55.5, 7.5 55.5, 7.5 60.5
+    Z
+" />
+<path class="detail" d="M 4 71 L 7.5 65.5" />
+<path class="detail" d="M 24 71 L 20.5 65.5" />
+<path class="detail" d="M 27 49 L 20.5 55.5" />
+<path class="detail" d="M 1 49 L 7.5 55.5" />
+<path class="detail" d="M 8.5 60.5 C 11 61, 16 60, 19.5 60.5" />
+<path class="detail" d="M 14 65 C 13.5 62, 14.5 59, 14 56" />
+<path class="detail" d="M 11 63.5 C 12.5 62, 15.5 59, 17 57.5" />
+<path class="detail" d="M 1 49 C 8 47, 20 47, 27 49" />
                                 </g>
                                 <text x="83.5" y="398" text-anchor="middle">47</text>
                                 </g>
                                 <g id="tooth-48" data-tooth="48" class="tooth">
                                 <g transform="translate(38.5 379) scale(1 -1)">
-                                <path class="tooth-shape" d="M2 52 L5 2 L14 27 L23 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
-                                <path class="detail" d="M2 52 Q14 47 26 52"/>
-                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
-                                <path class="detail" d="M7 61 H21"/>
-                                <path class="detail" d="M14 55 V67"/>
+                                <!-- Contorno principal corregido (Corona abajo en espacio local, raíces arriba) -->
+<path class="tooth-shape" d="
+    M 4 71
+    C 4 72.5, 24 72.5, 24 71
+    C 27.5 69, 27.5 53, 27 49
+    L 27 2
+    C 27 0.5, 25 0, 24 1.5
+    L 14 47
+    L 4 1.5
+    C 3 0, 1 0.5, 1 2
+    L 1 49
+    C 0.5 53, 0.5 69, 4 71
+    Z
+" />
+
+<!-- Detalles oclusales corregidos (ubicados en la base de la corona) -->
+<path class="detail" d="
+    M 6 69
+    C 6 69, 14 71, 22 69
+    C 26 68, 26 54, 22 52
+    C 14 50, 6 50, 6 52
+    C 2 54, 2 68, 6 69
+    Z
+" />
+<path class="detail" d="
+    M 7.5 60.5
+    C 7.5 65.5, 20.5 65.5, 20.5 60.5
+    C 20.5 55.5, 7.5 55.5, 7.5 60.5
+    Z
+" />
+<path class="detail" d="M 4 71 L 7.5 65.5" />
+<path class="detail" d="M 24 71 L 20.5 65.5" />
+<path class="detail" d="M 27 49 L 20.5 55.5" />
+<path class="detail" d="M 1 49 L 7.5 55.5" />
+<path class="detail" d="M 8.5 60.5 C 11 61, 16 60, 19.5 60.5" />
+<path class="detail" d="M 14 65 C 13.5 62, 14.5 59, 14 56" />
+<path class="detail" d="M 11 63.5 C 12.5 62, 15.5 59, 17 57.5" />
+<path class="detail" d="M 1 49 C 8 47, 20 47, 27 49" />
                                 </g>
                                 <text x="52.5" y="398" text-anchor="middle">48</text>
                                 </g>
@@ -1243,31 +1782,130 @@
                                 </g>
                                 <g id="tooth-36" data-tooth="36" class="tooth">
                                 <g transform="translate(451.5 379) scale(1 -1)">
-                                <path class="tooth-shape" d="M2 52 L5 2 L14 27 L23 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
-                                <path class="detail" d="M2 52 Q14 47 26 52"/>
-                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
-                                <path class="detail" d="M7 61 H21"/>
-                                <path class="detail" d="M14 55 V67"/>
+                                <!-- Contorno principal corregido (Corona abajo en espacio local, raíces arriba) -->
+<path class="tooth-shape" d="
+    M 4 71
+    C 4 72.5, 24 72.5, 24 71
+    C 27.5 69, 27.5 53, 27 49
+    L 27 2
+    C 27 0.5, 25 0, 24 1.5
+    L 14 47
+    L 4 1.5
+    C 3 0, 1 0.5, 1 2
+    L 1 49
+    C 0.5 53, 0.5 69, 4 71
+    Z
+" />
+
+<!-- Detalles oclusales corregidos (ubicados en la base de la corona) -->
+<path class="detail" d="
+    M 6 69
+    C 6 69, 14 71, 22 69
+    C 26 68, 26 54, 22 52
+    C 14 50, 6 50, 6 52
+    C 2 54, 2 68, 6 69
+    Z
+" />
+<path class="detail" d="
+    M 7.5 60.5
+    C 7.5 65.5, 20.5 65.5, 20.5 60.5
+    C 20.5 55.5, 7.5 55.5, 7.5 60.5
+    Z
+" />
+<path class="detail" d="M 4 71 L 7.5 65.5" />
+<path class="detail" d="M 24 71 L 20.5 65.5" />
+<path class="detail" d="M 27 49 L 20.5 55.5" />
+<path class="detail" d="M 1 49 L 7.5 55.5" />
+<path class="detail" d="M 8.5 60.5 C 11 61, 16 60, 19.5 60.5" />
+<path class="detail" d="M 14 65 C 13.5 62, 14.5 59, 14 56" />
+<path class="detail" d="M 11 63.5 C 12.5 62, 15.5 59, 17 57.5" />
+<path class="detail" d="M 1 49 C 8 47, 20 47, 27 49" />
                                 </g>
                                 <text x="465.5" y="398" text-anchor="middle">36</text>
                                 </g>
                                 <g id="tooth-37" data-tooth="37" class="tooth">
                                 <g transform="translate(482.5 379) scale(1 -1)">
-                                <path class="tooth-shape" d="M2 52 L5 2 L14 27 L23 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
-                                <path class="detail" d="M2 52 Q14 47 26 52"/>
-                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
-                                <path class="detail" d="M7 61 H21"/>
-                                <path class="detail" d="M14 55 V67"/>
+                                <!-- Contorno principal corregido (Corona abajo en espacio local, raíces arriba) -->
+<path class="tooth-shape" d="
+    M 4 71
+    C 4 72.5, 24 72.5, 24 71
+    C 27.5 69, 27.5 53, 27 49
+    L 27 2
+    C 27 0.5, 25 0, 24 1.5
+    L 14 47
+    L 4 1.5
+    C 3 0, 1 0.5, 1 2
+    L 1 49
+    C 0.5 53, 0.5 69, 4 71
+    Z
+" />
+
+<!-- Detalles oclusales corregidos (ubicados en la base de la corona) -->
+<path class="detail" d="
+    M 6 69
+    C 6 69, 14 71, 22 69
+    C 26 68, 26 54, 22 52
+    C 14 50, 6 50, 6 52
+    C 2 54, 2 68, 6 69
+    Z
+" />
+<path class="detail" d="
+    M 7.5 60.5
+    C 7.5 65.5, 20.5 65.5, 20.5 60.5
+    C 20.5 55.5, 7.5 55.5, 7.5 60.5
+    Z
+" />
+<path class="detail" d="M 4 71 L 7.5 65.5" />
+<path class="detail" d="M 24 71 L 20.5 65.5" />
+<path class="detail" d="M 27 49 L 20.5 55.5" />
+<path class="detail" d="M 1 49 L 7.5 55.5" />
+<path class="detail" d="M 8.5 60.5 C 11 61, 16 60, 19.5 60.5" />
+<path class="detail" d="M 14 65 C 13.5 62, 14.5 59, 14 56" />
+<path class="detail" d="M 11 63.5 C 12.5 62, 15.5 59, 17 57.5" />
+<path class="detail" d="M 1 49 C 8 47, 20 47, 27 49" />
                                 </g>
                                 <text x="496.5" y="398" text-anchor="middle">37</text>
                                 </g>
                                 <g id="tooth-38" data-tooth="38" class="tooth">
                                 <g transform="translate(513.5 379) scale(1 -1)">
-                                <path class="tooth-shape" d="M2 52 L5 2 L14 27 L23 2 L26 52 C28 62 26 72 14 73 C2 72 0 62 2 52 Z"/>
-                                <path class="detail" d="M2 52 Q14 47 26 52"/>
-                                <path class="detail" d="M9 55 H19 Q21 55 21 57 V65 Q21 67 19 67 H9 Q7 67 7 65 V57 Q7 55 9 55 Z"/>
-                                <path class="detail" d="M7 61 H21"/>
-                                <path class="detail" d="M14 55 V67"/>
+                                <!-- Contorno principal corregido (Corona abajo en espacio local, raíces arriba) -->
+<path class="tooth-shape" d="
+    M 4 71
+    C 4 72.5, 24 72.5, 24 71
+    C 27.5 69, 27.5 53, 27 49
+    L 27 2
+    C 27 0.5, 25 0, 24 1.5
+    L 14 47
+    L 4 1.5
+    C 3 0, 1 0.5, 1 2
+    L 1 49
+    C 0.5 53, 0.5 69, 4 71
+    Z
+" />
+
+<!-- Detalles oclusales corregidos (ubicados en la base de la corona) -->
+<path class="detail" d="
+    M 6 69
+    C 6 69, 14 71, 22 69
+    C 26 68, 26 54, 22 52
+    C 14 50, 6 50, 6 52
+    C 2 54, 2 68, 6 69
+    Z
+" />
+<path class="detail" d="
+    M 7.5 60.5
+    C 7.5 65.5, 20.5 65.5, 20.5 60.5
+    C 20.5 55.5, 7.5 55.5, 7.5 60.5
+    Z
+" />
+<path class="detail" d="M 4 71 L 7.5 65.5" />
+<path class="detail" d="M 24 71 L 20.5 65.5" />
+<path class="detail" d="M 27 49 L 20.5 55.5" />
+<path class="detail" d="M 1 49 L 7.5 55.5" />
+<path class="detail" d="M 8.5 60.5 C 11 61, 16 60, 19.5 60.5" />
+<path class="detail" d="M 14 65 C 13.5 62, 14.5 59, 14 56" />
+<path class="detail" d="M 11 63.5 C 12.5 62, 15.5 59, 17 57.5" />
+<path class="detail" d="M 1 49 C 8 47, 20 47, 27 49" />
                                 </g>
                                 <text x="527.5" y="398" text-anchor="middle">38</text>
                                 </g>
@@ -1573,6 +2211,7 @@
         let dienteSeleccionado = { numero: null, tipo: null, elemento: null };
 
         const imagenesDientes = {};
+        const notasEndodoncia = {};
 
         function nombreInputParaDiente(tipo, numero) {
 
@@ -1619,7 +2258,7 @@
                     aplicarOpcion(op);
 
                     // 👇 AGREGAR ESTO: Si es 1.7, NO cerramos el modal para ver los sub-botones
-                    if (op.codigo !== "1.7") {
+                    if (op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33") {
                         cerrarModal();
                     }
                     
@@ -2131,23 +2770,38 @@
 
             }
 
-            else if (op.codigo === "1.23") {
-
-                const inputName = nombreInputParaDiente(tipo, numero);
-
-                if (inputName) {
-
-                    const input = document.querySelector(`input[name="${inputName}"]`);
-
-                    if (input) {
-
-                        input.value = 'M1';
-                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
-
-                    }
-
-                }
-
+         else if (op.codigo === "1.23") {
+                // Al elegir 1.23 Movilidad, abrimos un submenú interactivo en el modal para elegir el grado
+                const lista = document.getElementById('listaOpcionesCOP');
+                lista.innerHTML = `
+                    <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-blue-50 p-2 rounded border border-blue-200">
+                        Seleccione el Grado de Movilidad para el diente ${dienteSeleccionado.numero}:
+                    </li>
+                    <li>
+                        <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarMovilidad('M1')">
+                            <span>Movilidad Grado 1</span>
+                            <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">M1</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarMovilidad('M2')">
+                            <span>Movilidad Grado 2</span>
+                            <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">M2</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarMovilidad('M3')">
+                            <span>Movilidad Grado 3</span>
+                            <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">M3</span>
+                        </button>
+                    </li>
+                    <li class="mt-4">
+                        <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
+                            &larr; Volver a la lista principal
+                        </button>
+                    </li>
+                `;
+                return; // Mantiene el modal abierto para permitir elegir el grado
             }
 
             else if (op.codigo === "1.12") {
@@ -2331,6 +2985,42 @@ else if (op.codigo === "1.17") {
                     </li>
                 `;
                 return; // Mantiene el modal abierto para permitir elegir el lado
+            } else if (op.codigo === "1.33") {
+                const notaPrevia = notasEndodoncia[dienteSeleccionado.numero] || '';
+                const lista = document.getElementById('listaOpcionesCOP');
+                lista.innerHTML = `
+                    <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-blue-50 p-2 rounded border border-blue-200">
+                        Tratamiento Pulpar - Diente ${dienteSeleccionado.numero}:
+                    </li>
+                    <li>
+                        <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarEndodoncia('TC')">
+                            <span>Tratamiento de conductos</span>
+                            <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">TC</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarEndodoncia('PC')">
+                            <span>Pulpectomía</span>
+                            <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">PC</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarEndodoncia('PP')">
+                            <span>Pulpotomía</span>
+                            <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">PP</span>
+                        </button>
+                    </li>
+                    <li class="mt-2 pt-2 border-t border-slate-200">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Observación / Detalle del tratamiento:</label>
+                        <input type="text" id="inputNotaEndodoncia" value="${notaPrevia}" placeholder="Ej. Conducto único, obturación..." class="w-full p-2 border border-slate-300 rounded text-xs outline-none focus:border-blue-500 bg-white" />
+                    </li>
+                    <li class="mt-3">
+                        <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
+                            &larr; Volver a la lista principal
+                        </button>
+                    </li>
+                `;
+                return;
             }
         }
         function dibujarMigracionDiente(grupoDiente, valorCasilla) {
@@ -2440,6 +3130,84 @@ function dibujarGiroversionDiente(grupoDiente, valorCasilla) {
 
             cerrarModal();
         }
+        function guardarYMarcarMovilidad(grado) {
+            if (!dienteSeleccionado.elemento) return;
+            const { numero, tipo, elemento } = dienteSeleccionado;
+
+            const inputName = nombreInputParaDiente(tipo, numero);
+            if (inputName) {
+                const input = document.querySelector(`input[name="${inputName}"]`);
+                if (input) {
+                    input.value = grado;
+                    input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+                }
+            }
+
+            cerrarModal();
+        }
+
+        function guardarYMarcarEndodoncia(sigla) {
+            if (!dienteSeleccionado.elemento) return;
+            const { numero, tipo, elemento } = dienteSeleccionado;
+
+            // 1. Guardar nota escrita en el input
+            const inputNota = document.getElementById('inputNotaEndodoncia');
+            if (inputNota) {
+                const textoNota = inputNota.value.trim();
+                if (textoNota) {
+                    notasEndodoncia[numero] = textoNota;
+                } else {
+                    delete notasEndodoncia[numero];
+                }
+            }
+
+            // 2. Guardar siglas (TC, PC, PP) en mayúsculas y azul en la casilla
+            const inputName = nombreInputParaDiente(tipo, numero);
+            if (inputName) {
+                const input = document.querySelector(`input[name="${inputName}"]`);
+                if (input) {
+                    input.value = sigla;
+                    input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+                }
+            }
+
+            // 3. Dibujar línea recta vertical azul en la raíz
+            const grupoDiente = elemento.querySelector('g');
+            if (grupoDiente) {
+                dibujarEndodonciaUnirradicular(grupoDiente, sigla);
+            }
+
+            cerrarModal();
+        }
+
+        function dibujarEndodonciaUnirradicular(grupoDiente, valorCasilla) {
+            grupoDiente.querySelectorAll('.marca-endodoncia').forEach(p => p.remove());
+            if (!['TC', 'PC', 'PP'].includes(valorCasilla)) return;
+
+            let bb = { x: 2, y: 2, width: 24, height: 71 };
+            try {
+                const forma = grupoDiente.querySelector('.tooth-shape');
+                const medida = forma ? forma.getBBox() : null;
+                if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+            } catch (err) {}
+
+            const cx = bb.x + bb.width / 2;
+            const yInicio = bb.y + 3;
+            const yFin = bb.y + bb.height * 0.68; // Llega hasta el límite cervical de la corona
+
+            const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            linea.setAttribute('class', 'marca-endodoncia');
+            linea.setAttribute('x1', cx);
+            linea.setAttribute('y1', yInicio);
+            linea.setAttribute('x2', cx);
+            linea.setAttribute('y2', yFin);
+            linea.setAttribute('stroke', '#2563eb');
+            linea.setAttribute('stroke-width', '2.2');
+            linea.setAttribute('stroke-linecap', 'round');
+            linea.style.stroke = '#2563eb';
+            linea.style.strokeWidth = '2.2px';
+            grupoDiente.appendChild(linea);
+        }
 
        function dibujarDiastemaDiente(grupoDiente, valorCasilla) {
             grupoDiente.querySelectorAll('.marca-diastema').forEach(p => p.remove());
@@ -2531,6 +3299,13 @@ function dibujarGiroversionDiente(grupoDiente, valorCasilla) {
                         if (grupoDiente) {
                             dibujarGiroversionDiente(grupoDiente, input.value);
                         }
+                    } else if (input && ['TC', 'PC', 'PP'].includes(input.value)) {
+                        dienteSeleccionado = { numero: num, tipo, elemento: el };
+                        document.getElementById('dienteNum').textContent = num;
+                        aplicarOpcion({ codigo: "1.33" });
+                        const modal = document.getElementById('modalDiente');
+                        modal.style.display = 'flex';
+                        modal.setAttribute('aria-hidden', 'false');
                     } else {
                         abrirModal(num, tipo, el);
                     }
@@ -2631,6 +3406,7 @@ function dibujarGiroversionDiente(grupoDiente, valorCasilla) {
         document.querySelector('form').addEventListener('submit', () => {
 
             document.getElementById('inputImagenesDientes').value = JSON.stringify(imagenesDientes);
+            document.getElementById('inputNotasEndodoncia').value = JSON.stringify(notasEndodoncia);
 
         });
 
@@ -2802,6 +3578,15 @@ function dibujarGiroversionDiente(grupoDiente, valorCasilla) {
                     console.error('Error cargando imágenes de dientes:', e);
                 }
             }
+            // Cargar notas de endodoncia guardadas
+            if (historiaData.notas_endodoncia) {
+                try {
+                    Object.assign(notasEndodoncia, JSON.parse(historiaData.notas_endodoncia));
+                } catch (e) {
+                    console.error('Error cargando notas de endodoncia:', e);
+                }
+            }
+
 
             
            // 3. RESTAURAR LOS GRÁFICOS SVG SEGÚN EL VALOR EXACTO DE CADA CASILLA
@@ -2995,6 +3780,11 @@ function dibujarGiroversionDiente(grupoDiente, valorCasilla) {
                     else if (valorCasilla.startsWith('GIV')) {
                         dibujarGiroversionDiente(grupoDiente, valorCasilla);
                     }
+// --- ENDODONCIA (TC / PC / PP) ---
+                    else if (['TC', 'PC', 'PP'].includes(valorCasilla)) {
+                        dibujarEndodonciaUnirradicular(grupoDiente, valorCasilla);
+                    }
+
 // --- H. DIASTEMA (DIA-DER / DIA-IZQ) ---
                     else if (valorCasilla.startsWith('DIA')) {
                         dibujarDiastemaDiente(grupoDiente, valorCasilla);
