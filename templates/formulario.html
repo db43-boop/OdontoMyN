@@ -2986,40 +2986,96 @@ else if (op.codigo === "1.17") {
                 `;
                 return; // Mantiene el modal abierto para permitir elegir el lado
             } else if (op.codigo === "1.33") {
-                const notaPrevia = notasEndodoncia[dienteSeleccionado.numero] || '';
+                const numDiente = parseInt(dienteSeleccionado.numero, 10);
+                const esTresRaices = [16, 17, 18, 26, 27, 28, 54, 55, 64, 65].includes(numDiente);
+                const esDosRaices = [14, 24, 36, 37, 38, 46, 47, 48, 74, 75, 84, 85].includes(numDiente);
+
                 const lista = document.getElementById('listaOpcionesCOP');
-                lista.innerHTML = `
-                    <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-blue-50 p-2 rounded border border-blue-200">
-                        Tratamiento Pulpar - Diente ${dienteSeleccionado.numero}:
-                    </li>
-                    <li>
-                        <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarEndodoncia('TC')">
-                            <span>Tratamiento de conductos</span>
-                            <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">TC</span>
-                        </button>
-                    </li>
-                    <li>
-                        <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarEndodoncia('PC')">
-                            <span>Pulpectomía</span>
-                            <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">PC</span>
-                        </button>
-                    </li>
-                    <li>
-                        <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarEndodoncia('PP')">
-                            <span>Pulpotomía</span>
-                            <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">PP</span>
-                        </button>
-                    </li>
-                    <li class="mt-2 pt-2 border-t border-slate-200">
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Observación / Detalle del tratamiento:</label>
-                        <input type="text" id="inputNotaEndodoncia" value="${notaPrevia}" placeholder="Ej. Conducto único, obturación..." class="w-full p-2 border border-slate-300 rounded text-xs outline-none focus:border-blue-500 bg-white" />
-                    </li>
-                    <li class="mt-3">
-                        <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
-                            &larr; Volver a la lista principal
-                        </button>
-                    </li>
-                `;
+                const notaPrevia = notasEndodoncia[dienteSeleccionado.numero] || '';
+
+                if (esTresRaices) {
+                    lista.innerHTML = `
+                        <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-blue-50 p-2 rounded border border-blue-200">
+                            Endodoncia (3 Raíces) - Diente ${dienteSeleccionado.numero}:
+                        </li>
+                        <div class="grid grid-cols-3 gap-1 mb-2">
+                            <button type="button" class="p-1.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold text-xs" onclick="guardarEndodonciaMultirraiz('TC', 'mesial')">Mesial (TC)</button>
+                            <button type="button" class="p-1.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold text-xs" onclick="guardarEndodonciaMultirraiz('TC', 'distal')">Distal (TC)</button>
+                            <button type="button" class="p-1.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold text-xs" onclick="guardarEndodonciaMultirraiz('TC', 'palatino')">Palatino (TC)</button>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1 mb-2">
+                            <button type="button" class="p-1.5 border border-indigo-300 rounded bg-indigo-50 hover:bg-indigo-100 text-indigo-800 font-bold text-xs" onclick="guardarEndodonciaMultirraiz('PC', 'todas')">Todas (PC)</button>
+                            <button type="button" class="p-1.5 border border-indigo-300 rounded bg-indigo-50 hover:bg-indigo-100 text-indigo-800 font-bold text-xs" onclick="guardarEndodonciaMultirraiz('PP', 'todas')">Todas (PP)</button>
+                            <button type="button" class="p-1.5 border border-emerald-300 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs" onclick="guardarEndodonciaMultirraiz('TC', 'todas')">Todas (TC)</button>
+                        </div>
+                        <li class="mt-2 pt-2 border-t border-slate-200">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Observación:</label>
+                            <input type="text" id="inputNotaEndodoncia" value="${notaPrevia}" placeholder="Detalle del tratamiento..." class="w-full p-2 border border-slate-300 rounded text-xs outline-none focus:border-blue-500 bg-white" />
+                        </li>
+                        <li class="mt-3">
+                            <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
+                                &larr; Volver
+                            </button>
+                        </li>
+                    `;
+                } else if (esDosRaices) {
+                    lista.innerHTML = `
+                        <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-blue-50 p-2 rounded border border-blue-200">
+                            Endodoncia (2 Raíces) - Diente ${dienteSeleccionado.numero}:
+                        </li>
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                            <button type="button" class="p-2 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold text-xs" onclick="guardarEndodonciaMultirraiz('TC', 'mesial')">Raíz Mesial (TC)</button>
+                            <button type="button" class="p-2 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold text-xs" onclick="guardarEndodonciaMultirraiz('TC', 'distal')">Raíz Distal (TC)</button>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1 mb-2">
+                            <button type="button" class="p-1.5 border border-indigo-300 rounded bg-indigo-50 hover:bg-indigo-100 text-indigo-800 font-bold text-xs" onclick="guardarEndodonciaMultirraiz('PC', 'todas')">Ambas (PC)</button>
+                            <button type="button" class="p-1.5 border border-indigo-300 rounded bg-indigo-50 hover:bg-indigo-100 text-indigo-800 font-bold text-xs" onclick="guardarEndodonciaMultirraiz('PP', 'todas')">Ambas (PP)</button>
+                            <button type="button" class="p-1.5 border border-emerald-300 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs" onclick="guardarEndodonciaMultirraiz('TC', 'todas')">Ambas (TC)</button>
+                        </div>
+                        <li class="mt-2 pt-2 border-t border-slate-200">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Observación:</label>
+                            <input type="text" id="inputNotaEndodoncia" value="${notaPrevia}" placeholder="Detalle del tratamiento..." class="w-full p-2 border border-slate-300 rounded text-xs outline-none focus:border-blue-500 bg-white" />
+                        </li>
+                        <li class="mt-3">
+                            <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
+                                &larr; Volver
+                            </button>
+                        </li>
+                    `;
+                } else {
+                    lista.innerHTML = `
+                        <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-blue-50 p-2 rounded border border-blue-200">
+                            Tratamiento Pulpar - Diente ${dienteSeleccionado.numero}:
+                        </li>
+                        <li>
+                            <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarEndodoncia('TC')">
+                                <span>Tratamiento de conductos</span>
+                                <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">TC</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarEndodoncia('PC')">
+                                <span>Pulpectomía</span>
+                                <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">PC</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarEndodoncia('PP')">
+                                <span>Pulpotomía</span>
+                                <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">PP</span>
+                            </button>
+                        </li>
+                        <li class="mt-2 pt-2 border-t border-slate-200">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Observación / Detalle:</label>
+                            <input type="text" id="inputNotaEndodoncia" value="${notaPrevia}" placeholder="Ej. Conducto único..." class="w-full p-2 border border-slate-300 rounded text-xs outline-none focus:border-blue-500 bg-white" />
+                        </li>
+                        <li class="mt-3">
+                            <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
+                                &larr; Volver a la lista principal
+                            </button>
+                        </li>
+                    `;
+                }
                 return;
             }
         }
@@ -3178,6 +3234,101 @@ function dibujarGiroversionDiente(grupoDiente, valorCasilla) {
             }
 
             cerrarModal();
+        }
+
+        function guardarEndodonciaMultirraiz(sigla, raizAfectada) {
+            if (!dienteSeleccionado.elemento) return;
+            const { numero, tipo, elemento } = dienteSeleccionado;
+
+            // Guardar nota de texto opcional
+            const inputNota = document.getElementById('inputNotaEndodoncia');
+            if (inputNota) {
+                const textoNota = inputNota.value.trim();
+                if (textoNota) {
+                    notasEndodoncia[numero] = textoNota;
+                } else {
+                    delete notasEndodoncia[numero];
+                }
+            }
+
+            // Registrar sigla en la casilla del formulario
+            const inputName = nombreInputParaDiente(tipo, numero);
+            if (inputName) {
+                const input = document.querySelector(`input[name="${inputName}"]`);
+                if (input) {
+                    input.value = sigla;
+                    input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+                }
+            }
+
+            // Dibujar las líneas en las raíces seleccionadas
+            const grupoDiente = elemento.querySelector('g');
+            if (grupoDiente) {
+                dibujarEndodonciaPorRaiz(grupoDiente, numero, raizAfectada);
+            }
+
+            cerrarModal();
+        }
+
+        function dibujarEndodonciaPorRaiz(grupoDiente, numero, raizAfectada) {
+            // Limpiar marcas previas de endodoncia en este diente
+            grupoDiente.querySelectorAll('.marca-endodoncia').forEach(p => p.remove());
+            
+            let bb = { x: 2, y: 2, width: 24, height: 71 };
+            try {
+                const forma = grupoDiente.querySelector('.tooth-shape');
+                const medida = forma ? forma.getBBox() : null;
+                if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+            } catch (err) {}
+
+            const yInicio = bb.y + 3; // Zona alta de las espinas
+            const yFin = bb.y + bb.height * 0.68; // Límite cervical
+
+            const numDiente = parseInt(numero, 10);
+            const esTresRaices = [16, 17, 18, 26, 27, 28, 54, 55, 64, 65].includes(numDiente);
+
+            if (esTresRaices) {
+                // Coordenadas X para las 3 espinas del molar superior
+                const xMesial = bb.x + 1;
+                const xPalatino = bb.x + 12;
+                const xDistal = bb.x + 23;
+
+                if (raizAfectada === 'mesial' || raizAfectada === 'todas') {
+                    crearLineaAzul(grupoDiente, xMesial, yInicio, xMesial, yFin);
+                }
+                if (raizAfectada === 'palatino' || raizAfectada === 'todas') {
+                    crearLineaAzul(grupoDiente, xPalatino, yInicio, xPalatino, yFin);
+                }
+                if (raizAfectada === 'distal' || raizAfectada === 'todas') {
+                    crearLineaAzul(grupoDiente, xDistal, yInicio, xDistal, yFin);
+                }
+            } else {
+                // Coordenadas X para las 2 espinas del molar inferior
+                const xMesial = bb.x + 3;
+                const xDistal = bb.x + 24;
+
+                if (raizAfectada === 'mesial' || raizAfectada === 'todas') {
+                    crearLineaAzul(grupoDiente, xMesial, yInicio, xMesial, yFin);
+                }
+                if (raizAfectada === 'distal' || raizAfectada === 'todas') {
+                    crearLineaAzul(grupoDiente, xDistal, yInicio, xDistal, yFin);
+                }
+            }
+        }
+
+        function crearLineaAzul(grupo, x1, y1, x2, y2) {
+            const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            linea.setAttribute('class', 'marca-endodoncia');
+            linea.setAttribute('x1', x1);
+            linea.setAttribute('y1', y1);
+            linea.setAttribute('x2', x2);
+            linea.setAttribute('y2', y2);
+            linea.setAttribute('stroke', '#2563eb');
+            linea.setAttribute('stroke-width', '2');
+            linea.setAttribute('stroke-linecap', 'round');
+            linea.style.stroke = '#2563eb';
+            linea.style.strokeWidth = '2px';
+            grupo.appendChild(linea);
         }
 
         function dibujarEndodonciaUnirradicular(grupoDiente, valorCasilla) {
