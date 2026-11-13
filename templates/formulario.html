@@ -782,6 +782,7 @@
                             {# Grafico del odontograma (SVG) #}
                             <div class="w-full max-w-[800px]">
                             <svg id="odontogram" viewBox="0 0 580 410" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto" role="img" aria-label="Odontograma">
+                                <g id="capa-edentulo"></g>
                                 <line x1="290" y1="0" x2="290" y2="410" stroke="#000" stroke-width="3"/>
                                 <line x1="126" y1="208" x2="470" y2="208" stroke="#000" stroke-width="1.5"/>
                                 <g id="tooth-11" data-tooth="11" class="tooth">
@@ -2258,7 +2259,8 @@
                     aplicarOpcion(op);
 
                     // 👇 AGREGAR ESTO: Si es 1.7, NO cerramos el modal para ver los sub-botones
-                    if (op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33") {
+                    if (op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33" && op.codigo !== "1.31") {
+                        cerrarModal();
                         cerrarModal();
                     }
                     
@@ -3077,7 +3079,46 @@ else if (op.codigo === "1.17") {
                     `;
                 }
                 return;
+            } else if (op.codigo === "1.31") {
+                // Al elegir 1.31 Supernumerario, abrimos un submenú interactivo para elegir el lado
+                const lista = document.getElementById('listaOpcionesCOP');
+                lista.innerHTML = `
+                    <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-blue-50 p-2 rounded border border-blue-200">
+                        Seleccione el lado del Supernumerario para el diente ${dienteSeleccionado.numero}:
+                    </li>
+                    <li>
+                        <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarSupernumerario('IZQ')">
+                            <span>Supernumerario (Izquierda)</span>
+                            <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">SUP-IZQ</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarSupernumerario('DER')">
+                            <span>Supernumerario (Derecha)</span>
+                            <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">SUP-DER</span>
+                        </button>
+                    </li>
+                    <li class="mt-4">
+                        <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
+                            &larr; Volver a la lista principal
+                        </button>
+                    </li>
+                `;
+                return; // Mantiene el modal abierto para permitir elegir el lado
             }
+            
+              else if (op.codigo === "1.14") {
+                // Detectar automáticamente si el diente seleccionado pertenece al maxilar superior o inferior
+                const arcada = (dienteSeleccionado.tipo && dienteSeleccionado.tipo.includes('sup')) ? 'superior' : 'inferior';
+                
+                // Aplicar el edéntulo total y la línea de inmediato
+                aplicarEdentuloTotal(arcada);
+                
+                // Cerrar el modal automáticamente
+                cerrarModal();
+                return;
+            }
+        
         }
         function dibujarMigracionDiente(grupoDiente, valorCasilla) {
             grupoDiente.querySelectorAll('.marca-migracion').forEach(p => p.remove());
@@ -3201,6 +3242,132 @@ function dibujarGiroversionDiente(grupoDiente, valorCasilla) {
 
             cerrarModal();
         }
+        function guardarYMarcarSupernumerario(lado) {
+            if (!dienteSeleccionado.elemento) return;
+            const { numero, tipo, elemento } = dienteSeleccionado;
+
+            const inputName = nombreInputParaDiente(tipo, numero);
+            if (inputName) {
+                const input = document.querySelector(`input[name="${inputName}"]`);
+                if (input) {
+                    input.value = `SUP-${lado}`;
+                    input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+                }
+            }
+
+            const grupoDiente = elemento.querySelector('g');
+            if (grupoDiente) {
+                dibujarSupernumerarioDiente(grupoDiente, numero, lado);
+            }
+
+            cerrarModal();
+        }
+
+        function dibujarSupernumerarioDiente(grupoDiente, numero, lado) {
+            grupoDiente.querySelectorAll(`.marca-supernumerario-${lado}`).forEach(el => el.remove());
+
+            let bb = { x: 2, y: 2, width: 24, height: 71 };
+            try {
+                const forma = grupoDiente.querySelector('.tooth-shape');
+                const medida = forma ? forma.getBBox() : null;
+                if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+            } catch (err) {}
+
+            const num = parseInt(numero, 10);
+            const esSuperior = (num >= 11 && num <= 28) || (num >= 51 && num <= 65);
+
+            const xPos = (lado === 'IZQ') ? (bb.x - 3) : (bb.x + bb.width + 3);
+           const yPos = esSuperior ? (bb.y + 4) : (bb.y + 12);
+
+            const circulo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circulo.setAttribute('class', `marca-supernumerario marca-supernumerario-${lado}`);
+            circulo.setAttribute('cx', xPos);
+            circulo.setAttribute('cy', yPos);
+            circulo.setAttribute('r', '6.5');
+            circulo.setAttribute('stroke', '#2563eb');
+            circulo.setAttribute('stroke-width', '1.5');
+            circulo.setAttribute('fill', '#ffffff');
+
+            const texto = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            texto.setAttribute('class', `marca-supernumerario marca-supernumerario-${lado}`);
+            texto.setAttribute('x', xPos);
+            texto.setAttribute('y', yPos + 3);
+            texto.setAttribute('text-anchor', 'middle');
+            texto.setAttribute('fill', '#2563eb');
+            texto.setAttribute('font-size', '8.5');
+            texto.setAttribute('font-weight', 'bold');
+            texto.textContent = 'S';
+
+            grupoDiente.appendChild(circulo);
+            grupoDiente.appendChild(texto);
+        }
+       function aplicarEdentuloTotal(arcada) {
+            let dientesAfectados = [];
+            let tipo = '';
+            let yLinea = 0;
+
+            // Determinar exactamente qué fila se seleccionó (solo adultos superior o inferior)
+            if (arcada === 'superior') {
+                dientesAfectados = [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28];
+                tipo = 'adulto-sup';
+                yLinea = 90; // Altura exacta por encima de las coronas superiores
+            } else if (arcada === 'inferior') {
+                dientesAfectados = [48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38];
+                tipo = 'adulto-inf';
+                yLinea = 315; // Altura exacta por encima de las coronas inferiores
+            }
+
+            // 1. Rellenar ÚNICAMENTE las casillas de esa fila con 'AUS' y BORRAR cualquier X individual previa
+            dientesAfectados.forEach(num => {
+                const inputName = nombreInputParaDiente(tipo, num);
+                if (inputName) {
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+                    if (input) {
+                        input.value = 'AUS';
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+                    }
+                }
+
+                // 🛑 ELIMINAR LA X (marca-ausente) SI EL DIENTE LA TENÍA DIBUJADA
+                const toothEl = document.querySelector(`#tooth-${num}`);
+                if (toothEl) {
+                    const grupoDiente = toothEl.querySelector('g');
+                    if (grupoDiente) {
+                        grupoDiente.querySelectorAll('.marca-ausente').forEach(p => p.remove());
+                    }
+                }
+            });
+
+            // 2. Dibujar la línea horizontal azul continua justo por encima de las coronas de esa fila
+            const svg = document.getElementById('odontogram');
+            if (svg) {
+                let capaEdentulo = svg.querySelector('#capa-edentulo');
+                if (!capaEdentulo) {
+                    capaEdentulo = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    capaEdentulo.setAttribute('id', 'capa-edentulo');
+                }
+
+                // Limpiar línea anterior de esta arcada específica
+                capaEdentulo.querySelectorAll(`.linea-edentulo-${arcada}`).forEach(el => el.remove());
+
+                const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                linea.setAttribute('class', `linea-edentulo linea-edentulo-${arcada}`);
+                linea.setAttribute('x1', '45');
+                linea.setAttribute('y1', yLinea);
+                linea.setAttribute('x2', '535');
+                linea.setAttribute('y2', yLinea);
+                linea.setAttribute('stroke', '#2563eb');
+                linea.setAttribute('stroke-width', '2.5');
+                linea.setAttribute('stroke-linecap', 'round');
+                
+                capaEdentulo.appendChild(linea);
+
+                svg.appendChild(capaEdentulo);
+            }
+
+            cerrarModal();
+        }
+    
 
         function guardarYMarcarEndodoncia(sigla) {
             if (!dienteSeleccionado.elemento) return;
@@ -3940,9 +4107,30 @@ function dibujarGiroversionDiente(grupoDiente, valorCasilla) {
                     else if (valorCasilla.startsWith('DIA')) {
                         dibujarDiastemaDiente(grupoDiente, valorCasilla);
                     }
+                    // --- I. SUPERNUMERARIO (SUP-DER / SUP-IZQ) ---
+                    else if (valorCasilla.startsWith('SUP')) {
+                        const ladoSup = valorCasilla.split('-')[1]; // Extrae 'IZQ' o 'DER'
+                        dibujarSupernumerarioDiente(grupoDiente, num, ladoSup);
+                    }
                 
             }
             });
+            // --- VERIFICAR Y REDIBUJAR EDÉNTULO TOTAL AL CARGAR HISTORIA GUARDADA ---
+            const supCompleto = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28].every(num => {
+                const input = document.querySelector(`input[name="rec_sup2_${num}"]`);
+                return input && input.value === 'AUS';
+            });
+            if (supCompleto) {
+                aplicarEdentuloTotal('superior');
+            }
+
+            const infCompleto = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38].every(num => {
+                const input = document.querySelector(`input[name="rec_inf2_${num}"]`);
+                return input && input.value === 'AUS';
+            });
+            if (infCompleto) {
+                aplicarEdentuloTotal('inferior');
+            }
             
         }
     </script>
@@ -3950,4 +4138,5 @@ function dibujarGiroversionDiente(grupoDiente, valorCasilla) {
 </body>
 
 </html>
+
 
