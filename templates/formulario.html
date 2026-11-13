@@ -2259,7 +2259,7 @@
                     aplicarOpcion(op);
 
                     // 👇 AGREGAR ESTO: Si es 1.7, NO cerramos el modal para ver los sub-botones
-                    if (op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33" && op.codigo !== "1.31") {
+                    if (op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33" && op.codigo !== "1.31" && op.codigo !== "1.4") {
                         cerrarModal();
                         cerrarModal();
                     }
@@ -2546,75 +2546,58 @@
 
                 }
 
-            } else if (op.codigo === "1.5") {
+          } else if (op.codigo === "1.5") {
 
-                const inputName = nombreInputParaDiente(tipo, numero);
+    const inputName = nombreInputParaDiente(tipo, numero);
 
-                if (inputName) {
+    if (inputName) {
+        const input = document.querySelector(`input[name="${inputName}"]`);
+        if (input) {
+            input.value = 'CT';
+            input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+        }
+    }
 
-                    const input = document.querySelector(`input[name="${inputName}"]`);
+    // Dibujar círculo rojo alrededor de la corona del diente (Corona temporal)
+    const grupoDiente = elemento.querySelector('g');
 
-                    if (input) {
+    if (grupoDiente) {
+        grupoDiente.querySelectorAll('.marca-corona-temporal').forEach(p => p.remove());
 
-                        input.value = 'CT';
+        let bb = { x: 2, y: 2, width: 24, height: 71 };
+        try {
+            const forma = grupoDiente.querySelector('.tooth-shape');
+            const medida = forma ? forma.getBBox() : null;
+            if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+        } catch (err) {}
 
-                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+        const cx = bb.x + bb.width / 2;
+        
+        // --- INICIO DE LA MODIFICACIÓN ---
+        const numDiente = parseInt(numero, 10);
+        const esTresRaices = [16, 17, 18, 26, 27, 28, 54, 55, 64, 65].includes(numDiente);
+        const factorAltura = esTresRaices ? 1.35 : 0.78;
+        
+        const cy = bb.y + bb.height * factorAltura;
+        // --- FIN DE LA MODIFICACIÓN ---
 
-                    }
+        const r = bb.width * 0.55;
 
-                }
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('class', 'marca-corona-temporal');
+        circle.setAttribute('cx', cx);
+        circle.setAttribute('cy', cy);
+        circle.setAttribute('r', r);
+        circle.setAttribute('stroke', '#dc2626');
+        circle.setAttribute('stroke-width', '2');
+        circle.setAttribute('fill', 'none');
+        
+        circle.style.stroke = '#dc2626';
+        circle.style.strokeWidth = '2';
+        circle.style.fill = 'none';
 
-                // Dibujar círculo rojo alrededor de la corona del diente (Corona temporal)
-
-                const grupoDiente = elemento.querySelector('g');
-
-                if (grupoDiente) {
-
-                    grupoDiente.querySelectorAll('.marca-corona-temporal').forEach(p => p.remove());
-
-                    let bb = { x: 2, y: 2, width: 24, height: 71 };
-
-                    try {
-
-                        const forma = grupoDiente.querySelector('.tooth-shape');
-
-                        const medida = forma ? forma.getBBox() : null;
-
-                        if (medida && medida.width > 0 && medida.height > 0) bb = medida;
-
-                    } catch (err) {}
-
-                    const cx = bb.x + bb.width / 2;
-
-                    const cy = bb.y + bb.height * 0.78;
-
-                    const r = bb.width * 0.55;
-
-                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-
-                    circle.setAttribute('class', 'marca-corona-temporal');
-
-                    circle.setAttribute('cx', cx);
-
-                    circle.setAttribute('cy', cy);
-
-                    circle.setAttribute('r', r);
-
-                    circle.setAttribute('stroke', '#dc2626');
-
-                    circle.setAttribute('stroke-width', '2');
-
-                    circle.setAttribute('fill', 'none');
-
-                    circle.style.stroke = '#dc2626';
-
-                    circle.style.strokeWidth = '2';
-
-                    circle.style.fill = 'none';
-
-                    grupoDiente.appendChild(circle);
-
-                }
+        grupoDiente.appendChild(circle);
+    }
 
             } else if (op.codigo === "1.15") {
 
@@ -3106,7 +3089,29 @@ else if (op.codigo === "1.17") {
                 `;
                 return; // Mantiene el modal abierto para permitir elegir el lado
             }
-            
+
+            else if (op.codigo === "1.4") {
+                // Submenú interactivo para elegir el tipo de Corona Definitiva según la norma
+                const lista = document.getElementById('listaOpcionesCOP');
+                lista.innerHTML = `
+                    <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-blue-50 p-2 rounded border border-blue-200">
+                        Seleccione el tipo de Corona Definitiva (Diente ${dienteSeleccionado.numero}):
+                    </li>
+                    <li><button type="button" class="w-full text-left p-2 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-xs flex justify-between items-center" onclick="guardarYMarcarCorona('CC')"><span>Corona Completa (Metálica)</span><span class="font-bold">CC</span></button></li>
+                    <li><button type="button" class="w-full text-left p-2 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-xs flex justify-between items-center" onclick="guardarYMarcarCorona('CF')"><span>Corona Fenestrada</span><span class="font-bold">CF</span></button></li>
+                    <li><button type="button" class="w-full text-left p-2 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-xs flex justify-between items-center" onclick="guardarYMarcarCorona('CMC')"><span>Corona Metal Cerámica</span><span class="font-bold">CMC</span></button></li>
+                    <li><button type="button" class="w-full text-left p-2 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-xs flex justify-between items-center" onclick="guardarYMarcarCorona('3/4')"><span>Corona Parcial (3/4, 4/5, 7/8)</span><span class="font-bold">3/4</span></button></li>
+                    <li><button type="button" class="w-full text-left p-2 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-xs flex justify-between items-center" onclick="guardarYMarcarCorona('CV')"><span>Corona Veneer</span><span class="font-bold">CV</span></button></li>
+                    <li><button type="button" class="w-full text-left p-2 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-xs flex justify-between items-center" onclick="guardarYMarcarCorona('CJ')"><span>Corona Jacket (Libre metal)</span><span class="font-bold">CJ</span></button></li>
+                    <li class="mt-3">
+                        <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
+                            &larr; Volver a la lista principal
+                        </button>
+                    </li>
+                `;
+                return;
+            }
+
               else if (op.codigo === "1.14") {
                 // Detectar automáticamente si el diente seleccionado pertenece al maxilar superior o inferior
                 const arcada = (dienteSeleccionado.tipo && dienteSeleccionado.tipo.includes('sup')) ? 'superior' : 'inferior';
@@ -3262,6 +3267,66 @@ function dibujarGiroversionDiente(grupoDiente, valorCasilla) {
 
             cerrarModal();
         }
+            function guardarYMarcarCorona(sigla) {
+            if (!dienteSeleccionado.elemento) return;
+            const { numero, tipo, elemento } = dienteSeleccionado;
+
+            const inputName = nombreInputParaDiente(tipo, numero);
+            if (inputName) {
+                const input = document.querySelector(`input[name="${inputName}"]`);
+                if (input) {
+                    input.value = sigla;
+                    input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+                }
+            }
+
+            const grupoDiente = elemento.querySelector('g');
+            if (grupoDiente) {
+                dibujarCoronaDefinitiva(grupoDiente);
+            }
+
+            cerrarModal();
+            }
+
+      function dibujarCoronaDefinitiva(grupoDiente, numeroDiente = null) {
+    grupoDiente.querySelectorAll('.marca-corona-definitiva').forEach(p => p.remove());
+
+    let bb = { x: 2, y: 2, width: 24, height: 71 };
+    try {
+        const forma = grupoDiente.querySelector('.tooth-shape');
+        const medida = forma ? forma.getBBox() : null;
+        if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+    } catch (err) {}
+
+    const cx = bb.x + bb.width / 2;
+    
+    // 🎯 Prioriza el número que le pasas por parámetro; si viene null, usa el global por seguridad
+    const nDiente = numeroDiente !== null ? numeroDiente : (window.dienteSeleccionado ? dienteSeleccionado.numero : null);
+    const numDiente = parseInt(nDiente, 10);
+    const esTresRaices = [16, 17, 18, 26, 27, 28, 54, 55, 64, 65].includes(numDiente);
+
+    // Si es de 3 raíces usamos un factor más alto; si es normal, usamos el 0.78 original
+    const factorAltura = esTresRaices ? 1.35 : 0.78;
+    const cy = bb.y + bb.height * factorAltura;
+    
+    const r = bb.width * 0.58;
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('class', 'marca-corona-definitiva');
+    circle.setAttribute('cx', cx);
+    circle.setAttribute('cy', cy);
+    circle.setAttribute('r', r);
+    circle.setAttribute('stroke', '#2563eb');
+    circle.setAttribute('stroke-width', '2');
+    circle.setAttribute('fill', 'none');
+    
+    circle.style.stroke = '#2563eb';
+    circle.style.strokeWidth = '2px';
+    circle.style.fill = 'none';
+
+    grupoDiente.appendChild(circle);
+}
+        
 
         function dibujarSupernumerarioDiente(grupoDiente, numero, lado) {
             grupoDiente.querySelectorAll(`.marca-supernumerario-${lado}`).forEach(el => el.remove());
@@ -3955,30 +4020,38 @@ function dibujarGiroversionDiente(grupoDiente, valorCasilla) {
                         grupoDiente.appendChild(punta);
                     }
 
-                 // --- B. CORONA TEMPORAL (CT) ---
-                    else if (valorCasilla === 'CT') {
-                        grupoDiente.querySelectorAll('.marca-corona-temporal').forEach(p => p.remove());
-                        let bb = { x: 2, y: 2, width: 24, height: 71 };
-                        try {
-                            const forma = grupoDiente.querySelector('.tooth-shape');
-                            const medida = forma ? forma.getBBox() : null;
-                            if (medida && medida.width > 0 && medida.height > 0) bb = medida;
-                        } catch (err) {}
+                // --- B. CORONA TEMPORAL (CT) ---
+else if (valorCasilla === 'CT') {
+    grupoDiente.querySelectorAll('.marca-corona-temporal').forEach(p => p.remove());
+    let bb = { x: 2, y: 2, width: 24, height: 71 };
+    try {
+        const forma = grupoDiente.querySelector('.tooth-shape');
+        const medida = forma ? forma.getBBox() : null;
+        if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+    } catch (err) {}
 
-                        const cx = bb.x + bb.width / 2;
-                        const cy = bb.y + bb.height * 0.78;
-                        const r = bb.width * 0.55;
+    const cx = bb.x + bb.width / 2;
+    
+    // --- INICIO DE LA MODIFICACIÓN ---
+    const numDiente = parseInt(num, 10);
+    const esTresRaices = [16, 17, 18, 26, 27, 28, 54, 55, 64, 65].includes(numDiente);
+    const factorAltura = esTresRaices ? 1.35 : 0.78;
+    
+    const cy = bb.y + bb.height * factorAltura;
+    // --- FIN DE LA MODIFICACIÓN ---
 
-                        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                        circle.setAttribute('class', 'marca-corona-temporal');
-                        circle.setAttribute('cx', cx);
-                        circle.setAttribute('cy', cy);
-                        circle.setAttribute('r', r);
-                        circle.setAttribute('stroke', '#dc2626');
-                        circle.setAttribute('stroke-width', '2');
-                        circle.setAttribute('fill', 'none');
-                        grupoDiente.appendChild(circle);
-                    }
+    const r = bb.width * 0.55;
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('class', 'marca-corona-temporal');
+    circle.setAttribute('cx', cx);
+    circle.setAttribute('cy', cy);
+    circle.setAttribute('r', r);
+    circle.setAttribute('stroke', '#dc2626');
+    circle.setAttribute('stroke-width', '2');
+    circle.setAttribute('fill', 'none');
+    grupoDiente.appendChild(circle);
+}
 
                     // --- C. FRACTURA (FR) ---
                     else if (valorCasilla === 'FR') {
@@ -4112,7 +4185,10 @@ function dibujarGiroversionDiente(grupoDiente, valorCasilla) {
                         const ladoSup = valorCasilla.split('-')[1]; // Extrae 'IZQ' o 'DER'
                         dibujarSupernumerarioDiente(grupoDiente, num, ladoSup);
                     }
-                
+                  // --- J. CORONA DEFINITIVA (CC, CF, CMC, 3/4, CV, CJ) ---
+                     else if (['CC', 'CF', 'CMC', '3/4', 'CV', 'CJ'].includes(valorCasilla)) {
+                      dibujarCoronaDefinitiva(grupoDiente, num); // <-- Asegúrate de pasarle el 'num' aquí
+                     }
             }
             });
             // --- VERIFICAR Y REDIBUJAR EDÉNTULO TOTAL AL CARGAR HISTORIA GUARDADA ---
