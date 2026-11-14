@@ -2259,7 +2259,7 @@
                     aplicarOpcion(op);
 
                     // 👇 AGREGAR ESTO: Si es 1.7, NO cerramos el modal para ver los sub-botones
-                    if (op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33" && op.codigo !== "1.31" && op.codigo !== "1.4") {
+                    if (op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33" && op.codigo !== "1.31" && op.codigo !== "1.4" && op.codigo !== "1.16") {
                         cerrarModal();
                         cerrarModal();
                     }
@@ -2664,8 +2664,33 @@
                     grupoDiente.appendChild(line);
 
                 }
-
-            } else if (op.codigo === "1.27") {
+} else if (op.codigo === "1.16") {
+    const lista = document.getElementById('listaOpcionesCOP');
+    lista.innerHTML = `
+        <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-blue-50 p-2 rounded border border-blue-200">
+            Seleccione el lado de la Geminación / Fusión para el diente ${dienteSeleccionado.numero}:
+        </li>
+        <li>
+            <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarGeminacion('izquierda')">
+                <span>Geminación / Fusión (Izquierda)</span>
+                <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">GF-I</span>
+            </button>
+        </li>
+        <li>
+            <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarGeminacion('derecha')">
+                <span>Geminación / Fusión (Derecha)</span>
+                <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold">GF-D</span>
+            </button>
+        </li>
+        <li class="mt-4">
+            <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
+                &larr; Volver a la lista principal
+            </button>
+        </li>
+    `;
+    return;
+}
+             else if (op.codigo === "1.27") {
 
                 const inputName = nombreInputParaDiente(tipo, numero);
 
@@ -3639,7 +3664,118 @@ function dibujarGiroversionDiente(grupoDiente, valorCasilla) {
 
             grupoDiente.appendChild(pathElem);
         }
+     function dibujarGeminacionFusion(grupoDiente, numeroDiente, direccion = 'derecha') {
+    grupoDiente.querySelectorAll('.marca-geminacion').forEach(p => p.remove());
 
+    let bb = { x: 2, y: 2, width: 24, height: 71 };
+    try {
+        const forma = grupoDiente.querySelector('.tooth-shape');
+        const medida = forma ? forma.getBBox() : null;
+        if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+    } catch (err) {}
+
+    const num = parseInt(numeroDiente, 10);
+    
+    // Clasificación independiente de piezas
+    const esTemporal = (num >= 51 && num <= 65) || (num >= 71 && num <= 85);
+    const esInferior = (num >= 31 && num <= 48) || (num >= 71 && num <= 85);
+let yPos = 0;
+    if (esInferior) {
+        if (esTemporal) {
+            // 3. Temporales Inferiores (71-85): Sus números están ARRIBA de las coronas
+            yPos = bb.y + 60; 
+        } else {
+            // 4. Permanentes Inferiores (31-48): Sus números están ABAJO (debajo de las raíces)
+            yPos = bb.y + bb.height - 83; // ⬅️ Modifica este número si deseas acercarlo o alejarlo de los números inferiores
+        }
+    } else {
+        if (esTemporal) {
+            // 2. Temporales Superiores (51-65): Sus números están ABAJO de las coronas
+            yPos = bb.y + bb.height + 15; 
+        } else {
+            // 1. Permanentes Superiores (11-28): Sus números están ARRIBA
+            yPos = bb.y - 18; 
+        }
+    }
+    // Separación horizontal entre los centros de los dos círculos
+    const distanciaDientes = esTemporal ? 29 : 31; 
+    const centroLocal = bb.x + bb.width / 2;
+
+    let x1, x2;
+    if (direccion === 'izquierda') {
+        x1 = centroLocal - distanciaDientes;
+        x2 = centroLocal;
+    } else {
+        x1 = centroLocal;
+        x2 = centroLocal + distanciaDientes;
+    }
+
+    const radio = 11; // Tamaño de las circunferencias
+
+    const gCirculos = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gCirculos.setAttribute('class', 'marca-geminacion');
+
+    const circulo1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circulo1.setAttribute('cx', x1);
+    circulo1.setAttribute('cy', yPos);
+    circulo1.setAttribute('r', radio);
+    circulo1.setAttribute('stroke', '#2563eb');
+    circulo1.setAttribute('stroke-width', '1.5');
+    circulo1.setAttribute('fill', 'none');
+
+    const circulo2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circulo2.setAttribute('cx', x2);
+    circulo2.setAttribute('cy', yPos);
+    circulo2.setAttribute('r', radio);
+    circulo2.setAttribute('stroke', '#2563eb');
+    circulo2.setAttribute('stroke-width', '1.5');
+    circulo2.setAttribute('fill', 'none');
+
+    gCirculos.appendChild(circulo1);
+    gCirculos.appendChild(circulo2);
+    grupoDiente.appendChild(gCirculos);
+}
+function guardarYMarcarGeminacion(direccion) {
+    if (!dienteSeleccionado.elemento) return;
+    const { numero, tipo, elemento } = dienteSeleccionado;
+    const numActual = parseInt(numero, 10);
+
+    // 1. Determinar el número del diente vecino afectado según la dirección elegida en el modal
+    let vecinoNum;
+    if (direccion === 'izquierda') {
+        vecinoNum = numActual - 1; 
+    } else {
+        vecinoNum = numActual + 1; 
+    }
+
+    // 2. Guardar SOLAMENTE 'GF' en la casilla del diente actual
+    const inputNameActual = nombreInputParaDiente(tipo, numActual);
+    if (inputNameActual) {
+        const inputActual = document.querySelector(`input[name="${inputNameActual}"]`);
+        if (inputActual) {
+            inputActual.value = 'GF'; // ⬅️ Limpio, solo la sigla
+            inputActual.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+        }
+    }
+
+    // 3. Guardar SOLAMENTE 'GF' en la casilla del diente vecino
+    const inputNameVecino = nombreInputParaDiente(tipo, vecinoNum);
+    if (inputNameVecino) {
+        const inputVecino = document.querySelector(`input[name="${inputNameVecino}"]`);
+        if (inputVecino) {
+            inputVecino.value = 'GF'; // ⬅️ Limpio, solo la sigla
+            inputVecino.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+        }
+    }
+
+    // 4. El SVG SE MANTIENE IGUAL: usa la 'direccion' para dibujar los círculos hacia el lado correcto
+    const grupoDiente = elemento.querySelector('g');
+    if (grupoDiente) {
+        dibujarGeminacionFusion(grupoDiente, numActual, direccion);
+    }
+
+    cerrarModal();
+}
         document.querySelectorAll('#odontogram .tooth').forEach(el => {
             const num = (el.dataset.tooth || '').trim();
             const n = parseInt(num, 10);
@@ -4189,6 +4325,21 @@ else if (valorCasilla === 'CT') {
                      else if (['CC', 'CF', 'CMC', '3/4', 'CV', 'CJ'].includes(valorCasilla)) {
                       dibujarCoronaDefinitiva(grupoDiente, num); // <-- Asegúrate de pasarle el 'num' aquí
                      }
+                     // --- K. GEMINACIÓN / FUSIÓN (GF) ---
+        else if (valorCasilla === 'GF') {
+            const numInt = parseInt(num, 10);
+            
+            // Verificamos si el diente anterior (numInt - 1) también tiene 'GF' escrito en su input.
+            // Si el anterior ya tiene 'GF', significa que ya dibujamos esta pareja desde el diente anterior, 
+            // así que este diente actual NO dibuja nada y evitamos el gráfico duplicado.
+            const inputAnterior = document.querySelector(`input[name*="${numInt - 1}"]`); // Ajusta el selector según el nombre real de tu input (ej: rec_sup2_...)
+            const esSegundoDeLaPareja = inputAnterior && inputAnterior.value.trim().toUpperCase() === 'GF';
+
+            if (!esSegundoDeLaPareja) {
+                // Si es el primer diente de la pareja, dibujamos una sola vez con total normalidad
+                dibujarGeminacionFusion(grupoDiente, num, 'derecha');
+            }
+        }
             }
             });
             // --- VERIFICAR Y REDIBUJAR EDÉNTULO TOTAL AL CARGAR HISTORIA GUARDADA ---
