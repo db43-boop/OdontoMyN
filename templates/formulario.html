@@ -2113,6 +2113,13 @@
                         </div>
                     </div>
                     <div class="space-y-2 h-full">
+                        <!-- 🔍 CAMPO DE BÚSQUEDA INSTANTÁNEA -->
+                        <div class="relative">
+                            <input type="text" id="buscadorCOP" placeholder="Buscar por código o tratamiento (ej. 1.1, caries)..." oninput="filtrarOpcionesCOP(this.value)" class="w-full p-2.5 pl-8 text-xs border border-slate-300 rounded-lg outline-none focus:border-teal-700 bg-slate-50 font-medium" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 absolute left-2.5 top-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
                         <ul id="listaOpcionesCOP" class="h-full overflow-y-auto pr-2"></ul>
                     </div>
                 </div>
@@ -2233,73 +2240,68 @@
         }
 
         function abrirModal(numero, tipo, elemento) {
-
             dienteSeleccionado = { numero, tipo, elemento };
 
             document.getElementById('dienteNum').textContent = numero;
 
-            const lista = document.getElementById('listaOpcionesCOP');
+            // Limpiar el buscador cada vez que se abre el modal
+            const buscador = document.getElementById('buscadorCOP');
+            if (buscador) buscador.value = '';
 
-            lista.innerHTML = '';
-
-            opcionesCOP.forEach(op => {
-
-                const li = document.createElement('li');
-
-                const btn = document.createElement('button');
-
-                btn.textContent = `${op.codigo} ${op.texto}`;
-
-                btn.className = 'w-full text-left p-2 border border-slate-300 rounded bg-white text-sm hover:bg-blue-50 hover:border-blue-500 transition';
-
-                btn.onclick = (e) => {
-
-                    e.stopPropagation();
-
-                    aplicarOpcion(op);
-
-                    // 👇 AGREGAR ESTO: Si es 1.7, NO cerramos el modal para ver los sub-botones
-                    if (op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33" && op.codigo !== "1.31" && op.codigo !== "1.4" && op.codigo !== "1.16") {
-                        cerrarModal();
-                        cerrarModal();
-                    }
-                    
-
-                };
-
-                li.appendChild(btn);
-
-                lista.appendChild(li);
-
-            });
+            // Dibujar la lista completa inicialmente
+            renderizarListaOpciones(opcionesCOP);
 
             // Mostrar preview si existe imagen guardada para este diente
-
             const preview = document.getElementById('previewImagenDiente');
-
             const imgPreview = document.getElementById('imgPreviewDiente');
-
             if (imagenesDientes[numero]) {
-
                 imgPreview.src = imagenesDientes[numero];
-
                 preview.classList.remove('hidden');
-
             } else {
-
                 imgPreview.src = '';
-
                 preview.classList.add('hidden');
-
             }
 
             const modal = document.getElementById('modalDiente');
-
             modal.style.display = 'flex';
-
             modal.setAttribute('aria-hidden', 'false');
-
         }
+
+        function renderizarListaOpciones(arrayOpciones) {
+            const lista = document.getElementById('listaOpcionesCOP');
+            lista.innerHTML = '';
+
+            arrayOpciones.forEach(op => {
+                const li = document.createElement('li');
+                const btn = document.createElement('button');
+                btn.textContent = `${op.codigo} ${op.texto}`;
+                btn.className = 'w-full text-left p-2 border border-slate-300 rounded bg-white text-sm hover:bg-blue-50 hover:border-blue-500 transition mb-1';
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    aplicarOpcion(op);
+
+                    // Si es 1.7, 1.23, 1.33, etc., NO cerramos el modal para ver los sub-botones
+                    if (op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33" && op.codigo !== "1.31" && op.codigo !== "1.4" && op.codigo !== "1.16" && op.codigo !== "1.26") {
+                        cerrarModal();
+                        cerrarModal();
+                    }
+                };
+                li.appendChild(btn);
+                lista.appendChild(li);
+            });
+        }
+
+        function filtrarOpcionesCOP(textoBusqueda) {
+            const filtro = textoBusqueda.toLowerCase().trim();
+            const opcionesFiltradas = opcionesCOP.filter(op => {
+                const codigoStr = op.codigo.toLowerCase();
+                const textoStr = op.texto.toLowerCase();
+                return codigoStr.includes(filtro) || textoStr.includes(filtro);
+            });
+            renderizarListaOpciones(opcionesFiltradas);
+        }
+
+          
 
         function cerrarModal() {
 
@@ -2778,6 +2780,33 @@
 
                 }
 
+            }
+  else if (op.codigo === "1.26") {
+                // Abrir submenú interactivo para escoger el estado de la Prótesis Total
+                const lista = document.getElementById('listaOpcionesCOP');
+                lista.innerHTML = `
+                    <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-blue-50 p-2 rounded border border-blue-200">
+                        Seleccione el estado de la Prótesis Total (Arcada ${parseInt(numero, 10) >= 11 && parseInt(numero, 10) <= 28 ? 'Superior' : 'Inferior'}):
+                    </li>
+                    <li>
+                        <button type="button" class="w-full text-left p-2.5 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarProtesisTotal('bueno')">
+                            <span>Prótesis total en Buen Estado</span>
+                            <span class="text-xs bg-blue-200 px-2 py-0.5 rounded font-bold text-blue-800">PT (Azul)</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="w-full text-left p-2.5 border border-red-300 rounded bg-red-50 hover:bg-red-100 text-red-800 font-semibold text-sm transition flex justify-between items-center" onclick="guardarYMarcarProtesisTotal('malo')">
+                            <span>Prótesis total en Mal Estado</span>
+                            <span class="text-xs bg-red-200 px-2 py-0.5 rounded font-bold text-red-800">PT (Rojo)</span>
+                        </button>
+                    </li>
+                    <li class="mt-4">
+                        <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
+                            &larr; Volver a la lista principal
+                        </button>
+                    </li>
+                `;
+                return; // Mantiene el modal abierto para que el usuario elija el estado
             }
 
          else if (op.codigo === "1.23") {
@@ -3457,7 +3486,80 @@ function dibujarGiroversionDiente(grupoDiente, valorCasilla) {
 
             cerrarModal();
         }
-    
+      function aplicarProtesisTotal(arcada, estado = 'bueno') {
+            let dientesAfectados = [];
+            let tipo = '';
+            let yLinea1 = 0;
+            let yLinea2 = 0;
+
+            if (arcada === 'superior') {
+                dientesAfectados = [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28];
+                tipo = 'adulto-sup';
+                yLinea1 = 88; 
+                yLinea2 = 92; 
+            } else if (arcada === 'inferior') {
+                dientesAfectados = [48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38];
+                tipo = 'adulto-inf';
+                yLinea1 = 313; 
+                yLinea2 = 317; 
+            }
+
+            const claseColorInput = (estado === 'malo') ? ['text-red-600', 'font-bold', 'border-red-600'] : ['text-blue-600', 'font-bold', 'border-blue-600'];
+            const colorHex = (estado === 'malo') ? '#dc2626' : '#2563eb'; 
+
+            dientesAfectados.forEach(num => {
+                const inputName = nombreInputParaDiente(tipo, num);
+                if (inputName) {
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+                    if (input) {
+                        // 👇 CAMBIO AQUÍ: Guarda 'PT-M' si es malo para que la BD lo recuerde
+                        input.value = (estado === 'malo') ? 'PT-M' : 'PT';
+                        
+                        input.classList.remove('text-blue-600', 'text-red-600', 'border-blue-600', 'border-red-600');
+                        input.classList.add(...claseColorInput);
+                    }
+                }
+            });
+
+            const svg = document.getElementById('odontogram');
+            if (svg) {
+                let capaProtesis = svg.querySelector('#capa-protesis-total');
+                if (!capaProtesis) {
+                    capaProtesis = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    capaProtesis.setAttribute('id', 'capa-protesis-total');
+                    svg.appendChild(capaProtesis);
+                }
+
+                capaProtesis.querySelectorAll(`.linea-protesis-${arcada}`).forEach(el => el.remove());
+
+                const crearLinea = (y) => {
+                    const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    linea.setAttribute('class', `linea-protesis linea-protesis-${arcada}`);
+                    linea.setAttribute('x1', '45');
+                    linea.setAttribute('y1', y);
+                    linea.setAttribute('x2', '535');
+                    linea.setAttribute('y2', y);
+                    linea.setAttribute('stroke', colorHex);
+                    linea.setAttribute('stroke-width', '2');
+                    linea.setAttribute('stroke-linecap', 'round');
+                    return linea;
+                };
+
+                capaProtesis.appendChild(crearLinea(yLinea1));
+                capaProtesis.appendChild(crearLinea(yLinea2));
+            }
+        }
+
+        function guardarYMarcarProtesisTotal(estado) {
+            if (!dienteSeleccionado.elemento) return;
+            const { numero } = dienteSeleccionado;
+            const numInt = parseInt(numero, 10);
+            const esSuperior = numInt >= 11 && numInt <= 28;
+            const arcada = esSuperior ? 'superior' : 'inferior';
+
+            aplicarProtesisTotal(arcada, estado);
+            cerrarModal();
+        }
 
         function guardarYMarcarEndodoncia(sigla) {
             if (!dienteSeleccionado.elemento) return;
@@ -4358,7 +4460,22 @@ else if (valorCasilla === 'CT') {
             if (infCompleto) {
                 aplicarEdentuloTotal('inferior');
             }
-            
+            // --- VERIFICAR Y REDIBUJAR PRÓTESIS TOTAL AL CARGAR HISTORIA GUARDADA ---
+            const inputsSupPT = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28].map(num => 
+                document.querySelector(`input[name="rec_sup2_${num}"]`)
+            );
+            if (inputsSupPT.every(inp => inp && (inp.value === 'PT' || inp.value === 'PT-M'))) {
+                const esMaloSup = inputsSupPT.some(inp => inp.value === 'PT-M');
+                aplicarProtesisTotal('superior', esMaloSup ? 'malo' : 'bueno');
+            }
+
+            const inputsInfPT = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38].map(num => 
+                document.querySelector(`input[name="rec_inf2_${num}"]`)
+            );
+            if (inputsInfPT.every(inp => inp && (inp.value === 'PT' || inp.value === 'PT-M'))) {
+                const esMaloInf = inputsInfPT.some(inp => inp.value === 'PT-M');
+                aplicarProtesisTotal('inferior', esMaloInf ? 'malo' : 'bueno');
+            }
         }
     </script>
 
