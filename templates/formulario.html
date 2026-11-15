@@ -2281,7 +2281,7 @@
                     aplicarOpcion(op);
 
                     // Si es 1.7, 1.23, 1.33, etc., NO cerramos el modal para ver los sub-botones
-                    if (op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33" && op.codigo !== "1.31" && op.codigo !== "1.4" && op.codigo !== "1.16" && op.codigo !== "1.26") {
+                    if (op.codigo !=="1.1" && op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33" && op.codigo !== "1.31" && op.codigo !== "1.4" && op.codigo !== "1.16" && op.codigo !== "1.26") {
                         cerrarModal();
                         cerrarModal();
                     }
@@ -2357,7 +2357,62 @@
                     grupoDiente.appendChild(x);
                 }
             
+          } else if (op.codigo === "1.1") {
+                // Submenú interactivo para Aparato Ortodóntico Fijo
+                const numeroDienteBase = parseInt(dienteSeleccionado.numero, 10);
+                const esInferior = numeroDienteBase >= 31 || (numeroDienteBase >= 71 && numeroDienteBase <= 85);
+                const arcadaSugerida = esInferior ? 'inferior' : 'superior';
+                
+                // Sugerir un rango inteligente según el diente base en el que se hizo clic
+                let inicioSugerido = numeroDienteBase;
+                let finSugerido = esInferior ? 48 : 28;
+                if (numeroDienteBase >= 51 && numeroDienteBase <= 65) finSugerido = 65;
+                if (numeroDienteBase >= 71 && numeroDienteBase <= 85) finSugerido = 85;
+                if (numeroDienteBase >= 31 && numeroDienteBase <= 48) finSugerido = 48;
+                if (numeroDienteBase >= 11 && numeroDienteBase <= 28) finSugerido = 28;
 
+                const lista = document.getElementById('listaOpcionesCOP');
+                lista.innerHTML = `
+                    <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-blue-50 p-2 rounded border border-blue-200">
+                        1.1 Aparato Ortodóntico Fijo (Diente base: ${dienteSeleccionado.numero})
+                    </li>
+                    <li class="mb-2">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Arcada:</label>
+                        <select id="ortoFijoArcada" class="w-full p-2 border border-slate-300 rounded text-xs bg-white font-medium text-slate-800">
+                            <option value="superior" ${arcadaSugerida === 'superior' ? 'selected' : ''}>Maxilar Superior</option>
+                            <option value="inferior" ${arcadaSugerida === 'inferior' ? 'selected' : ''}>Maxilar Inferior</option>
+                        </select>
+                    </li>
+                    <li class="mb-2 grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Diente Inicial:</label>
+                            <input type="number" id="ortoFijoInicio" value="${inicioSugerido}" class="w-full p-2 border border-slate-300 rounded text-xs text-center font-bold bg-white text-slate-800" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Diente Final:</label>
+                            <input type="number" id="ortoFijoFin" value="${finSugerido}" class="w-full p-2 border border-slate-300 rounded text-xs text-center font-bold bg-white text-slate-800" />
+                        </div>
+                    </li>
+                    <li class="mb-3">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Estado:</label>
+                        <select id="ortoFijoEstado" class="w-full p-2 border border-slate-300 rounded text-xs bg-white font-medium text-slate-800">
+                            <option value="bueno">Buen Estado (Azul)</option>
+                            <option value="malo">Mal Estado (Rojo)</option>
+                        </select>
+                    </li>
+                    <li class="mb-2">
+                        <button type="button" style="background-color: #0f766e; color: #ffffff; text-align: center; border-color: #0f766e;" class="w-full py-2.5 hover:opacity-90 font-bold rounded text-xs uppercase transition shadow-sm cursor-pointer" onclick="guardarYMarcarOrtodonciaFija()">
+                            Aplicar Aparato Fijo
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
+                            &larr; Volver a la lista principal
+                        </button>
+                    </li>
+                `;
+                return;
+            
             } else if (op.codigo === "1.6") {
 
                 const inputName = nombreInputParaDiente(tipo, numero);
@@ -3878,6 +3933,285 @@ function guardarYMarcarGeminacion(direccion) {
 
     cerrarModal();
 }
+function guardarYMarcarOrtodonciaFija() {
+            const arcada = document.getElementById('ortoFijoArcada').value;
+            const dInicio = parseInt(document.getElementById('ortoFijoInicio').value, 10);
+            const dFin = parseInt(document.getElementById('ortoFijoFin').value, 10);
+            const estado = document.getElementById('ortoFijoEstado').value;
+
+            if (isNaN(dInicio) || isNaN(dFin)) {
+                alert('Por favor ingrese números de dientes válidos para los extremos.');
+                return;
+            }
+
+            aplicarOrtodonciaFija(arcada, dInicio, dFin, estado);
+            cerrarModal();
+        }
+
+     function aplicarOrtodonciaFija(arcada, dInicio, dFin, estado) {
+            const esSuperior = (arcada === 'superior');
+            
+            // Detectar si el rango seleccionado pertenece a temporales o permanentes según el diente inicial
+            const esTemporal = (dInicio >= 51 && dInicio <= 65) || (dInicio >= 71 && dInicio <= 85);
+
+            // Listas separadas según corresponda
+            const ordenSupTemp = [55,54,53,52,51, 61,62,63,64,65];
+            const ordenSupPerm = [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28];
+            const ordenInfTemp = [85,84,83,82,81, 71,72,73,74,75];
+            const ordenInfPerm = [48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38];
+
+            let listaArcada;
+            if (esSuperior) {
+                listaArcada = esTemporal ? ordenSupTemp : ordenSupPerm;
+            } else {
+                listaArcada = esTemporal ? ordenInfTemp : ordenInfPerm;
+            }
+
+            const idxInicio = listaArcada.indexOf(dInicio);
+            const idxFin = listaArcada.indexOf(dFin);
+
+            if (idxInicio === -1 || idxFin === -1) {
+                alert('Por favor asegúrese de que los dientes inicial y final correspondan al mismo grupo (temporales o permanentes) de la arcada.');
+                return;
+            }
+
+            const minIdx = Math.min(idxInicio, idxFin);
+            const maxIdx = Math.max(idxInicio, idxFin);
+
+            const obtenerTipoInput = (num) => {
+                if (num >= 11 && num <= 28) return 'adulto-sup';
+                if (num >= 31 && num <= 48) return 'adulto-inf';
+                if (num >= 51 && num <= 65) return 'temp-sup';
+                if (num >= 71 && num <= 85) return 'temp-inf';
+                return esSuperior ? 'adulto-sup' : 'adulto-inf';
+            };
+
+            // Limpiar únicamente dentro de su propio grupo (temporal o permanente) para no afectar al otro
+            listaArcada.forEach(num => {
+                const tipoActual = obtenerTipoInput(num);
+                const inputName = nombreInputParaDiente(tipoActual, num);
+                if (inputName) {
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+                    if (input) {
+                        input.value = '';
+                        input.classList.remove('text-blue-600', 'text-red-600', 'border-blue-600', 'border-red-600', 'font-bold');
+                    }
+                }
+            });
+
+            const claseColorInput = (estado === 'malo') ? ['text-red-600', 'font-bold', 'border-red-600'] : ['text-blue-600', 'font-bold', 'border-blue-600'];
+            const colorHex = (estado === 'malo') ? '#dc2626' : '#2563eb';
+
+            // Rellenar las casillas dentro del rango seleccionado
+            for (let i = minIdx; i <= maxIdx; i++) {
+                const num = listaArcada[i];
+                const tipoActual = obtenerTipoInput(num);
+                const inputName = nombreInputParaDiente(tipoActual, num);
+                if (inputName) {
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+                    if (input) {
+                        input.value = (estado === 'malo') ? 'AO-M' : 'AO';
+                        input.classList.remove('text-blue-600', 'text-red-600', 'border-blue-600', 'border-red-600');
+                        input.classList.add(...claseColorInput);
+                    }
+                }
+            }
+
+            // Obtener coordenadas X de los dientes extremos en el SVG
+            const elInicio = document.querySelector(`#tooth-${listaArcada[minIdx]}`);
+            const elFin = document.querySelector(`#tooth-${listaArcada[maxIdx]}`);
+
+            if (!elInicio || !elFin) {
+                alert('Uno de los dientes extremos no se encuentra en el odontograma principal.');
+                return;
+            }
+
+            const getCentroX = (el) => {
+                const g = el.querySelector('g');
+                if (g) {
+                    const transform = g.getAttribute('transform');
+                    const match = transform ? transform.match(/translate\(([^,\s]+)[\s,]([^)]+)\)/) : null;
+                    if (match) {
+                        return parseFloat(match[1]) + 14; 
+                    }
+                }
+                return 290;
+            };
+
+            const x1 = getCentroX(elInicio);
+            const x2 = getCentroX(elFin);
+
+            // Altura exacta (yAparejo) y clase única para evitar que se sobrescriban entre niños y adultos
+            let yAparejo, claseGrafica;
+            if (esSuperior) {
+                yAparejo = esTemporal ? 155 : 68;
+                claseGrafica = esTemporal ? 'orto-fija-sup-temp' : 'orto-fija-sup-perm';
+            } else {
+                yAparejo = esTemporal ? 255 : 335;
+                claseGrafica = esTemporal ? 'orto-fija-inf-temp' : 'orto-fija-inf-perm';
+            }
+
+            const svg = document.getElementById('odontogram');
+            if (svg) {
+                let capaOrto = svg.querySelector('#capa-ortodoncia-fija');
+                if (!capaOrto) {
+                    capaOrto = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    capaOrto.setAttribute('id', 'capa-ortodoncia-fija');
+                    svg.appendChild(capaOrto);
+                }
+
+                // Borrar únicamente la línea anterior de SU MISMO GRUPO (respetando al otro grupo)
+                capaOrto.querySelectorAll(`.${claseGrafica}`).forEach(el => el.remove());
+
+                const crearCuadradoCruz = (cx, cy) => {
+                    const gCruz = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    gCruz.setAttribute('class', claseGrafica);
+                    
+                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    rect.setAttribute('x', cx - 6);
+                    rect.setAttribute('y', cy - 6);
+                    rect.setAttribute('width', '12');
+                    rect.setAttribute('height', '12');
+                    rect.setAttribute('stroke', colorHex);
+                    rect.setAttribute('stroke-width', '1.5');
+                    rect.setAttribute('fill', '#ffffff');
+
+                    const l1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    l1.setAttribute('x1', cx); l1.setAttribute('y1', cy - 4);
+                    l1.setAttribute('x2', cx); l1.setAttribute('y2', cy + 4);
+                    l1.setAttribute('stroke', colorHex); l1.setAttribute('stroke-width', '1.5');
+
+                    const l2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    l2.setAttribute('x1', cx - 4); l2.setAttribute('y1', cy);
+                    l2.setAttribute('x2', cx + 4); l2.setAttribute('y2', cy);
+                    l2.setAttribute('stroke', colorHex); l2.setAttribute('stroke-width', '1.5');
+
+                    gCruz.appendChild(rect);
+                    gCruz.appendChild(l1);
+                    gCruz.appendChild(l2);
+                    return gCruz;
+                };
+
+                const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                linea.setAttribute('class', claseGrafica);
+                linea.setAttribute('x1', Math.min(x1, x2));
+                linea.setAttribute('y1', yAparejo);
+                linea.setAttribute('x2', Math.max(x1, x2));
+                linea.setAttribute('y2', yAparejo);
+                linea.setAttribute('stroke', colorHex);
+                linea.setAttribute('stroke-width', '2');
+
+                capaOrto.appendChild(linea);
+                capaOrto.appendChild(crearCuadradoCruz(x1, yAparejo));
+                capaOrto.appendChild(crearCuadradoCruz(x2, yAparejo));
+            }
+        }
+       function aplicarOrtodonciaFijaDesdeCarga(arcada, dInicio, dFin, estado, esTemporal) {
+            const esSuperior = (arcada === 'superior');
+            const colorHex = (estado === 'malo') ? '#dc2626' : '#2563eb';
+            const claseColorInput = (estado === 'malo') ? ['text-red-600', 'font-bold', 'border-red-600'] : ['text-blue-600', 'font-bold', 'border-blue-600'];
+
+            // --- 1. PINTAR LAS CASILLAS CORRESPONDIENTES AL RANGO CARGADO ---
+            const ordenSupTemp = [55,54,53,52,51, 61,62,63,64,65];
+            const ordenSupPerm = [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28];
+            const ordenInfTemp = [85,84,83,82,81, 71,72,73,74,75];
+            const ordenInfPerm = [48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38];
+
+            let lista = arcada === 'superior' ? (esTemporal ? ordenSupTemp : ordenSupPerm) : (esTemporal ? ordenInfTemp : ordenInfPerm);
+            const idxInicio = lista.indexOf(dInicio);
+            const idxFin = lista.indexOf(dFin);
+
+            if (idxInicio !== -1 && idxFin !== -1) {
+                const minIdx = Math.min(idxInicio, idxFin);
+                const maxIdx = Math.max(idxInicio, idxFin);
+
+                for (let i = minIdx; i <= maxIdx; i++) {
+                    const num = lista[i];
+                    const tipoActual = (num >= 11 && num <= 28) ? 'adulto-sup' : (num >= 31 && num <= 48) ? 'adulto-inf' : (num >= 51 && num <= 65) ? 'temp-sup' : 'temp-inf';
+                    const inputName = nombreInputParaDiente(tipoActual, num);
+                    if (inputName) {
+                        const input = document.querySelector(`input[name="${inputName}"]`);
+                        if (input) {
+                            input.value = (estado === 'malo') ? 'AO-M' : 'AO';
+                            input.classList.remove('text-blue-600', 'text-red-600', 'border-blue-600', 'border-red-600');
+                            input.classList.add(...claseColorInput);
+                        }
+                    }
+                }
+            }
+
+            // --- 2. DIBUJAR LOS TRAZOS GRÁFICOS EN EL SVG ---
+            const elInicio = document.querySelector(`#tooth-${dInicio}`);
+            const elFin = document.querySelector(`#tooth-${dFin}`);
+
+            if (!elInicio || !elFin) return;
+
+            const getCentroX = (el) => {
+                const g = el.querySelector('g');
+                if (g) {
+                    const transform = g.getAttribute('transform');
+                    const match = transform ? transform.match(/translate\(([^,\s]+)[\s,]([^)]+)\)/) : null;
+                    if (match) return parseFloat(match[1]) + 14; 
+                }
+                return 290;
+            };
+
+            const x1 = getCentroX(elInicio);
+            const x2 = getCentroX(elFin);
+
+            let yAparejo, claseGrafica;
+            if (esSuperior) {
+                yAparejo = esTemporal ? 155 : 68;
+                claseGrafica = esTemporal ? 'orto-fija-sup-temp' : 'orto-fija-sup-perm';
+            } else {
+                yAparejo = esTemporal ? 255 : 335;
+                claseGrafica = esTemporal ? 'orto-fija-inf-temp' : 'orto-fija-inf-perm';
+            }
+
+            const svg = document.getElementById('odontogram');
+            if (svg) {
+                let capaOrto = svg.querySelector('#capa-ortodoncia-fija');
+                if (!capaOrto) {
+                    capaOrto = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    capaOrto.setAttribute('id', 'capa-ortodoncia-fija');
+                    svg.appendChild(capaOrto);
+                }
+
+                capaOrto.querySelectorAll(`.${claseGrafica}`).forEach(el => el.remove());
+
+                const crearCuadradoCruz = (cx, cy) => {
+                    const gCruz = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    gCruz.setAttribute('class', claseGrafica);
+                    
+                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    rect.setAttribute('x', cx - 6); rect.setAttribute('y', cy - 6);
+                    rect.setAttribute('width', '12'); rect.setAttribute('height', '12');
+                    rect.setAttribute('stroke', colorHex); rect.setAttribute('stroke-width', '1.5');
+                    rect.setAttribute('fill', '#ffffff');
+
+                    const l1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    l1.setAttribute('x1', cx); l1.setAttribute('y1', cy - 4); l1.setAttribute('x2', cx); l1.setAttribute('y2', cy + 4);
+                    l1.setAttribute('stroke', colorHex); l1.setAttribute('stroke-width', '1.5');
+
+                    const l2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    l2.setAttribute('x1', cx - 4); l2.setAttribute('y1', cy); l2.setAttribute('x2', cx + 4); l2.setAttribute('y2', cy);
+                    l2.setAttribute('stroke', colorHex); l2.setAttribute('stroke-width', '1.5');
+
+                    gCruz.appendChild(rect); gCruz.appendChild(l1); gCruz.appendChild(l2);
+                    return gCruz;
+                };
+
+                const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                linea.setAttribute('class', claseGrafica);
+                linea.setAttribute('x1', Math.min(x1, x2)); linea.setAttribute('y1', yAparejo);
+                linea.setAttribute('x2', Math.max(x1, x2)); linea.setAttribute('y2', yAparejo);
+                linea.setAttribute('stroke', colorHex); linea.setAttribute('stroke-width', '2');
+
+                capaOrto.appendChild(linea);
+                capaOrto.appendChild(crearCuadradoCruz(x1, yAparejo));
+                capaOrto.appendChild(crearCuadradoCruz(x2, yAparejo));
+            }
+        }
         document.querySelectorAll('#odontogram .tooth').forEach(el => {
             const num = (el.dataset.tooth || '').trim();
             const n = parseInt(num, 10);
@@ -4443,6 +4777,42 @@ else if (valorCasilla === 'CT') {
             }
         }
             }
+            });
+          // --- RESTAURAR APARATO ORTODÓNTICO FIJO (1.1) DE FORMA EXACTA ---
+            ['superior', 'inferior'].forEach(arcada => {
+                [true, false].forEach(esTemporal => {
+                    const ordenSupTemp = [55,54,53,52,51, 61,62,63,64,65];
+                    const ordenSupPerm = [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28];
+                    const ordenInfTemp = [85,84,83,82,81, 71,72,73,74,75];
+                    const ordenInfPerm = [48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38];
+
+                    let lista = arcada === 'superior' ? (esTemporal ? ordenSupTemp : ordenSupPerm) : (esTemporal ? ordenInfTemp : ordenInfPerm);
+                    
+                    // Recopilar exactamente los índices de los dientes que tienen guardado AO o AO-M
+                    let indicesValidos = [];
+                    lista.forEach((num, idx) => {
+                        const tipo = (num >= 11 && num <= 28) ? 'adulto-sup' : (num >= 31 && num <= 48) ? 'adulto-inf' : (num >= 51 && num <= 65) ? 'temp-sup' : 'temp-inf';
+                        const inputName = nombreInputParaDiente(tipo, num);
+                        if (inputName && historiaData[inputName] && historiaData[inputName].startsWith('AO')) {
+                            indicesValidos.push(idx);
+                        }
+                    });
+
+                    if (indicesValidos.length > 0) {
+                        const minIdx = Math.min(...indicesValidos);
+                        const maxIdx = Math.max(...indicesValidos);
+                        
+                        // Respetar estrictamente el rango exacto guardado por el usuario (sin rellenar de más)
+                        const dInicio = lista[minIdx];
+                        const dFin = lista[maxIdx];
+
+                        const tipoEjemplo = (dInicio >= 11 && dInicio <= 28) ? 'adulto-sup' : (dInicio >= 31 && dInicio <= 48) ? 'adulto-inf' : (dInicio >= 51 && dInicio <= 65) ? 'temp-sup' : 'temp-inf';
+                        const valEjemplo = historiaData[nombreInputParaDiente(tipoEjemplo, dInicio)];
+                        const estadoGuardado = (valEjemplo === 'AO-M') ? 'malo' : 'bueno';
+
+                        aplicarOrtodonciaFijaDesdeCarga(arcada, dInicio, dFin, estadoGuardado, esTemporal);
+                    }
+                });
             });
             // --- VERIFICAR Y REDIBUJAR EDÉNTULO TOTAL AL CARGAR HISTORIA GUARDADA ---
             const supCompleto = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28].every(num => {
