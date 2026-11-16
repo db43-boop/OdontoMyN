@@ -2281,7 +2281,7 @@
                     aplicarOpcion(op);
 
                     // Si es 1.7, 1.23, 1.33, etc., NO cerramos el modal para ver los sub-botones
-                    if (op.codigo !=="1.1" && op.codigo !== "1.2" && op.codigo !== "1.24" && op.codigo !== "1.25" && op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33" && op.codigo !== "1.31" && op.codigo !== "1.4" && op.codigo !== "1.16" && op.codigo !== "1.26") {
+                    if (op.codigo !=="1.1" && op.codigo !== "1.2" && op.codigo !== "1.24" && op.codigo !== "1.25" && op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33" && op.codigo !== "1.31" && op.codigo !== "1.4" && op.codigo !== "1.16" && op.codigo !== "1.26" && op.codigo !== "1.32") {
                         cerrarModal();
                         cerrarModal();
                     }
@@ -3360,7 +3360,40 @@ else if (op.codigo === "1.17") {
                     </li>
                 `;
                 return; // Mantiene el modal abierto para permitir elegir el lado
+            
+            } else if (op.codigo === "1.32") {
+                const numBase = parseInt(dienteSeleccionado.numero, 10);
+                
+                const lista = document.getElementById('listaOpcionesCOP');
+                lista.innerHTML = `
+                    <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-blue-50 p-2 rounded border border-blue-200">
+                        1.32 Transposición (Diente: ${dienteSeleccionado.numero})
+                    </li>
+                    <li class="mb-2">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Diente Involucrado (Par):</label>
+                        <input type="number" id="transDientePar" value="${numBase + 1}" class="w-full p-2 border border-slate-300 rounded text-xs text-center font-bold bg-white text-slate-800" />
+                    </li>
+                    <li class="mb-2">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Dirección de la Transposición:</label>
+                        <select id="transDireccion" class="w-full p-2 border border-slate-300 rounded text-xs bg-white font-medium text-slate-800">
+                            <option value="derecha">Hacia la Derecha (Mesial/Distal)</option>
+                            <option value="izquierda">Hacia la Izquierda</option>
+                        </select>
+                    </li>
+                    <li class="mb-2">
+                        <button type="button" style="background-color: #0f766e; color: #ffffff; text-align: center; border-color: #0f766e;" class="w-full py-2.5 hover:opacity-90 font-bold rounded text-xs uppercase transition shadow-sm cursor-pointer" onclick="guardarYMarcarTransposicion()">
+                            Aplicar Transposición
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
+                            &larr; Volver a la lista principal
+                        </button>
+                    </li>
+                `;
+                return;
             }
+
 
             else if (op.codigo === "1.4") {
                 // Submenú interactivo para elegir el tipo de Corona Definitiva según la norma
@@ -3397,6 +3430,181 @@ else if (op.codigo === "1.17") {
             }
         
         }
+      function guardarYMarcarTransposicion() {
+            const dBase = parseInt(dienteSeleccionado.numero, 10);
+            const dParInput = parseInt(document.getElementById('transDientePar').value, 10);
+
+            if (isNaN(dParInput)) {
+                alert('Por favor ingrese un número de diente válido para el par.');
+                return;
+            }
+
+            // 🛠️ VALIDACIÓN DE LÍMITES REALES SEGÚN EL TIPO DE DIENTE
+            // Definimos los rangos permitidos por cuadrante en la numeración FDI
+            let esValido = false;
+            const esTemp = (dBase >= 51 && dBase <= 85);
+            
+            if (esTemp) {
+                // Rangos temporales válidos por cuadrante
+                if ((dBase >= 51 && dBase <= 55) && (dParInput >= 51 && dParInput <= 55)) esValido = true;
+                if ((dBase >= 61 && dBase <= 65) && (dParInput >= 61 && dParInput <= 65)) esValido = true;
+                if ((dBase >= 71 && dBase <= 75) && (dParInput >= 71 && dParInput <= 75)) esValido = true;
+                if ((dBase >= 81 && dBase <= 85) && (dParInput >= 81 && dParInput <= 85)) esValido = true;
+            } else {
+                // Rangos permanentes válidos por cuadrante (del 11 al 18, 21 al 28, etc.)
+                if ((dBase >= 11 && dBase <= 18) && (dParInput >= 11 && dParInput <= 18)) esValido = true;
+                if ((dBase >= 21 && dBase <= 28) && (dParInput >= 21 && dParInput <= 28)) esValido = true;
+                if ((dBase >= 31 && dBase <= 38) && (dParInput >= 31 && dParInput <= 38)) esValido = true;
+                if ((dBase >= 41 && dBase <= 48) && (dParInput >= 41 && dParInput <= 48)) esValido = true;
+            }
+
+            if (!esValido) {
+                alert(`El diente par (${dParInput}) no pertenece al mismo cuadrante o está fuera de los límites reales del odonograma.`);
+                return;
+            }
+
+            const dPar = dParInput;
+
+            // Registrar la sigla TR en los inputs de ambos dientes
+            [dBase, dPar].forEach(num => {
+                const tipo = (num >= 11 && num <= 28) ? 'adulto-sup' : (num >= 31 && num <= 48) ? 'adulto-inf' : (num >= 51 && num <= 65) ? 'temp-sup' : 'temp-inf';
+                const inputName = nombreInputParaDiente(tipo, num);
+                if (inputName) {
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+                    if (input) {
+                        input.value = 'TR';
+                        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+                    }
+                }
+            });
+
+            // Dibujar el gráfico a nivel global del SVG usando los dos dientes validados
+            aplicarTransposicionGlobal(dBase, dPar);
+            cerrarModal();
+        }
+
+  function aplicarTransposicionGlobal(d1, d2) {
+    const svg = document.getElementById('odontogram');
+    if (!svg) return;
+
+    let defs = svg.querySelector('defs');
+    if (!defs) {
+        defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        svg.prepend(defs);
+    }
+    if (!defs.querySelector('#flecha-transposicion')) {
+        const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+        marker.setAttribute('id', 'flecha-transposicion');
+        marker.setAttribute('viewBox', '0 0 10 10');
+        marker.setAttribute('refX', '6');
+        marker.setAttribute('refY', '5');
+        marker.setAttribute('markerWidth', '5');
+        marker.setAttribute('markerHeight', '5');
+        marker.setAttribute('orient', 'auto');
+
+        const poly = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        poly.setAttribute('d', 'M 0 1.5 L 8 5 L 0 8.5 z');
+        poly.setAttribute('fill', '#2563eb');
+        marker.appendChild(poly);
+        defs.appendChild(marker);
+    }
+
+    let capaTrans = svg.querySelector('#capa-transposicion');
+    if (!capaTrans) {
+        capaTrans = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        capaTrans.setAttribute('id', 'capa-transposicion');
+        svg.appendChild(capaTrans);
+    }
+
+    const elI = document.querySelector(`#tooth-${d1}`);
+    const elF = document.querySelector(`#tooth-${d2}`);
+    if (!elI || !elF) return;
+
+    // 🛠️ SOLUCIÓN DEFINITIVA: Extraer el valor X real desde el transform="translate(X Y)" del grupo interno
+    const getCentroRealX = (el) => {
+        const g = el.querySelector('g');
+        if (g && g.hasAttribute('transform')) {
+            const transform = g.getAttribute('transform');
+            const match = transform.match(/translate\(([^,\s]+)[\s,]([^)]+)\)/);
+            if (match) {
+                // El ancho estándar de la caja del diente en tu SVG es ~28px, sumamos 14 para ir al centro exacto
+                return parseFloat(match[1]) + 14;
+            }
+        }
+        // Fallback por si acaso
+        const txt = el.querySelector('text');
+        if (txt && txt.hasAttribute('x')) {
+            return parseFloat(txt.getAttribute('x'));
+        }
+        return 290;
+    };
+
+    const x1 = getCentroRealX(elI);
+    const x2 = getCentroRealX(elF);
+    const minX = Math.min(x1, x2);
+    const maxX = Math.max(x1, x2);
+    const mitadX = Math.round((minX + maxX) / 2);
+
+    const num = parseInt(d1, 10);
+    const esInferior = (num >= 31 && num <= 48) || (num >= 71 && num <= 85);
+    const esTemporal = (num >= 51 && num <= 65) || (num >= 71 && num <= 85);
+
+    // Definir yBase y dirección del arco según la sección exacta del odontograma
+    let yBase = 22;
+    let arcDirection = -1; // -1: Arco hacia arriba | 1: Arco hacia abajo
+
+    if (!esTemporal && !esInferior) {
+        // Adulto Superior (11-28): Números arriba
+        yBase = 30;
+        arcDirection = -1;
+    } else if (esTemporal && !esInferior) {
+        // Temporal Superior (51-65): Números abajo
+        yBase = 125;
+        arcDirection = -1;
+    } else if (esTemporal && esInferior) {
+        // Temporal Inferior (71-85): Números arriba
+        yBase = 290;
+        arcDirection = 1;
+    } else {
+        // Adulto Inferior (31-48): Números abajo
+        yBase = 385;
+        arcDirection = 1;
+    }
+
+    const curvaturaY = yBase + (14 * arcDirection);
+    const claseTramoUnico = `trans-tramo-${Math.round(minX)}-${Math.round(maxX)}-${yBase}`;
+    capaTrans.querySelectorAll(`.${claseTramoUnico}`).forEach(el => el.remove());
+
+    const gTrans = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gTrans.setAttribute('class', `marca-transposicion ${claseTramoUnico}`);
+
+    let p1D, p2D;
+    if (arcDirection === -1) {
+        p1D = `M ${minX} ${yBase + 4} Q ${mitadX} ${curvaturaY} ${maxX} ${yBase - 4}`;
+        p2D = `M ${maxX} ${yBase + 4} Q ${mitadX} ${curvaturaY} ${minX} ${yBase - 4}`;
+    } else {
+        p1D = `M ${minX} ${yBase - 4} Q ${mitadX} ${curvaturaY} ${maxX} ${yBase + 4}`;
+        p2D = `M ${maxX} ${yBase - 4} Q ${mitadX} ${curvaturaY} ${minX} ${yBase + 4}`;
+    }
+
+    const path1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path1.setAttribute('d', p1D);
+    path1.setAttribute('stroke', '#2563eb');
+    path1.setAttribute('stroke-width', '1.5');
+    path1.setAttribute('fill', 'none');
+    path1.setAttribute('marker-end', 'url(#flecha-transposicion)');
+
+    const path2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path2.setAttribute('d', p2D);
+    path2.setAttribute('stroke', '#2563eb');
+    path2.setAttribute('stroke-width', '1.5');
+    path2.setAttribute('fill', 'none');
+    path2.setAttribute('marker-end', 'url(#flecha-transposicion)');
+
+    gTrans.appendChild(path1);
+    gTrans.appendChild(path2);
+    capaTrans.appendChild(gTrans);
+}
         function dibujarMigracionDiente(grupoDiente, valorCasilla) {
             grupoDiente.querySelectorAll('.marca-migracion').forEach(p => p.remove());
             if (!valorCasilla || !valorCasilla.startsWith('MIG')) return;
@@ -4789,7 +4997,7 @@ function guardarYMarcarOrtodonciaFija() {
                 capaOrto.appendChild(crearCuadradoCruz(x2, yAparejo));
             }
         }
-        document.querySelectorAll('#odontogram .tooth').forEach(el => {
+   document.querySelectorAll('#odontogram .tooth').forEach(el => {
             const num = (el.dataset.tooth || '').trim();
             const n = parseInt(num, 10);
             let tipo = '';
@@ -5355,6 +5563,24 @@ else if (valorCasilla === 'CT') {
         }
             }
             });
+            // --- RESTAURAR TRANSPOSICIÓN (1.32 / TR) ---
+            let dientesTransposicion = [];
+            document.querySelectorAll('#odontogram .tooth').forEach(el => {
+                const num = (el.dataset.tooth || '').trim();
+                const tipo = el.dataset.tipo;
+                const inputName = nombreInputParaDiente(tipo, num);
+                if (inputName && historiaData[inputName] === 'TR') {
+                    dientesTransposicion.push(parseInt(num, 10));
+                }
+            });
+
+            // Agrupar los dientes encontrados de par en par para redibujar el arco de transposición
+            for (let i = 0; i < dientesTransposicion.length; i += 2) {
+                if (i + 1 < dientesTransposicion.length) {
+                    aplicarTransposicionGlobal(dientesTransposicion[i], dientesTransposicion[i + 1]);
+                }
+            }
+
           // --- RESTAURAR APARATO ORTODÓNTICO FIJO (1.1) DE FORMA EXACTA ---
             ['superior', 'inferior'].forEach(arcada => {
                 [true, false].forEach(esTemporal => {

@@ -294,7 +294,7 @@ def abrir_como_programa():
         chrome_path = os.path.expanduser("~") + "\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe"
     url = "http://127.0.0.1:5000/"
     try:
-        subprocess.Popen([chrome_path, "--app=" + url, "--start-maximized", "--kiosk"])
+        subprocess.Popen([chrome_path, "--app=" + url, "--start-maximized"])
     except Exception:
         pass
 
