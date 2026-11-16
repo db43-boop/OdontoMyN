@@ -2281,7 +2281,7 @@
                     aplicarOpcion(op);
 
                     // Si es 1.7, 1.23, 1.33, etc., NO cerramos el modal para ver los sub-botones
-                    if (op.codigo !=="1.1" && op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33" && op.codigo !== "1.31" && op.codigo !== "1.4" && op.codigo !== "1.16" && op.codigo !== "1.26") {
+                    if (op.codigo !=="1.1" && op.codigo !== "1.2" && op.codigo !== "1.24" && op.codigo !== "1.25" && op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33" && op.codigo !== "1.31" && op.codigo !== "1.4" && op.codigo !== "1.16" && op.codigo !== "1.26") {
                         cerrarModal();
                         cerrarModal();
                     }
@@ -2413,6 +2413,169 @@
                 `;
                 return;
             
+            } else if (op.codigo === "1.2") {
+                // Submenú interactivo para Aparato Ortodóntico Removible
+                const numeroDienteBase = parseInt(dienteSeleccionado.numero, 10);
+                const esInferior = numeroDienteBase >= 31 || (numeroDienteBase >= 71 && numeroDienteBase <= 85);
+                const arcadaSugerida = esInferior ? 'inferior' : 'superior';
+                
+                let inicioSugerido = numeroDienteBase;
+                let finSugerido = esInferior ? 48 : 28;
+                if (numeroDienteBase >= 51 && numeroDienteBase <= 65) finSugerido = 65;
+                if (numeroDienteBase >= 71 && numeroDienteBase <= 85) finSugerido = 85;
+                if (numeroDienteBase >= 31 && numeroDienteBase <= 48) finSugerido = 48;
+                if (numeroDienteBase >= 11 && numeroDienteBase <= 28) finSugerido = 28;
+
+                const lista = document.getElementById('listaOpcionesCOP');
+                lista.innerHTML = `
+                    <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-blue-50 p-2 rounded border border-blue-200">
+                        1.2 Aparato Ortodóntico Removible (Diente base: ${dienteSeleccionado.numero})
+                    </li>
+                    <li class="mb-2">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Arcada:</label>
+                        <select id="ortoRemArcada" class="w-full p-2 border border-slate-300 rounded text-xs bg-white font-medium text-slate-800">
+                            <option value="superior" ${arcadaSugerida === 'superior' ? 'selected' : ''}>Maxilar Superior</option>
+                            <option value="inferior" ${arcadaSugerida === 'inferior' ? 'selected' : ''}>Maxilar Inferior</option>
+                        </select>
+                    </li>
+                    <li class="mb-2 grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Diente Inicial:</label>
+                            <input type="number" id="ortoRemInicio" value="${inicioSugerido}" class="w-full p-2 border border-slate-300 rounded text-xs text-center font-bold bg-white text-slate-800" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Diente Final:</label>
+                            <input type="number" id="ortoRemFin" value="${finSugerido}" class="w-full p-2 border border-slate-300 rounded text-xs text-center font-bold bg-white text-slate-800" />
+                        </div>
+                    </li>
+                    <li class="mb-3">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Estado:</label>
+                        <select id="ortoRemEstado" class="w-full p-2 border border-slate-300 rounded text-xs bg-white font-medium text-slate-800">
+                            <option value="bueno">Buen Estado (Azul)</option>
+                            <option value="malo">Mal Estado (Rojo)</option>
+                        </select>
+                    </li>
+                    <li class="mb-2">
+                        <button type="button" style="background-color: #0f766e; color: #ffffff; text-align: center; border-color: #0f766e;" class="w-full py-2.5 hover:opacity-90 font-bold rounded text-xs uppercase transition shadow-sm cursor-pointer" onclick="guardarYMarcarOrtodonciaRemovible()">
+                            Aplicar Aparato Removible
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
+                            &larr; Volver a la lista principal
+                        </button>
+                    </li>
+                `;
+                return;
+                } else if (op.codigo === "1.24") {
+                // Submenú interactivo para Prótesis Fija (1.24)
+                const numeroDienteBase = parseInt(dienteSeleccionado.numero, 10);
+                const esInferior = numeroDienteBase >= 31 || (numeroDienteBase >= 71 && numeroDienteBase <= 85);
+                const arcadaSugerida = esInferior ? 'inferior' : 'superior';
+                
+                let inicioSugerido = numeroDienteBase;
+                let finSugerido = esInferior ? 48 : 28;
+                if (numeroDienteBase >= 51 && numeroDienteBase <= 65) finSugerido = 65;
+                if (numeroDienteBase >= 71 && numeroDienteBase <= 85) finSugerido = 85;
+                if (numeroDienteBase >= 31 && numeroDienteBase <= 48) finSugerido = 48;
+                if (numeroDienteBase >= 11 && numeroDienteBase <= 28) finSugerido = 28;
+
+                const lista = document.getElementById('listaOpcionesCOP');
+                lista.innerHTML = `
+                    <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-blue-50 p-2 rounded border border-blue-200">
+                        1.24 Prótesis Fija (Diente base: ${dienteSeleccionado.numero})
+                    </li>
+                    <li class="mb-2">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Arcada:</label>
+                        <select id="protesisFijaArcada" class="w-full p-2 border border-slate-300 rounded text-xs bg-white font-medium text-slate-800">
+                            <option value="superior" ${arcadaSugerida === 'superior' ? 'selected' : ''}>Maxilar Superior</option>
+                            <option value="inferior" ${arcadaSugerida === 'inferior' ? 'selected' : ''}>Maxilar Inferior</option>
+                        </select>
+                    </li>
+                    <li class="mb-2 grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Diente Pilar Inicial:</label>
+                            <input type="number" id="protesisFijaInicio" value="${inicioSugerido}" class="w-full p-2 border border-slate-300 rounded text-xs text-center font-bold bg-white text-slate-800" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Diente Pilar Final:</label>
+                            <input type="number" id="protesisFijaFin" value="${finSugerido}" class="w-full p-2 border border-slate-300 rounded text-xs text-center font-bold bg-white text-slate-800" />
+                        </div>
+                    </li>
+                    <li class="mb-3">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Estado:</label>
+                        <select id="protesisFijaEstado" class="w-full p-2 border border-slate-300 rounded text-xs bg-white font-medium text-slate-800">
+                            <option value="bueno">Buen Estado (Azul)</option>
+                            <option value="malo">Mal Estado (Rojo)</option>
+                        </select>
+                    </li>
+                    <li class="mb-2">
+                        <button type="button" style="background-color: #0f766e; color: #ffffff; text-align: center; border-color: #0f766e;" class="w-full py-2.5 hover:opacity-90 font-bold rounded text-xs uppercase transition shadow-sm cursor-pointer" onclick="guardarYMarcarProtesisFija()">
+                            Aplicar Prótesis Fija
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
+                            &larr; Volver a la lista principal
+                        </button>
+                    </li>
+                `;
+                return;
+} else if (op.codigo === "1.25") {
+                // Submenú interactivo para Prótesis Removible (1.25)
+                const numeroDienteBase = parseInt(dienteSeleccionado.numero, 10);
+                const esInferior = numeroDienteBase >= 31 || (numeroDienteBase >= 71 && numeroDienteBase <= 85);
+                const arcadaSugerida = esInferior ? 'inferior' : 'superior';
+                
+                let inicioSugerido = numeroDienteBase;
+                let finSugerido = esInferior ? 48 : 28;
+                if (numeroDienteBase >= 51 && numeroDienteBase <= 65) finSugerido = 65;
+                if (numeroDienteBase >= 71 && numeroDienteBase <= 85) finSugerido = 85;
+                if (numeroDienteBase >= 31 && numeroDienteBase <= 48) finSugerido = 48;
+                if (numeroDienteBase >= 11 && numeroDienteBase <= 28) finSugerido = 28;
+
+                const lista = document.getElementById('listaOpcionesCOP');
+                lista.innerHTML = `
+                    <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-blue-50 p-2 rounded border border-blue-200">
+                        1.25 Prótesis Removible (Diente base: ${dienteSeleccionado.numero})
+                    </li>
+                    <li class="mb-2">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Arcada:</label>
+                        <select id="protesisRemArcada" class="w-full p-2 border border-slate-300 rounded text-xs bg-white font-medium text-slate-800">
+                            <option value="superior" ${arcadaSugerida === 'superior' ? 'selected' : ''}>Maxilar Superior</option>
+                            <option value="inferior" ${arcadaSugerida === 'inferior' ? 'selected' : ''}>Maxilar Inferior</option>
+                        </select>
+                    </li>
+                    <li class="mb-2 grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Diente Inicial:</label>
+                            <input type="number" id="protesisRemInicio" value="${inicioSugerido}" class="w-full p-2 border border-slate-300 rounded text-xs text-center font-bold bg-white text-slate-800" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Diente Final:</label>
+                            <input type="number" id="protesisRemFin" value="${finSugerido}" class="w-full p-2 border border-slate-300 rounded text-xs text-center font-bold bg-white text-slate-800" />
+                        </div>
+                    </li>
+                    <li class="mb-3">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Estado:</label>
+                        <select id="protesisRemEstado" class="w-full p-2 border border-slate-300 rounded text-xs bg-white font-medium text-slate-800">
+                            <option value="bueno">Buen Estado (Azul)</option>
+                            <option value="malo">Mal Estado (Rojo)</option>
+                        </select>
+                    </li>
+                    <li class="mb-2">
+                        <button type="button" style="background-color: #0f766e; color: #ffffff; text-align: center; border-color: #0f766e;" class="w-full py-2.5 hover:opacity-90 font-bold rounded text-xs uppercase transition shadow-sm cursor-pointer" onclick="guardarYMarcarProtesisRemovible()">
+                            Aplicar Prótesis Removible
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
+                            &larr; Volver a la lista principal
+                        </button>
+                    </li>
+                `;
+                return;
+                
             } else if (op.codigo === "1.6") {
 
                 const inputName = nombreInputParaDiente(tipo, numero);
@@ -4106,6 +4269,420 @@ function guardarYMarcarOrtodonciaFija() {
                 capaOrto.appendChild(crearCuadradoCruz(x2, yAparejo));
             }
         }
+        function guardarYMarcarOrtodonciaRemovible() {
+            const arcada = document.getElementById('ortoRemArcada').value;
+            const dInicio = parseInt(document.getElementById('ortoRemInicio').value, 10);
+            const dFin = parseInt(document.getElementById('ortoRemFin').value, 10);
+            const estado = document.getElementById('ortoRemEstado').value;
+
+            if (isNaN(dInicio) || isNaN(dFin)) {
+                alert('Por favor ingrese números de dientes válidos para los extremos.');
+                return;
+            }
+
+            aplicarOrtodonciaRemovible(arcada, dInicio, dFin, estado);
+            cerrarModal();
+        }
+
+       function aplicarOrtodonciaRemovible(arcada, dInicio, dFin, estado) {
+            const esSuperior = (arcada === 'superior');
+            const esTemporal = (dInicio >= 51 && dInicio <= 65) || (dInicio >= 71 && dInicio <= 85);
+
+            const ordenSupTemp = [55,54,53,52,51, 61,62,63,64,65];
+            const ordenSupPerm = [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28];
+            const ordenInfTemp = [85,84,83,82,81, 71,72,73,74,75];
+            const ordenInfPerm = [48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38];
+
+            let listaArcada = esSuperior ? (esTemporal ? ordenSupTemp : ordenSupPerm) : (esTemporal ? ordenInfTemp : ordenInfPerm);
+
+            const idxInicio = listaArcada.indexOf(dInicio);
+            const idxFin = listaArcada.indexOf(dFin);
+
+            if (idxInicio === -1 || idxFin === -1) {
+                alert('Por favor asegúrese de que los dientes inicial y final correspondan al mismo grupo (temporales o permanentes) de la arcada.');
+                return;
+            }
+
+            const minIdx = Math.min(idxInicio, idxFin);
+            const maxIdx = Math.max(idxInicio, idxFin);
+
+            const obtenerTipoInput = (num) => {
+                if (num >= 11 && num <= 28) return 'adulto-sup';
+                if (num >= 31 && num <= 48) return 'adulto-inf';
+                if (num >= 51 && num <= 65) return 'temp-sup';
+                if (num >= 71 && num <= 85) return 'temp-inf';
+                return esSuperior ? 'adulto-sup' : 'adulto-inf';
+            };
+
+            listaArcada.forEach(num => {
+                const tipoActual = obtenerTipoInput(num);
+                const inputName = nombreInputParaDiente(tipoActual, num);
+                if (inputName) {
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+                    if (input) {
+                        input.value = '';
+                        input.classList.remove('text-blue-600', 'text-red-600', 'border-blue-600', 'border-red-600', 'font-bold');
+                    }
+                }
+            });
+
+            const claseColorInput = (estado === 'malo') ? ['text-red-600', 'font-bold', 'border-red-600'] : ['text-blue-600', 'font-bold', 'border-blue-600'];
+            const colorHex = (estado === 'malo') ? '#dc2626' : '#2563eb';
+
+            for (let i = minIdx; i <= maxIdx; i++) {
+                const num = listaArcada[i];
+                const tipoActual = obtenerTipoInput(num);
+                const inputName = nombreInputParaDiente(tipoActual, num);
+                if (inputName) {
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+                    if (input) {
+                        input.value = (estado === 'malo') ? 'AR-M' : 'AR';
+                        input.classList.remove('text-blue-600', 'text-red-600', 'border-blue-600', 'border-red-600');
+                        input.classList.add(...claseColorInput);
+                    }
+                }
+            }
+
+            const elInicio = document.querySelector(`#tooth-${listaArcada[minIdx]}`);
+            const elFin = document.querySelector(`#tooth-${listaArcada[maxIdx]}`);
+
+            if (!elInicio || !elFin) return;
+
+            const getCentroX = (el) => {
+                const g = el.querySelector('g');
+                if (g) {
+                    const transform = g.getAttribute('transform');
+                    const match = transform ? transform.match(/translate\(([^,\s]+)[\s,]([^)]+)\)/) : null;
+                    if (match) return parseFloat(match[1]) + 14; 
+                }
+                return 290;
+            };
+
+            const x1 = getCentroX(elInicio);
+            const x2 = getCentroX(elFin);
+
+            // 🎯 ALTURAS INDEPENDIENTES Y EXACTAS PARA CADA GRUPO
+      let yAparejo, claseGrafica;
+            if (esSuperior) {
+                if (esTemporal) {
+                    yAparejo = 112; // 👈 Ápices de temporales superiores (justo arriba de sus raíces cortas)
+                    claseGrafica = 'orto-rem-sup-temp';
+                } else {
+                    yAparejo = 6;  // 👈 Ápices de permanentes superiores
+                    claseGrafica = 'orto-rem-sup-perm';
+                }
+            } else {
+                if (esTemporal) {
+                    yAparejo = 295; // 👈 Ápices de temporales inferiores (arriba de sus coronas invertidas en la vista local)
+                    claseGrafica = 'orto-rem-inf-temp';
+                } else {
+                    yAparejo = 405; // 👈 Ápices de permanentes inferiores (abajo del todo)
+                    claseGrafica = 'orto-rem-inf-perm';
+                }
+            }
+
+            const svg = document.getElementById('odontogram');
+            if (svg) {
+                let capaRem = svg.querySelector('#capa-ortodoncia-removible');
+                if (!capaRem) {
+                    capaRem = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    capaRem.setAttribute('id', 'capa-ortodoncia-removible');
+                    svg.appendChild(capaRem);
+                }
+
+                capaRem.querySelectorAll(`.${claseGrafica}`).forEach(el => el.remove());
+
+                // Generar trazo en ZIG-ZAG
+                const minX = Math.min(x1, x2);
+                const maxX = Math.max(x1, x2);
+                const paso = 8; 
+                const alturaPico = 6; 
+                let pathD = `M ${minX} ${yAparejo}`;
+                
+                let subiendo = true;
+                for (let x = minX + paso; x <= maxX; x += paso) {
+                    const yActual = subiendo ? (yAparejo - alturaPico) : (yAparejo + alturaPico);
+                    pathD += ` L ${x} ${yActual}`;
+                    subiendo = !subiendo;
+                }
+
+                const zigzag = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                zigzag.setAttribute('class', claseGrafica);
+                zigzag.setAttribute('d', pathD);
+                zigzag.setAttribute('stroke', colorHex);
+                zigzag.setAttribute('stroke-width', '2');
+                zigzag.setAttribute('stroke-linejoin', 'miter');
+                zigzag.setAttribute('fill', 'none');
+
+                capaRem.appendChild(zigzag);
+            }
+        }
+        function guardarYMarcarProtesisRemovible() {
+            const arcada = document.getElementById('protesisRemArcada').value;
+            const dInicio = parseInt(document.getElementById('protesisRemInicio').value, 10);
+            const dFin = parseInt(document.getElementById('protesisRemFin').value, 10);
+            const estado = document.getElementById('protesisRemEstado').value;
+
+            if (isNaN(dInicio) || isNaN(dFin)) {
+                alert('Por favor ingrese números de dientes válidos para los extremos.');
+                return;
+            }
+
+            aplicarProtesisRemovible(arcada, dInicio, dFin, estado);
+            cerrarModal();
+        }
+
+      function aplicarProtesisRemovible(arcada, dInicio, dFin, estado) {
+            const esSuperior = (arcada === 'superior');
+            const esTemporal = (dInicio >= 51 && dInicio <= 65) || (dInicio >= 71 && dInicio <= 85);
+
+            const ordenSupTemp = [55,54,53,52,51, 61,62,63,64,65];
+            const ordenSupPerm = [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28];
+            const ordenInfTemp = [85,84,83,82,81, 71,72,73,74,75];
+            const ordenInfPerm = [48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38];
+
+            let listaArcada = esSuperior ? (esTemporal ? ordenSupTemp : ordenSupPerm) : (esTemporal ? ordenInfTemp : ordenInfPerm);
+
+            const idxInicio = listaArcada.indexOf(dInicio);
+            const idxFin = listaArcada.indexOf(dFin);
+
+            if (idxInicio === -1 || idxFin === -1) {
+                alert('Por favor asegúrese de que los dientes inicial y final correspondan al mismo grupo (temporales o permanentes) de la arcada.');
+                return;
+            }
+
+            const minIdx = Math.min(idxInicio, idxFin);
+            const maxIdx = Math.max(idxInicio, idxFin);
+
+            const obtenerTipoInput = (num) => {
+                if (num >= 11 && num <= 28) return 'adulto-sup';
+                if (num >= 31 && num <= 48) return 'adulto-inf';
+                if (num >= 51 && num <= 65) return 'temp-sup';
+                if (num >= 71 && num <= 85) return 'temp-inf';
+                return esSuperior ? 'adulto-sup' : 'adulto-inf';
+            };
+
+            const claseColorInput = (estado === 'malo') ? ['text-red-600', 'font-bold', 'border-red-600'] : ['text-blue-600', 'font-bold', 'border-blue-600'];
+            const colorHex = (estado === 'malo') ? '#dc2626' : '#2563eb';
+            const siglaPR = (estado === 'malo') ? 'PR-M' : 'PR';
+
+            // Marcar los dientes del nuevo tramo seleccionado
+            for (let i = minIdx; i <= maxIdx; i++) {
+                const num = listaArcada[i];
+                const tipoActual = obtenerTipoInput(num);
+                const inputName = nombreInputParaDiente(tipoActual, num);
+                if (inputName) {
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+                    if (input) {
+                        input.value = siglaPR;
+                        input.classList.remove('text-blue-600', 'text-red-600', 'border-blue-600', 'border-red-600');
+                        input.classList.add(...claseColorInput);
+                    }
+                }
+            }
+
+            const svg = document.getElementById('odontogram');
+            if (svg) {
+                let capaPR = svg.querySelector('#capa-protesis-removible');
+                if (!capaPR) {
+                    capaPR = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    capaPR.setAttribute('id', 'capa-protesis-removible');
+                    svg.appendChild(capaPR);
+                }
+
+               // 🎯 LÓGICA DE VARIABLES SEPARADAS POR CADA GRUPO (ADULTO Y TEMPORAL)
+                let yBase;
+                if (esSuperior) {
+                    if (esTemporal) {
+                        yBase = 112; // Ápices de temporales superiores (55-65)
+                    } else {
+                        yBase = 10;  // Ápices de permanentes superiores (18-28) [Elevado arriba]
+                    }
+                } else {
+                    if (esTemporal) {
+                        yBase = 290; // Ápices de temporales inferiores (85-75)
+                    } else {
+                        yBase = 405; // Ápices de permanentes inferiores (48-38) [Abajo de las raíces]
+                    }
+                }
+                const getCentroX = (el) => {
+                    const g = el.querySelector('g');
+                    if (g) {
+                        const transform = g.getAttribute('transform');
+                        const match = transform ? transform.match(/translate\(([^,\s]+)[\s,]([^)]+)\)/) : null;
+                        if (match) return parseFloat(match[1]) + 14; 
+                    }
+                    return 290;
+                };
+
+                const dibujarTramoParalelo = (dInicioTramo, dFinTramo) => {
+                    const elI = document.querySelector(`#tooth-${dInicioTramo}`);
+                    const elF = document.querySelector(`#tooth-${dFinTramo}`);
+                    if (!elI || !elF) return;
+
+                    const x1 = getCentroX(elI);
+                    const x2 = getCentroX(elF);
+                    const minX = Math.round(Math.min(x1, x2));
+                    const maxX = Math.round(Math.max(x1, x2));
+
+                    const y1 = yBase - 2;
+                    const y2 = yBase + 2;
+
+                    // 🛠️ Solución: Reemplazamos los puntos decimales por guiones para que sea un selector de clase válido
+                    const claseTramoUnico = `pr-tramo-${minX}-${maxX}-${yBase}`;
+                    capaPR.querySelectorAll(`.${claseTramoUnico}`).forEach(el => el.remove());
+
+                    [y1, y2].forEach(yCoord => {
+                        const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        l.setAttribute('class', `protesis-removible-trazo ${claseTramoUnico}`);
+                        l.setAttribute('x1', minX);
+                        l.setAttribute('y1', yCoord);
+                        l.setAttribute('x2', maxX);
+                        l.setAttribute('y2', yCoord);
+                        l.setAttribute('stroke', colorHex);
+                        l.setAttribute('stroke-width', '2');
+                        l.setAttribute('stroke-linecap', 'round');
+                        capaPR.appendChild(l);
+                    });
+                };
+
+                // Dibujar el tramo actual solicitado
+                dibujarTramoParalelo(listaArcada[minIdx], listaArcada[maxIdx]);
+            }
+        }
+        function guardarYMarcarProtesisFija() {
+            const arcada = document.getElementById('protesisFijaArcada').value;
+            const dInicio = parseInt(document.getElementById('protesisFijaInicio').value, 10);
+            const dFin = parseInt(document.getElementById('protesisFijaFin').value, 10);
+            const estado = document.getElementById('protesisFijaEstado').value;
+
+            if (isNaN(dInicio) || isNaN(dFin)) {
+                alert('Por favor ingrese números de dientes válidos para los extremos.');
+                return;
+            }
+
+            aplicarProtesisFija(arcada, dInicio, dFin, estado);
+            cerrarModal();
+        }
+
+        function aplicarProtesisFija(arcada, dInicio, dFin, estado) {
+            const esSuperior = (arcada === 'superior');
+            const esTemporal = (dInicio >= 51 && dInicio <= 65) || (dInicio >= 71 && dInicio <= 85);
+
+            const ordenSupTemp = [55,54,53,52,51, 61,62,63,64,65];
+            const ordenSupPerm = [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28];
+            const ordenInfTemp = [85,84,83,82,81, 71,72,73,74,75];
+            const ordenInfPerm = [48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38];
+
+            let listaArcada = esSuperior ? (esTemporal ? ordenSupTemp : ordenSupPerm) : (esTemporal ? ordenInfTemp : ordenInfPerm);
+
+            const idxInicio = listaArcada.indexOf(dInicio);
+            const idxFin = listaArcada.indexOf(dFin);
+
+            if (idxInicio === -1 || idxFin === -1) {
+                alert('Por favor asegúrese de que los dientes inicial y final correspondan al mismo grupo de la arcada.');
+                return;
+            }
+
+            const minIdx = Math.min(idxInicio, idxFin);
+            const maxIdx = Math.max(idxInicio, idxFin);
+
+            const obtenerTipoInput = (num) => {
+                if (num >= 11 && num <= 28) return 'adulto-sup';
+                if (num >= 31 && num <= 48) return 'adulto-inf';
+                if (num >= 51 && num <= 65) return 'temp-sup';
+                if (num >= 71 && num <= 85) return 'temp-inf';
+                return esSuperior ? 'adulto-sup' : 'adulto-inf';
+            };
+
+            const claseColorInput = (estado === 'malo') ? ['text-red-600', 'font-bold', 'border-red-600'] : ['text-blue-600', 'font-bold', 'border-blue-600'];
+            const colorHex = (estado === 'malo') ? '#dc2626' : '#2563eb';
+            const siglaPF = (estado === 'malo') ? 'PF-M' : 'PF';
+
+            // Marcar los dientes del puente en el formulario
+            for (let i = minIdx; i <= maxIdx; i++) {
+                const num = listaArcada[i];
+                const tipoActual = obtenerTipoInput(num);
+                const inputName = nombreInputParaDiente(tipoActual, num);
+                if (inputName) {
+                    const input = document.querySelector(`input[name="${inputName}"]`);
+                    if (input) {
+                        input.value = siglaPF;
+                        input.classList.remove('text-blue-600', 'text-red-600', 'border-blue-600', 'border-red-600');
+                        input.classList.add(...claseColorInput);
+                    }
+                }
+            }
+
+            const svg = document.getElementById('odontogram');
+            if (svg) {
+                let capaPF = svg.querySelector('#capa-protesis-fija');
+                if (!capaPF) {
+                    capaPF = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    capaPF.setAttribute('id', 'capa-protesis-fija');
+                    svg.appendChild(capaPF);
+                }
+
+                // Alturas de los ápices alineadas exactamente con las de la norma
+                let yBase;
+                if (esSuperior) {
+                    yBase = esTemporal ? 112 : 24;
+                } else {
+                    yBase = esTemporal ? 290 : 378;
+                }
+
+                const getCentroX = (el) => {
+                    const g = el.querySelector('g');
+                    if (g) {
+                        const transform = g.getAttribute('transform');
+                        const match = transform ? transform.match(/translate\(([^,\s]+)[\s,]([^)]+)\)/) : null;
+                        if (match) return parseFloat(match[1]) + 14; 
+                    }
+                    return 290;
+                };
+
+                const elI = document.querySelector(`#tooth-${listaArcada[minIdx]}`);
+                const elF = document.querySelector(`#tooth-${listaArcada[maxIdx]}`);
+                if (!elI || !elF) return;
+
+                const x1 = getCentroX(elI);
+                const x2 = getCentroX(elF);
+                const minX = Math.round(Math.min(x1, x2));
+                const maxX = Math.round(Math.max(x1, x2));
+
+                const claseTramoUnico = `pf-tramo-${minX}-${maxX}-${yBase}`;
+                capaPF.querySelectorAll(`.${claseTramoUnico}`).forEach(el => el.remove());
+
+                // 1. Línea horizontal principal a la altura de los ápices
+                const lHorizontal = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                lHorizontal.setAttribute('class', `protesis-fija-trazo ${claseTramoUnico}`);
+                lHorizontal.setAttribute('x1', minX);
+                lHorizontal.setAttribute('y1', yBase);
+                lHorizontal.setAttribute('x2', maxX);
+                lHorizontal.setAttribute('y2', yBase);
+                lHorizontal.setAttribute('stroke', colorHex);
+                lHorizontal.setAttribute('stroke-width', '2');
+                lHorizontal.setAttribute('stroke-linecap', 'round');
+                capaPF.appendChild(lHorizontal);
+
+                // 2. Líneas verticales (patitas) sobre los pilares extremos (hacia abajo si es superior, hacia arriba si es inferior)
+                const altoPatita = 6;
+                const yPatitaFin = esSuperior ? (yBase + altoPatita) : (yBase - altoPatita);
+
+                [minX, maxX].forEach(xCoord => {
+                    const lVertical = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    lVertical.setAttribute('class', `protesis-fija-trazo ${claseTramoUnico}`);
+                    lVertical.setAttribute('x1', xCoord);
+                    lVertical.setAttribute('y1', yBase);
+                    lVertical.setAttribute('x2', xCoord);
+                    lVertical.setAttribute('y2', yPatitaFin);
+                    lVertical.setAttribute('stroke', colorHex);
+                    lVertical.setAttribute('stroke-width', '2');
+                    lVertical.setAttribute('stroke-linecap', 'round');
+                    capaPF.appendChild(lVertical);
+                });
+            }
+        }
        function aplicarOrtodonciaFijaDesdeCarga(arcada, dInicio, dFin, estado, esTemporal) {
             const esSuperior = (arcada === 'superior');
             const colorHex = (estado === 'malo') ? '#dc2626' : '#2563eb';
@@ -4811,6 +5388,132 @@ else if (valorCasilla === 'CT') {
                         const estadoGuardado = (valEjemplo === 'AO-M') ? 'malo' : 'bueno';
 
                         aplicarOrtodonciaFijaDesdeCarga(arcada, dInicio, dFin, estadoGuardado, esTemporal);
+                    }
+                });
+            });
+            // --- RESTAURAR APARATO ORTODÓNTICO REMOVIBLE (1.2) ---
+            ['superior', 'inferior'].forEach(arcada => {
+                [true, false].forEach(esTemporal => {
+                    const ordenSupTemp = [55,54,53,52,51, 61,62,63,64,65];
+                    const ordenSupPerm = [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28];
+                    const ordenInfTemp = [85,84,83,82,81, 71,72,73,74,75];
+                    const ordenInfPerm = [48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38];
+
+                    let lista = arcada === 'superior' ? (esTemporal ? ordenSupTemp : ordenSupPerm) : (esTemporal ? ordenInfTemp : ordenInfPerm);
+                    
+                    let indicesValidos = [];
+                    lista.forEach((num, idx) => {
+                        const tipo = (num >= 11 && num <= 28) ? 'adulto-sup' : (num >= 31 && num <= 48) ? 'adulto-inf' : (num >= 51 && num <= 65) ? 'temp-sup' : 'temp-inf';
+                        const inputName = nombreInputParaDiente(tipo, num);
+                        if (inputName && historiaData[inputName] && historiaData[inputName].startsWith('AR')) {
+                            indicesValidos.push(idx);
+                        }
+                    });
+
+                    if (indicesValidos.length > 0) {
+                        const minIdx = Math.min(...indicesValidos);
+                        const maxIdx = Math.max(...indicesValidos);
+                        const dInicio = lista[minIdx];
+                        const dFin = lista[maxIdx];
+
+                        const tipoEjemplo = (dInicio >= 11 && dInicio <= 28) ? 'adulto-sup' : (dInicio >= 31 && dInicio <= 48) ? 'adulto-inf' : (dInicio >= 51 && dInicio <= 65) ? 'temp-sup' : 'temp-inf';
+                        const valEjemplo = historiaData[nombreInputParaDiente(tipoEjemplo, dInicio)];
+                        const estadoGuardado = (valEjemplo === 'AR-M') ? 'malo' : 'bueno';
+
+                        // Llama directamente a la función principal unificada
+                        aplicarOrtodonciaRemovible(arcada, dInicio, dFin, estadoGuardado);
+                    }
+                });
+            });
+            // --- RESTAURAR PRÓTESIS REMOVIBLE (1.25) POR TRAMOS INDEPENDIENTES ---
+            ['superior', 'inferior'].forEach(arcada => {
+                [true, false].forEach(esTemporal => {
+                    const ordenSupTemp = [55,54,53,52,51, 61,62,63,64,65];
+                    const ordenSupPerm = [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28];
+                    const ordenInfTemp = [85,84,83,82,81, 71,72,73,74,75];
+                    const ordenInfPerm = [48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38];
+
+                    let lista = arcada === 'superior' ? (esTemporal ? ordenSupTemp : ordenSupPerm) : (esTemporal ? ordenInfTemp : ordenInfPerm);
+                    
+                    let indicesValidos = [];
+                    lista.forEach((num, idx) => {
+                        const tipo = (num >= 11 && num <= 28) ? 'adulto-sup' : (num >= 31 && num <= 48) ? 'adulto-inf' : (num >= 51 && num <= 65) ? 'temp-sup' : 'temp-inf';
+                        const inputName = nombreInputParaDiente(tipo, num);
+                        if (inputName && historiaData[inputName] && historiaData[inputName].startsWith('PR')) {
+                            indicesValidos.push(idx);
+                        }
+                    });
+
+                    if (indicesValidos.length > 0) {
+                        // Agrupar índices consecutivos en sub-tramos independientes (evita unir espacios separados)
+                        let subTramos = [];
+                        let tramoActual = [indicesValidos[0]];
+
+                        for (let i = 1; i < indicesValidos.length; i++) {
+                            if (indicesValidos[i] === indicesValidos[i - 1] + 1) {
+                                tramoActual.push(indicesValidos[i]);
+                            } else {
+                                subTramos.push(tramoActual);
+                                tramoActual = [indicesValidos[i]];
+                            }
+                        }
+                        subTramos.push(tramoActual);
+
+                        // Aplicar cada tramo de la prótesis removible por separado
+                        subTramos.forEach(tramo => {
+                            const dInicio = lista[tramo[0]];
+                            const dFin = lista[tramo[tramo.length - 1]];
+                            const tipoEjemplo = (dInicio >= 11 && dInicio <= 28) ? 'adulto-sup' : (dInicio >= 31 && dInicio <= 48) ? 'adulto-inf' : (dInicio >= 51 && dInicio <= 65) ? 'temp-sup' : 'temp-inf';
+                            const valEjemplo = historiaData[nombreInputParaDiente(tipoEjemplo, dInicio)];
+                            const estadoGuardado = (valEjemplo === 'PR-M') ? 'malo' : 'bueno';
+
+                            aplicarProtesisRemovible(arcada, dInicio, dFin, estadoGuardado);
+                        });
+                    }
+                });
+            });
+            // --- RESTAURAR PRÓTESIS FIJA (1.24) POR TRAMOS ---
+            ['superior', 'inferior'].forEach(arcada => {
+                [true, false].forEach(esTemporal => {
+                    const ordenSupTemp = [55,54,53,52,51, 61,62,63,64,65];
+                    const ordenSupPerm = [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28];
+                    const ordenInfTemp = [85,84,83,82,81, 71,72,73,74,75];
+                    const ordenInfPerm = [48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38];
+
+                    let lista = arcada === 'superior' ? (esTemporal ? ordenSupTemp : ordenSupPerm) : (esTemporal ? ordenInfTemp : ordenInfPerm);
+                    
+                    let indicesValidos = [];
+                    lista.forEach((num, idx) => {
+                        const tipo = (num >= 11 && num <= 28) ? 'adulto-sup' : (num >= 31 && num <= 48) ? 'adulto-inf' : (num >= 51 && num <= 65) ? 'temp-sup' : 'temp-inf';
+                        const inputName = nombreInputParaDiente(tipo, num);
+                        if (inputName && historiaData[inputName] && historiaData[inputName].startsWith('PF')) {
+                            indicesValidos.push(idx);
+                        }
+                    });
+
+                    if (indicesValidos.length > 0) {
+                        let subTramos = [];
+                        let tramoActual = [indicesValidos[0]];
+
+                        for (let i = 1; i < indicesValidos.length; i++) {
+                            if (indicesValidos[i] === indicesValidos[i - 1] + 1) {
+                                tramoActual.push(indicesValidos[i]);
+                            } else {
+                                subTramos.push(tramoActual);
+                                tramoActual = [indicesValidos[i]];
+                            }
+                        }
+                        subTramos.push(tramoActual);
+
+                        subTramos.forEach(tramo => {
+                            const dInicio = lista[tramo[0]];
+                            const dFin = lista[tramo[tramo.length - 1]];
+                            const tipoEjemplo = (dInicio >= 11 && dInicio <= 28) ? 'adulto-sup' : (dInicio >= 31 && dInicio <= 48) ? 'adulto-inf' : (dInicio >= 51 && dInicio <= 65) ? 'temp-sup' : 'temp-inf';
+                            const valEjemplo = historiaData[nombreInputParaDiente(tipoEjemplo, dInicio)];
+                            const estadoGuardado = (valEjemplo === 'PF-M') ? 'malo' : 'bueno';
+
+                            aplicarProtesisFija(arcada, dInicio, dFin, estadoGuardado);
+                        });
                     }
                 });
             });
