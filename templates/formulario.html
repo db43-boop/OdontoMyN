@@ -1917,7 +1917,7 @@
                                 <div class="relative w-full" style="height: 24px;">
                                     {% for n in [85,84,83,82,81, 71,72,73,74,75] %}
                                     {% set x = (255.5 - ((n % 10) - 1) * 31) if (n // 10) in [1,4,5,8] else (296.5 + ((n % 10) - 1) * 31) %}
-                                    <input type="text" name="rec_temp_inf_{{n}}" maxlength="4" style="left: {{ '%.3f'|format(x / 5.8) }}%; width: 4.828%;" class="absolute top-0 h-6 border border-slate-400 text-[9px] text-center font-bold uppercase bg-white outline-none">
+                                    <input type="text" name="rec_temp_inf_{{n}}" maxlength="8" style="left: {{ '%.3f'|format(x / 5.8) }}%; width: 4.828%;" class="absolute top-0 h-6 border border-slate-400 text-[9px] text-center font-bold uppercase bg-white outline-none">
                                     {% endfor %}
                                 <div class="absolute top-0 h-6 border-r-2 border-slate-800" style="left: 50%;"></div>
                                 </div>
@@ -1926,7 +1926,7 @@
                                 <div class="relative w-full" style="height: 24px;">
                                     {% for n in [48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38] %}
                                     {% set x = (255.5 - ((n % 10) - 1) * 31) if (n // 10) in [1,4,5,8] else (296.5 + ((n % 10) - 1) * 31) %}
-                                    <input type="text" name="rec_inf2_{{n}}" maxlength="4" style="left: {{ '%.3f'|format(x / 5.8) }}%; width: 4.828%;" class="absolute top-0 h-6 border border-slate-400 text-[10px] text-center font-bold uppercase bg-white outline-none">
+                                    <input type="text" name="rec_inf2_{{n}}" maxlength="8" style="left: {{ '%.3f'|format(x / 5.8) }}%; width: 4.828%;" class="absolute top-0 h-6 border border-slate-400 text-[10px] text-center font-bold uppercase bg-white outline-none">
                                     {% endfor %}
                                 </div>
                             </div>
@@ -2241,7 +2241,7 @@
 
         function abrirModal(numero, tipo, elemento) {
             dienteSeleccionado = { numero, tipo, elemento };
-
+ restauracionPendiente = { caras: [], material: '' };
             document.getElementById('dienteNum').textContent = numero;
 
             // Limpiar el buscador cada vez que se abre el modal
@@ -2281,7 +2281,7 @@
                     aplicarOpcion(op);
 
                     // Si es 1.7, 1.23, 1.33, etc., NO cerramos el modal para ver los sub-botones
-                    if (op.codigo !=="1.1" && op.codigo !== "1.2" && op.codigo !== "1.3" && op.codigo !== "1.24" && op.codigo !== "1.25" && op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33" && op.codigo !== "1.31" && op.codigo !== "1.4" && op.codigo !== "1.16" && op.codigo !== "1.26" && op.codigo !== "1.32") {
+                    if (op.codigo !=="1.1" && op.codigo !== "1.2" && op.codigo !== "1.3" && op.codigo !== "1.24" && op.codigo !== "1.25" && op.codigo !=="1.28" && op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33" && op.codigo !== "1.31" && op.codigo !== "1.4" && op.codigo !== "1.16" && op.codigo !== "1.26" && op.codigo !== "1.32") {
                         cerrarModal();
                         cerrarModal();
                     }
@@ -2982,8 +2982,19 @@
                     grupoDiente.appendChild(textoRR);
 
                 }
+} else if (op.codigo === "1.28") {
+    const inputName = nombreInputParaDiente(dienteSeleccionado.tipo, dienteSeleccionado.numero);
+    const input = inputName ? document.querySelector(`input[name="${inputName}"]`) : null;
+    const actual = obtenerRestauracionDesdeInput(input);
 
-            } else if (op.codigo === "1.30") {
+    restauracionPendiente = {
+        caras: [...actual.caras],
+        material: actual.material
+    };
+
+    abrirSubmenuRestauracion(false);
+    return;
+} else if (op.codigo === "1.30") {
 
                 const inputName = nombreInputParaDiente(tipo, numero);
 
@@ -3629,7 +3640,306 @@ function dibujarCaries(grupoDiente, caras, numeroDiente = null) {
         pintarCarasGeometricas(grupoDiente, caras, esCuadranteDerecho, esInferior);
     }
 }
-        
+   let restauracionPendiente = { caras: [], material: '' };
+
+const MATERIALES_RESTAURACION = [
+    { sigla: 'AM', nombre: 'Amalgama' },
+    { sigla: 'R',  nombre: 'Resina' },
+    { sigla: 'IM', nombre: 'Incrustación Metálica' },
+    { sigla: 'IE', nombre: 'Incrustación Estética' },
+    { sigla: 'IV', nombre: 'Ionómero de Vidrio' } // Cámbialo a 'IB' si prefieres tu sigla
+];
+
+
+// Nuevas funciones auxiliares de restauración (lectura de caras pintadas en SVG)
+function obtenerCarasPintadasEnSVG(grupoDiente, numeroDiente) {
+    if (!grupoDiente) return [];
+    const num = parseInt(numeroDiente, 10);
+    const esCuadranteDerecho = [1, 4, 5, 8].includes(Math.floor(num / 10));
+    const carasDetectadas = new Set();
+
+    grupoDiente.querySelectorAll('[data-cara].cara-restauracion-activa').forEach(el => {
+        const attrCara = el.getAttribute('data-cara');
+        if (attrCara === 'superior') carasDetectadas.add('V');
+        else if (attrCara === 'inferior') carasDetectadas.add('L');
+        else if (attrCara === 'central') carasDetectadas.add('O');
+        else if (attrCara === 'izquierda') carasDetectadas.add(esCuadranteDerecho ? 'D' : 'M');
+        else if (attrCara === 'derecha') carasDetectadas.add(esCuadranteDerecho ? 'M' : 'D');
+    });
+
+    return Array.from(carasDetectadas);
+}
+
+function obtenerRestauracionActual(input, elementoDiente, numeroDiente) {
+    const siglasValidas = MATERIALES_RESTAURACION.map(m => m.sigla);
+    const valorInput = input ? (input.value || '').trim().toUpperCase() : '';
+    const material = siglasValidas.includes(valorInput) ? valorInput : '';
+
+    const carasDataset = input
+        ? (input.dataset.carasRestauracion || '')
+            .split(',')
+            .map(s => s.trim().toUpperCase())
+            .filter(s => ['V', 'L', 'M', 'D', 'O'].includes(s))
+        : [];
+
+    const carasSVG = elementoDiente
+        ? obtenerCarasPintadasEnSVG(elementoDiente.querySelector('g'), numeroDiente)
+        : [];
+
+    const caras = carasDataset.length > 0 ? carasDataset : carasSVG;
+
+    if (input && caras.length > 0) {
+        input.dataset.carasRestauracion = caras.join(',');
+    }
+
+    return { material, caras };
+}
+
+function obtenerRestauracionDesdeInput(input) {
+    if (!input) return { material: '', caras: [] };
+
+    const siglasValidas = MATERIALES_RESTAURACION.map(m => m.sigla);
+    let raw = (input.value || '').trim().toUpperCase();
+
+    // Por si algún dato antiguo venía como "AM:L,V", extraemos solo la sigla y las caras
+    let carasDesdeValor = [];
+    if (raw.includes(':')) {
+        const [matPart, carasPart] = raw.split(':');
+        raw = (matPart || '').trim();
+        carasDesdeValor = (carasPart || '')
+            .split(',')
+            .map(s => s.trim().toUpperCase())
+            .filter(s => ['V', 'L', 'M', 'D', 'O'].includes(s));
+        input.value = siglasValidas.includes(raw) ? raw : '';
+    }
+
+    const material = siglasValidas.includes(raw) ? raw : '';
+    const carasDataset = (input.dataset.carasRestauracion || '')
+        .split(',')
+        .map(s => s.trim().toUpperCase())
+        .filter(s => ['V', 'L', 'M', 'D', 'O'].includes(s));
+
+    const caras = carasDataset.length > 0 ? carasDataset : carasDesdeValor;
+    if (caras.length > 0 && !input.dataset.carasRestauracion) {
+        input.dataset.carasRestauracion = caras.join(',');
+    }
+
+    return { material, caras };
+}
+
+function abrirSubmenuRestauracion(inicializarDesdeInput = false) {
+    if (!dienteSeleccionado.elemento) return;
+
+    const { numero, tipo, elemento } = dienteSeleccionado;
+    const inputName = nombreInputParaDiente(tipo, numero);
+    const input = inputName ? document.querySelector(`input[name="${inputName}"]`) : null;
+
+    if (inicializarDesdeInput) {
+        const actual = obtenerRestauracionDesdeInput(input);
+        restauracionPendiente = {
+            caras: [...actual.caras],
+            material: actual.material || ''
+        };
+        const grupoDiente = elemento.querySelector('g');
+        const carasNombres = restauracionPendiente.caras.map(s => CARA_DESDE_SIGLA[s]).filter(Boolean);
+        dibujarRestauracion(grupoDiente, carasNombres, numero);
+    }
+
+    const activas = restauracionPendiente.caras;
+    const matActual = restauracionPendiente.material;
+
+    const claseCaraBtn = (sigla) => activas.includes(sigla)
+        ? 'p-2 border-2 border-blue-700 rounded bg-blue-600 text-white font-bold text-xs shadow-sm'
+        : 'p-2 border border-blue-300 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold text-xs';
+
+    const claseMatBtn = (sigla) => matActual === sigla
+        ? 'p-2 border-2 border-blue-800 rounded bg-blue-700 text-white font-bold text-xs shadow-sm'
+        : 'p-2 border border-slate-300 rounded bg-white hover:bg-blue-50 hover:border-blue-500 text-slate-800 font-semibold text-xs';
+
+    const lista = document.getElementById('listaOpcionesCOP');
+    lista.innerHTML = `
+        <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-blue-50 p-2 rounded border border-blue-200 flex justify-between items-center">
+            <span>1.28 Restauración - Diente ${numero}</span>
+            <span class="text-[11px] font-mono bg-white px-2 py-0.5 rounded border border-blue-200 text-blue-700">
+                ${activas.length ? activas.join(',') : 'Sin caras'} ${matActual ? '· ' + matActual : ''}
+            </span>
+        </li>
+
+        <li class="text-[11px] font-bold uppercase text-blue-800 mb-1">1. Partes del diente (pinta en azul sin tocar la casilla):</li>
+        <div class="grid grid-cols-2 gap-1.5 mb-3">
+            <button type="button" class="${claseCaraBtn('V')}" onclick="toggleCaraRestauracion('vestibular')">Vestibular (V)</button>
+            <button type="button" class="${claseCaraBtn('L')}" onclick="toggleCaraRestauracion('lingual')">Lingual / Pal. (L)</button>
+            <button type="button" class="${claseCaraBtn('M')}" onclick="toggleCaraRestauracion('mesial')">Mesial (M)</button>
+            <button type="button" class="${claseCaraBtn('D')}" onclick="toggleCaraRestauracion('distal')">Distal (D)</button>
+            <button type="button" class="col-span-2 ${claseCaraBtn('O')}" onclick="toggleCaraRestauracion('central')">Oclusal / Incisal (O)</button>
+        </div>
+
+        <li class="text-[11px] font-bold uppercase text-slate-700 mb-1">2. Material de restauración (se anota en la casilla):</li>
+        <div class="grid grid-cols-2 gap-1.5 mb-3">
+            ${MATERIALES_RESTAURACION.map(m => `
+                <button type="button" class="${claseMatBtn(m.sigla)}" onclick="seleccionarMaterialRestauracion('${m.sigla}')">
+                    ${m.nombre} (${m.sigla})
+                </button>
+            `).join('')}
+        </div>
+
+        <div class="grid grid-cols-2 gap-1.5 mt-2">
+            <button type="button" class="p-2 border border-blue-200 rounded bg-white hover:bg-blue-50 text-blue-700 text-xs font-bold transition cursor-pointer" onclick="limpiarRestauracion()">
+                Limpiar restauración
+            </button>
+            <button type="button" class="p-2 border border-slate-800 rounded bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition cursor-pointer" onclick="cerrarModal()">
+                Listo / Cerrar
+            </button>
+        </div>
+        <li class="mt-2">
+            <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
+                &larr; Volver a la lista principal
+            </button>
+        </li>
+    `;
+}
+
+// Solo colorea el diente en azul; NO escribe nada en la casilla
+function toggleCaraRestauracion(caraSeleccionada) {
+    if (!dienteSeleccionado.elemento) return;
+    const { numero, elemento } = dienteSeleccionado;
+    const sigla = ABREVIATURA_CARA[caraSeleccionada] || caraSeleccionada.toUpperCase();
+
+    restauracionPendiente.caras = restauracionPendiente.caras.includes(sigla)
+        ? restauracionPendiente.caras.filter(c => c !== sigla)
+        : [...restauracionPendiente.caras, sigla];
+
+    const grupoDiente = elemento.querySelector('g');
+    const carasNombres = restauracionPendiente.caras.map(s => CARA_DESDE_SIGLA[s]).filter(Boolean);
+    dibujarRestauracion(grupoDiente, carasNombres, numero);
+
+    // Si ya había material elegido y se modifican caras, actualizamos "MATERIAL:CARAS" en la casilla
+    if (restauracionPendiente.material) {
+        escribirMaterialEnCasilla(restauracionPendiente.material, restauracionPendiente.caras);
+    }
+
+    abrirSubmenuRestauracion(false);
+}
+
+// Escribe el tipo de material en azul en la casilla del diente
+function seleccionarMaterialRestauracion(siglaMaterial) {
+    if (!dienteSeleccionado.elemento) return;
+    restauracionPendiente.material = siglaMaterial;
+    escribirMaterialEnCasilla(siglaMaterial, restauracionPendiente.caras);
+    abrirSubmenuRestauracion(false);
+}
+
+function escribirMaterialEnCasilla(siglaMaterial, carasArray = []) {
+    const { numero, tipo } = dienteSeleccionado;
+    const inputName = nombreInputParaDiente(tipo, numero);
+    const input = inputName ? document.querySelector(`input[name="${inputName}"]`) : null;
+    if (!input) return;
+
+    // En la casilla va únicamente la sigla del material
+    input.value = siglaMaterial || '';
+    input.dataset.carasRestauracion = (carasArray || []).join(',');
+
+    if (siglaMaterial) {
+        input.classList.remove('text-red-600', 'border-red-600');
+        input.classList.add('text-blue-600', 'font-bold', 'border-blue-600');
+    } else {
+        input.classList.remove('text-blue-600', 'font-bold', 'border-blue-600');
+    }
+}
+
+function limpiarRestauracion() {
+    if (!dienteSeleccionado.elemento) return;
+    const { numero, tipo, elemento } = dienteSeleccionado;
+    restauracionPendiente = { caras: [], material: '' };
+
+    const inputName = nombreInputParaDiente(tipo, numero);
+    const input = inputName ? document.querySelector(`input[name="${inputName}"]`) : null;
+    if (input) {
+        input.value = '';
+        input.classList.remove('text-blue-600', 'font-bold', 'border-blue-600', 'text-red-600', 'border-red-600');
+    }
+
+    dibujarRestauracion(elemento.querySelector('g'), [], numero);
+    abrirSubmenuRestauracion(false);
+}
+
+function limpiarRestauracionSVG(grupoDiente) {
+    grupoDiente.querySelectorAll('.cara-restauracion-activa').forEach(el => {
+        if (el.tagName.toLowerCase() === 'polygon') {
+            el.remove();
+        } else {
+            el.style.fill = '';
+            el.classList.remove('cara-restauracion-activa');
+        }
+    });
+}
+
+function dibujarRestauracion(grupoDiente, caras, numeroDiente = null) {
+    if (!grupoDiente) return;
+    limpiarRestauracionSVG(grupoDiente);
+    if (!caras || caras.length === 0) return;
+
+    const num = parseInt(numeroDiente || (dienteSeleccionado ? dienteSeleccionado.numero : 0), 10);
+    const esCuadranteDerecho = [1, 4, 5, 8].includes(Math.floor(num / 10));
+    const esInferior = (num >= 31 && num <= 48) || (num >= 71 && num <= 85);
+
+    if (grupoDiente.querySelector('[data-cara]')) {
+        const mapaCaras = {
+            vestibular: 'superior',
+            lingual: 'inferior',
+            central: 'central',
+            mesial: esCuadranteDerecho ? 'derecha' : 'izquierda',
+            distal: esCuadranteDerecho ? 'izquierda' : 'derecha'
+        };
+        caras.forEach(cara => {
+            const pathCara = grupoDiente.querySelector(`[data-cara="${mapaCaras[cara]}"]`);
+            if (pathCara) {
+                pathCara.style.fill = '#2563eb';
+                pathCara.classList.add('cara-restauracion-activa');
+            }
+        });
+    } else {
+        let bb = { x: 2, y: 2, width: 24, height: 71 };
+        try {
+            const forma = grupoDiente.querySelector('.tooth-shape');
+            const medida = forma ? forma.getBBox() : null;
+            if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+        } catch (err) {}
+
+        const x0 = bb.x + 2.5;
+        const x1 = bb.x + bb.width - 2.5;
+        const y0 = bb.y + bb.height * 0.68;
+        const y1 = bb.y + bb.height - 2.5;
+        const ix0 = x0 + 4.5;
+        const ix1 = x1 - 4.5;
+        const iy0 = y0 + 4.5;
+        const iy1 = y1 - 4.5;
+
+        const caraArriba = esInferior ? 'lingual' : 'vestibular';
+        const caraAbajo = esInferior ? 'vestibular' : 'lingual';
+        const caraIzq = esCuadranteDerecho ? 'distal' : 'mesial';
+        const caraDer = esCuadranteDerecho ? 'mesial' : 'distal';
+
+        const poligonos = {
+            [caraArriba]: `${x0},${y0} ${x1},${y0} ${ix1},${iy0} ${ix0},${iy0}`,
+            [caraAbajo]:  `${x0},${y1} ${x1},${y1} ${ix1},${iy1} ${ix0},${iy1}`,
+            [caraIzq]:    `${x0},${y0} ${ix0},${iy0} ${ix0},${iy1} ${x0},${y1}`,
+            [caraDer]:    `${x1},${y0} ${ix1},${iy0} ${ix1},${iy1} ${x1},${y1}`,
+            central:      `${ix0},${iy0} ${ix1},${iy0} ${ix1},${iy1} ${ix0},${iy1}`
+        };
+
+        caras.forEach(cara => {
+            if (!poligonos[cara]) return;
+            const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            poly.setAttribute('class', 'cara-restauracion-activa');
+            poly.setAttribute('points', poligonos[cara]);
+            poly.setAttribute('fill', '#2563eb');
+            poly.setAttribute('stroke', '#1d4ed8');
+            poly.setAttribute('stroke-width', '0.7');
+            grupoDiente.appendChild(poly);
+        });
+    }
+}     
       function guardarYMarcarTransposicion() {
             const dBase = parseInt(dienteSeleccionado.numero, 10);
             const dParInput = parseInt(document.getElementById('transDientePar').value, 10);
@@ -5214,7 +5524,30 @@ function guardarYMarcarOrtodonciaFija() {
           el.addEventListener('click', () => {
                     const inputName = nombreInputParaDiente(tipo, num);
                     const input = inputName ? document.querySelector(`input[name="${inputName}"]`) : null;
-                    
+                                const restExistente = input ? obtenerRestauracionDesdeInput(input) : { caras: [], material: '' };
+
+                    // Rescatar caras pintadas en el SVG si el input no trajo nada
+                    const grupoDiente = el.querySelector('g');
+                    const carasSVG = grupoDiente ? obtenerCarasPintadasEnSVG(grupoDiente, num) : [];
+                    if (!restExistente.material && restExistente.caras.length === 0 && carasSVG.length > 0) {
+                        restExistente.caras = carasSVG;
+                    }
+
+                    restauracionPendiente = {
+                        caras: [...restExistente.caras],
+                        material: restExistente.material
+                    };
+
+                    if (restExistente.material || restExistente.caras.length > 0) {
+                        abrirModal(num, tipo, el);
+                        if (grupoDiente && restExistente.caras.length > 0) {
+                            const carasNombres = restauracionPendiente.caras.map(s => CARA_DESDE_SIGLA[s]).filter(Boolean);
+                            dibujarRestauracion(grupoDiente, carasNombres, num);
+                        }
+                        abrirSubmenuRestauracion(false);
+                        return;
+                    }
+
                     if (input && input.value && input.value.startsWith('MIG')) {
                         if (input.value.includes('IZQ')) {
                             input.value = 'MIG-DER';
