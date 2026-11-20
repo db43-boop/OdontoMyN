@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="es">
 
@@ -124,7 +124,7 @@
         </div>
 
         <form method="POST"  class="space-y-6 no-print-btn">
-
+<input type="hidden" name="caras_restauracion" id="inputCarasRestauracion" value="" />
             <input type="hidden" name="imagenes_dientes" id="inputImagenesDientes" value="" />
             <input type="hidden" name="notas_endodoncia" id="inputNotasEndodoncia" value="" />
             {% if historia and historia.get('id') %}
@@ -2241,7 +2241,15 @@
 
         function abrirModal(numero, tipo, elemento) {
             dienteSeleccionado = { numero, tipo, elemento };
- restauracionPendiente = { caras: [], material: '' };
+
+            const inputName = nombreInputParaDiente(tipo, numero);
+            const input = inputName ? document.querySelector(`input[name="${inputName}"]`) : null;
+            const actual = obtenerRestauracionActual(input, elemento, numero);
+            restauracionPendiente = {
+                caras: [...actual.caras],
+                material: actual.material
+            };
+
             document.getElementById('dienteNum').textContent = numero;
 
             // Limpiar el buscador cada vez que se abre el modal
@@ -2281,7 +2289,7 @@
                     aplicarOpcion(op);
 
                     // Si es 1.7, 1.23, 1.33, etc., NO cerramos el modal para ver los sub-botones
-                    if (op.codigo !=="1.1" && op.codigo !== "1.2" && op.codigo !== "1.3" && op.codigo !== "1.24" && op.codigo !== "1.25" && op.codigo !=="1.28" && op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33" && op.codigo !== "1.31" && op.codigo !== "1.4" && op.codigo !== "1.16" && op.codigo !== "1.26" && op.codigo !== "1.32") {
+                    if (op.codigo !=="1.1" && op.codigo !== "1.2" && op.codigo !== "1.3" && op.codigo !== "1.24" && op.codigo !== "1.25" && op.codigo !=="1.28" && op.codigo !== "1.29" && op.codigo !== "1.7" && op.codigo !== "1.23" && op.codigo !== "1.33" && op.codigo !== "1.31" && op.codigo !== "1.4" && op.codigo !== "1.16" && op.codigo !== "1.26" && op.codigo !== "1.32") {
                         cerrarModal();
                         cerrarModal();
                     }
@@ -3802,7 +3810,7 @@ function abrirSubmenuRestauracion(inicializarDesdeInput = false) {
 // Solo colorea el diente en azul; NO escribe nada en la casilla
 function toggleCaraRestauracion(caraSeleccionada) {
     if (!dienteSeleccionado.elemento) return;
-    const { numero, elemento } = dienteSeleccionado;
+    const { numero, tipo, elemento } = dienteSeleccionado;
     const sigla = ABREVIATURA_CARA[caraSeleccionada] || caraSeleccionada.toUpperCase();
 
     restauracionPendiente.caras = restauracionPendiente.caras.includes(sigla)
@@ -3813,7 +3821,12 @@ function toggleCaraRestauracion(caraSeleccionada) {
     const carasNombres = restauracionPendiente.caras.map(s => CARA_DESDE_SIGLA[s]).filter(Boolean);
     dibujarRestauracion(grupoDiente, carasNombres, numero);
 
-    // Si ya había material elegido y se modifican caras, actualizamos "MATERIAL:CARAS" en la casilla
+    const inputName = nombreInputParaDiente(tipo, numero);
+    const input = inputName ? document.querySelector(`input[name="${inputName}"]`) : null;
+    if (input) {
+        input.dataset.carasRestauracion = restauracionPendiente.caras.join(',');
+    }
+
     if (restauracionPendiente.material) {
         escribirMaterialEnCasilla(restauracionPendiente.material, restauracionPendiente.caras);
     }
@@ -3856,6 +3869,7 @@ function limpiarRestauracion() {
     const input = inputName ? document.querySelector(`input[name="${inputName}"]`) : null;
     if (input) {
         input.value = '';
+        delete input.dataset.carasRestauracion;
         input.classList.remove('text-blue-600', 'font-bold', 'border-blue-600', 'text-red-600', 'border-red-600');
     }
 
@@ -5683,7 +5697,14 @@ function guardarYMarcarOrtodonciaFija() {
 
             document.getElementById('inputImagenesDientes').value = JSON.stringify(imagenesDientes);
             document.getElementById('inputNotasEndodoncia').value = JSON.stringify(notasEndodoncia);
-
+const carasRestauracionMap = {};
+document.querySelectorAll('input[name^="rec_"]').forEach((inp) => {
+    if (inp.dataset.carasRestauracion) {
+        const match = inp.name.match(/(\d+)$/);
+        if (match) carasRestauracionMap[match[1]] = inp.dataset.carasRestauracion;
+    }
+});
+document.getElementById('inputCarasRestauracion').value = JSON.stringify(carasRestauracionMap);
         });
 
 
@@ -5869,7 +5890,17 @@ function guardarYMarcarOrtodonciaFija() {
                     console.error('Error cargando notas de endodoncia:', e);
                 }
             }
-
+let carasRestauracionGuardadas = {};
+if (historiaData.caras_restauracion) {
+    try {
+        carasRestauracionGuardadas = typeof historiaData.caras_restauracion === 'string'
+            ? JSON.parse(historiaData.caras_restauracion)
+            : historiaData.caras_restauracion;
+    } catch (e) {
+        console.error('Error cargando caras de restauración:', e);
+    }
+}
+const siglasRestauracion = MATERIALES_RESTAURACION.map(m => m.sigla);
 
             
            // 3. RESTAURAR LOS GRÁFICOS SVG SEGÚN EL VALOR EXACTO DE CADA CASILLA
@@ -6104,6 +6135,27 @@ else if (valorCasilla === 'CT') {
                 dibujarGeminacionFusion(grupoDiente, num, 'derecha');
             }
         }
+        // --- RESTAURACIÓN (AM, R, IM, IE, IV) ---
+else if (siglasRestauracion.includes(valorCasilla)) {
+    const inputEl = inputName ? document.querySelector(`input[name="${inputName}"]`) : null;
+    const carasStr = carasRestauracionGuardadas[num] || '';
+
+    if (inputEl && carasStr) {
+        inputEl.dataset.carasRestauracion = carasStr;
+    }
+
+    const carasSiglas = carasStr
+        .split(',')
+        .map(s => s.trim().toUpperCase())
+        .filter(Boolean);
+    const carasNombres = carasSiglas
+        .map(s => CARA_DESDE_SIGLA[s])
+        .filter(Boolean);
+
+    if (carasNombres.length > 0) {
+        dibujarRestauracion(grupoDiente, carasNombres, num);
+    }
+}
         // --- L. CARIES (V, L, M, D, O) ---
 else {
     const carasSiglas = obtenerCarasActivasDesdeInput({ value: valorCasilla });
