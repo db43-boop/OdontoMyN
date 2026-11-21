@@ -124,6 +124,7 @@ def _definiciones_columnas():
         "especificaciones_odontograma TEXT",
         "imagenes_dientes TEXT",
         "caras_restauracion TEXT",
+        "caras_restauracion_temp TEXT",
     ]
     definiciones += [f"{nombre} TEXT" for nombre in _columnas_examen_clinico()]
     definiciones += [f"{nombre} TEXT" for nombre in _columnas_odontograma()]
@@ -169,6 +170,7 @@ def _nombres_columnas():
         "especificaciones_odontograma",
         "imagenes_dientes",
         "caras_restauracion",
+        "caras_restauracion_temp",
     ]
     nombres += _columnas_examen_clinico()
     nombres += _columnas_odontograma()

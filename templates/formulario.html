@@ -125,6 +125,7 @@
 
         <form method="POST"  class="space-y-6 no-print-btn">
 <input type="hidden" name="caras_restauracion" id="inputCarasRestauracion" value="" />
+<input type="hidden" name="caras_restauracion_temp" id="inputCarasRestauracionTemp" value="" />
             <input type="hidden" name="imagenes_dientes" id="inputImagenesDientes" value="" />
             <input type="hidden" name="notas_endodoncia" id="inputNotasEndodoncia" value="" />
             {% if historia and historia.get('id') %}
@@ -2239,7 +2240,7 @@
 
         }
 
-        function abrirModal(numero, tipo, elemento) {
+      function abrirModal(numero, tipo, elemento) {
             dienteSeleccionado = { numero, tipo, elemento };
 
             const inputName = nombreInputParaDiente(tipo, numero);
@@ -2256,8 +2257,20 @@
             const buscador = document.getElementById('buscadorCOP');
             if (buscador) buscador.value = '';
 
-            // Dibujar la lista completa inicialmente
-            renderizarListaOpciones(opcionesCOP);
+            // Si el diente ya tiene restauración temporal, ir directo a su submenú
+            const tieneRestTemp = Boolean(
+                input && (
+                    (input.value || '').trim().toUpperCase() === 'RT' ||
+                    (input.dataset && input.dataset.carasRestauracionTemp && input.dataset.carasRestauracionTemp.trim() !== '')
+                )
+            );
+
+            if (tieneRestTemp && typeof abrirSubmenuRestauracionTemporal === 'function') {
+                abrirSubmenuRestauracionTemporal();
+            } else {
+                // Dibujar la lista completa inicialmente
+                renderizarListaOpciones(opcionesCOP);
+            }
 
             // Mostrar preview si existe imagen guardada para este diente
             const preview = document.getElementById('previewImagenDiente');
@@ -2274,7 +2287,6 @@
             modal.style.display = 'flex';
             modal.setAttribute('aria-hidden', 'false');
         }
-
         function renderizarListaOpciones(arrayOpciones) {
             const lista = document.getElementById('listaOpcionesCOP');
             lista.innerHTML = '';
@@ -3449,6 +3461,9 @@ else if (op.codigo === "1.17") {
                 // Cerrar el modal automáticamente
                 cerrarModal();
                 return;
+            } else if (op.codigo === "1.29") {
+                abrirSubmenuRestauracionTemporal();
+                return;
             }
         }
         function abrirSubmenuCaries() {
@@ -3509,7 +3524,176 @@ const CARA_DESDE_SIGLA = {
     O: 'central',
     '0': 'central'
 };
+let carasRestTempActuales = [];
 
+function abrirSubmenuRestauracionTemporal() {
+    if (!dienteSeleccionado.elemento) return;
+    const { numero, tipo, elemento } = dienteSeleccionado;
+    const inputName = nombreInputParaDiente(tipo, numero);
+    const input = inputName ? document.querySelector(`input[name="${inputName}"]`) : null;
+
+    const raw = (input?.dataset.carasRestauracionTemp || '').trim().toUpperCase();
+    carasRestTempActuales = raw
+        ? raw.split(',').map(s => s.trim()).filter(s => ['V', 'L', 'M', 'D', 'O'].includes(s))
+        : [];
+
+    const claseBtn = (sigla) => carasRestTempActuales.includes(sigla)
+        ? 'p-2 border-2 border-red-700 rounded bg-red-600 text-white font-bold text-xs shadow-sm'
+        : 'p-2 border border-red-300 rounded bg-red-50 hover:bg-red-100 text-red-800 font-bold text-xs';
+
+    const lista = document.getElementById('listaOpcionesCOP');
+    lista.innerHTML = `
+        <li class="mb-2 font-bold text-slate-700 text-xs uppercase bg-red-50 p-2 rounded border border-red-200 flex justify-between items-center">
+            <span>1.29 Restauración Temporal - Diente ${numero}</span>
+            <span class="text-[11px] font-mono bg-white px-2 py-0.5 rounded border border-red-200 text-red-700">
+                ${carasRestTempActuales.length ? carasRestTempActuales.join(',') : 'Ninguna'}
+            </span>
+        </li>
+        <div class="grid grid-cols-2 gap-1.5 mb-2">
+            <button type="button" class="${claseBtn('V')}" onclick="toggleCaraRestTemp('vestibular')">Vestibular (V)</button>
+            <button type="button" class="${claseBtn('L')}" onclick="toggleCaraRestTemp('lingual')">Lingual / Pal. (L)</button>
+            <button type="button" class="${claseBtn('M')}" onclick="toggleCaraRestTemp('mesial')">Mesial (M)</button>
+            <button type="button" class="${claseBtn('D')}" onclick="toggleCaraRestTemp('distal')">Distal (D)</button>
+            <button type="button" class="col-span-2 ${claseBtn('O')}" onclick="toggleCaraRestTemp('central')">Oclusal / Incisal (O)</button>
+        </div>
+        <div class="grid grid-cols-2 gap-1.5 mt-2">
+            <button type="button" class="p-2 border border-red-200 rounded bg-white hover:bg-red-50 text-red-700 text-xs font-bold transition cursor-pointer" onclick="limpiarRestTemp()">
+                Limpiar
+            </button>
+            <button type="button" class="p-2 border border-slate-800 rounded bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition cursor-pointer" onclick="cerrarModal()">
+                Listo / Cerrar
+            </button>
+        </div>
+        <li class="mt-2">
+            <button type="button" class="w-full text-center p-2 border border-slate-300 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer" onclick="abrirModal(${dienteSeleccionado.numero}, '${dienteSeleccionado.tipo}', dienteSeleccionado.elemento)">
+                &larr; Volver a la lista principal
+            </button>
+        </li>
+    `;
+}
+
+function toggleCaraRestTemp(caraSeleccionada) {
+    if (!dienteSeleccionado.elemento) return;
+    const { numero, tipo, elemento } = dienteSeleccionado;
+    const sigla = ABREVIATURA_CARA[caraSeleccionada] || caraSeleccionada.toUpperCase();
+
+    carasRestTempActuales = carasRestTempActuales.includes(sigla)
+        ? carasRestTempActuales.filter(c => c !== sigla)
+        : [...carasRestTempActuales, sigla];
+
+    const inputName = nombreInputParaDiente(tipo, numero);
+    const input = inputName ? document.querySelector(`input[name="${inputName}"]`) : null;
+    if (input) {
+        input.dataset.carasRestauracionTemp = carasRestTempActuales.join(',');
+        input.classList.remove('text-blue-600', 'border-blue-600');
+        if (carasRestTempActuales.length > 0) {
+            input.value = 'RT';
+            input.classList.add('text-red-600', 'font-bold', 'border-red-600');
+        } else {
+            input.value = '';
+            input.classList.remove('text-red-600', 'font-bold', 'border-red-600');
+        }
+    }
+
+    const carasNombres = carasRestTempActuales.map(s => CARA_DESDE_SIGLA[s]).filter(Boolean);
+    dibujarRestauracionTemporal(elemento.querySelector('g'), carasNombres, numero);
+    abrirSubmenuRestauracionTemporal();
+}
+
+function limpiarRestTemp() {
+    if (!dienteSeleccionado.elemento) return;
+    const { numero, tipo, elemento } = dienteSeleccionado;
+    carasRestTempActuales = [];
+
+    const inputName = nombreInputParaDiente(tipo, numero);
+    const input = inputName ? document.querySelector(`input[name="${inputName}"]`) : null;
+    if (input) {
+        delete input.dataset.carasRestauracionTemp;
+        input.value = '';
+        input.classList.remove('text-red-600', 'font-bold', 'border-red-600', 'text-blue-600', 'border-blue-600');
+    }
+
+    dibujarRestauracionTemporal(elemento.querySelector('g'), [], numero);
+    abrirSubmenuRestauracionTemporal();
+}
+
+function dibujarRestauracionTemporal(grupoDiente, caras, numeroDiente = null) {
+    if (!grupoDiente) return;
+    grupoDiente.querySelectorAll('.contorno-rest-temp').forEach(el => {
+        if (el.tagName.toLowerCase() === 'polygon') {
+            el.remove();
+        } else {
+            el.style.stroke = '';
+            el.style.strokeWidth = '';
+            el.style.fill = '';
+            el.classList.remove('contorno-rest-temp');
+        }
+    });
+    if (!caras || caras.length === 0) return;
+
+    const num = parseInt(numeroDiente || (dienteSeleccionado ? dienteSeleccionado.numero : 0), 10);
+    const esCuadranteDerecho = [1, 4, 5, 8].includes(Math.floor(num / 10));
+    const esInferior = (num >= 31 && num <= 48) || (num >= 71 && num <= 85);
+
+    if (grupoDiente.querySelector('[data-cara]')) {
+        const mapaCaras = {
+            vestibular: 'superior',
+            lingual: 'inferior',
+            central: 'central',
+            mesial: esCuadranteDerecho ? 'derecha' : 'izquierda',
+            distal: esCuadranteDerecho ? 'izquierda' : 'derecha'
+        };
+        caras.forEach(cara => {
+            const pathCara = grupoDiente.querySelector(`[data-cara="${mapaCaras[cara]}"]`);
+            if (pathCara) {
+                pathCara.style.fill = 'none';
+                pathCara.style.stroke = '#dc2626';
+                pathCara.style.strokeWidth = '1.8';
+                pathCara.classList.add('contorno-rest-temp');
+            }
+        });
+    } else {
+        let bb = { x: 2, y: 2, width: 24, height: 71 };
+        try {
+            const forma = grupoDiente.querySelector('.tooth-shape');
+            const medida = forma ? forma.getBBox() : null;
+            if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+        } catch (err) {}
+
+        const x0 = bb.x + 2.5;
+        const x1 = bb.x + bb.width - 2.5;
+        const y0 = bb.y + bb.height * 0.68;
+        const y1 = bb.y + bb.height - 2.5;
+        const ix0 = x0 + 4.5;
+        const ix1 = x1 - 4.5;
+        const iy0 = y0 + 4.5;
+        const iy1 = y1 - 4.5;
+
+        const caraArriba = esInferior ? 'lingual' : 'vestibular';
+        const caraAbajo = esInferior ? 'vestibular' : 'lingual';
+        const caraIzq = esCuadranteDerecho ? 'distal' : 'mesial';
+        const caraDer = esCuadranteDerecho ? 'mesial' : 'distal';
+
+        const poligonos = {
+            [caraArriba]: `${x0},${y0} ${x1},${y0} ${ix1},${iy0} ${ix0},${iy0}`,
+            [caraAbajo]:  `${x0},${y1} ${x1},${y1} ${ix1},${iy1} ${ix0},${iy1}`,
+            [caraIzq]:    `${x0},${y0} ${ix0},${iy0} ${ix0},${iy1} ${x0},${y1}`,
+            [caraDer]:    `${x1},${y0} ${ix1},${iy0} ${ix1},${iy1} ${x1},${y1}`,
+            central:      `${ix0},${iy0} ${ix1},${iy0} ${ix1},${iy1} ${ix0},${iy1}`
+        };
+
+        caras.forEach(cara => {
+            if (!poligonos[cara]) return;
+            const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            poly.setAttribute('class', 'contorno-rest-temp');
+            poly.setAttribute('points', poligonos[cara]);
+            poly.setAttribute('fill', 'none');
+            poly.setAttribute('stroke', '#dc2626');
+            poly.setAttribute('stroke-width', '1.6');
+            grupoDiente.appendChild(poly);
+        });
+    }
+}
 function obtenerCarasActivasDesdeInput(input) {
     if (!input || !input.value.trim()) return [];
     const partes = input.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
@@ -5705,6 +5889,19 @@ document.querySelectorAll('input[name^="rec_"]').forEach((inp) => {
     }
 });
 document.getElementById('inputCarasRestauracion').value = JSON.stringify(carasRestauracionMap);
+const carasTempMap = {};
+document.querySelectorAll('input[name^="rec_"]').forEach((inp) => {
+    if (inp.dataset.carasRestauracionTemp) {
+        const match = inp.name.match(/(\d+)$/);
+        if (match) {
+            carasTempMap[match[1]] = inp.dataset.carasRestauracionTemp;
+        }
+    }
+});
+const inputCarasTemp = document.getElementById('inputCarasRestauracionTemp');
+if (inputCarasTemp) {
+    inputCarasTemp.value = JSON.stringify(carasTempMap);
+}
         });
 
 
@@ -5900,6 +6097,15 @@ if (historiaData.caras_restauracion) {
         console.error('Error cargando caras de restauración:', e);
     }
 }
+let carasTempGuardadas = {};
+if (historiaData.caras_restauracion_temp) {
+    try {
+        carasTempGuardadas = typeof historiaData.caras_restauracion_temp === 'string'
+            ? JSON.parse(historiaData.caras_restauracion_temp)
+            : historiaData.caras_restauracion_temp;
+    } catch (e) {}
+}
+
 const siglasRestauracion = MATERIALES_RESTAURACION.map(m => m.sigla);
 
             
@@ -6154,6 +6360,28 @@ else if (siglasRestauracion.includes(valorCasilla)) {
 
     if (carasNombres.length > 0) {
         dibujarRestauracion(grupoDiente, carasNombres, num);
+    }
+}
+
+const carasTempStr = carasTempGuardadas[num] || '';
+if (valorCasilla === 'RT' || carasTempStr) {
+    const inputEl = inputName ? document.querySelector(`input[name="${inputName}"]`) : null;
+    if (inputEl) {
+        if (carasTempStr) {
+            inputEl.dataset.carasRestauracionTemp = carasTempStr;
+        }
+        inputEl.classList.remove('text-blue-600', 'border-blue-600');
+        inputEl.classList.add('text-red-600', 'font-bold', 'border-red-600');
+    }
+    const carasNombres = carasTempStr
+        .split(',')
+        .map(s => s.trim().toUpperCase())
+        .filter(Boolean)
+        .map(s => CARA_DESDE_SIGLA[s])
+        .filter(Boolean);
+
+    if (carasNombres.length > 0 && typeof dibujarRestauracionTemporal === 'function') {
+        dibujarRestauracionTemporal(grupoDiente, carasNombres, num);
     }
 }
         // --- L. CARIES (V, L, M, D, O) ---
