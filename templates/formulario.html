@@ -4313,48 +4313,63 @@ function dibujarRestauracion(grupoDiente, caras, numeroDiente = null) {
     gTrans.appendChild(path2);
     capaTrans.appendChild(gTrans);
 }
-        function dibujarMigracionDiente(grupoDiente, valorCasilla) {
-            grupoDiente.querySelectorAll('.marca-migracion').forEach(p => p.remove());
-            if (!valorCasilla || !valorCasilla.startsWith('MIG')) return;
+       function dibujarMigracionDiente(grupoDiente, valorCasilla) {
+    grupoDiente.querySelectorAll('.marca-migracion').forEach(p => p.remove());
+    if (!valorCasilla || !valorCasilla.startsWith('MIG')) return;
 
-            const esIzquierda = valorCasilla.includes('IZQ');
-            let bb = { x: 2, y: 2, width: 24, height: 71 };
-            try {
-                const forma = grupoDiente.querySelector('.tooth-shape');
-                const medida = forma ? forma.getBBox() : null;
-                if (medida && medida.width > 0 && medida.height > 0) bb = medida;
-            } catch (err) {}
+    const esIzquierda = valorCasilla.includes('IZQ');
+    let bb = { x: 2, y: 2, width: 24, height: 71 };
+    try {
+        const forma = grupoDiente.querySelector('.tooth-shape');
+        const medida = forma ? forma.getBBox() : null;
+        if (medida && medida.width > 0 && medida.height > 0) bb = medida;
+    } catch (err) {}
 
-            const cx = bb.x + bb.width / 2;
-            const yOclusal = bb.y + bb.height * 1.10; 
-            const largoLinea = bb.width * 1.2; 
-            const dir = esIzquierda ? -1 : 1;
+    // Detectar número de diente FDI
+    const toothEl = grupoDiente.closest('.tooth');
+    const numAttr = toothEl?.dataset?.diente || toothEl?.dataset?.numero || toothEl?.id || '';
+    const numMatch = String(numAttr).match(/\d+/);
+    const numDiente = numMatch ? parseInt(numMatch[0], 10) : (dienteSeleccionado?.numero || null);
 
-            // 1. Línea horizontal de la flecha
-            const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            linea.setAttribute('class', 'marca-migracion');
-            linea.setAttribute('x1', cx - (largoLinea / 2) * dir);
-            linea.setAttribute('y1', yOclusal);
-            linea.setAttribute('x2', cx + (largoLinea / 2) * dir);
-            linea.setAttribute('y2', yOclusal);
-            linea.setAttribute('stroke', '#2563eb');
-            linea.setAttribute('stroke-width', '2');
-            grupoDiente.appendChild(linea);
+    // Constantes separadas para dientes de 3 raíces
+    const DIENTES_TRES_RAICES = [16, 17, 18, 26, 27, 28];
+    const esTresRaices = numDiente ? DIENTES_TRES_RAICES.includes(numDiente) : false;
+    const factorY_TresRaices = 1.10;   // Multiplicador propio para 3 raíces
+    const offsetY_TresRaices = 27;     // Ajuste extra en Y solo para 3 raíces (súbelo o bájalo a gusto)
 
-            // 2. Punta de la flecha
-            const puntaX = cx + (largoLinea / 2) * dir;
-            const punta = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-            punta.setAttribute('class', 'marca-migracion');
-            
-            if (esIzquierda) {
-                punta.setAttribute('points', `${puntaX},${yOclusal} ${puntaX + 5},${yOclusal - 4} ${puntaX + 5},${yOclusal + 4}`);
-            } else {
-                punta.setAttribute('points', `${puntaX},${yOclusal} ${puntaX - 5},${yOclusal - 4} ${puntaX - 5},${yOclusal + 4}`);
-            }
-            
-            punta.setAttribute('fill', '#2563eb');
-            grupoDiente.appendChild(punta);
-        }
+    const cx = bb.x + bb.width / 2;
+    const yOclusal = esTresRaices
+        ? bb.y + bb.height * factorY_TresRaices + offsetY_TresRaices
+        : bb.y + bb.height * 1.10;
+
+    const largoLinea = bb.width * 1.2;
+    const dir = esIzquierda ? -1 : 1;
+
+    // 1. Línea horizontal de la flecha
+    const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    linea.setAttribute('class', 'marca-migracion');
+    linea.setAttribute('x1', cx - (largoLinea / 2) * dir);
+    linea.setAttribute('y1', yOclusal);
+    linea.setAttribute('x2', cx + (largoLinea / 2) * dir);
+    linea.setAttribute('y2', yOclusal);
+    linea.setAttribute('stroke', '#2563eb');
+    linea.setAttribute('stroke-width', '2');
+    grupoDiente.appendChild(linea);
+
+    // 2. Punta de la flecha
+    const puntaX = cx + (largoLinea / 2) * dir;
+    const punta = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    punta.setAttribute('class', 'marca-migracion');
+
+    if (esIzquierda) {
+        punta.setAttribute('points', `${puntaX},${yOclusal} ${puntaX + 5},${yOclusal - 4} ${puntaX + 5},${yOclusal + 4}`);
+    } else {
+        punta.setAttribute('points', `${puntaX},${yOclusal} ${puntaX - 5},${yOclusal - 4} ${puntaX - 5},${yOclusal + 4}`);
+    }
+
+    punta.setAttribute('fill', '#2563eb');
+    grupoDiente.appendChild(punta);
+}
 function dibujarGiroversionDiente(grupoDiente, valorCasilla) {
             grupoDiente.querySelectorAll('.marca-giroversion').forEach(p => p.remove());
             if (!valorCasilla || !valorCasilla.startsWith('GIV')) return;

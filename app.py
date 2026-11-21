@@ -270,24 +270,44 @@ def nueva_historia():
     return render_template("formulario.html", siguiente_n=siguiente_n)
 
 
-@app.route("/ver/<int:id>")
+@app.route("/ver/<int:id>", methods=["GET", "POST"])
 def ver_historia(id):
+    if request.method == "POST":
+        data = request.form
+        nombres = _nombres_columnas()
+        set_clause = ", ".join([f"{nombre} = ?" for nombre in nombres])
+        valores = tuple(data.get(nombre) for nombre in nombres) + (id,)
+
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        cursor.execute(
+            f"""
+            UPDATE historias
+            SET {set_clause}
+            WHERE id = ?
+        """,
+            valores,
+        )
+        conn.commit()
+        conn.close()
+        return redirect(url_for("dashboard"))
+
     conn = sqlite3.connect(db_path)
-    
+
     # LÍNEA Mágica: Hace que SQLite devuelva los datos como un diccionario basado en los nombres reales de las columnas
-    conn.row_factory = sqlite3.Row 
-    
+    conn.row_factory = sqlite3.Row
+
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM historias WHERE id = ?", (id,))
     row = cursor.fetchone()
     conn.close()
-    
+
     if not row:
         return redirect(url_for("dashboard"))
-    
+
     # Convertimos la fila de sqlite3 directamente a un diccionario limpio
     historia = dict(row)
-    
+
     siguiente_n = historia.get("n_historia") or str(1).zfill(2)
     return render_template("formulario.html", siguiente_n=siguiente_n, historia=historia)
 
